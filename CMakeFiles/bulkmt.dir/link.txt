@@ -1,0 +1,1 @@
+/usr/bin/g++    -rdynamic CMakeFiles/bulkmt.dir/bulkmt.cpp.o  -o bulkmt libhomework_10.a libinput_processor.a libinput_reader.a libpublisher_mt.a -lpthread 

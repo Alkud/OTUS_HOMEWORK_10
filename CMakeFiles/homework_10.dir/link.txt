@@ -1,0 +1,2 @@
+/usr/bin/ar qc libhomework_10.a  CMakeFiles/homework_10.dir/library/homework_10.cpp.o
+/usr/bin/ranlib libhomework_10.a

@@ -1,0 +1,15 @@
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/install/local.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/install.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/install/strip.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/list_install_components.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/edit_cache.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/test.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/package.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/otus_hw_10_test.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/publisher_mt.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/input_reader.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/input_processor.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/rebuild_cache.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/homework_10.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/package_source.dir
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/bulkmt.dir

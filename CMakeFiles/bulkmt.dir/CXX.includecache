@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/./library/homework_10.h
+iostream
+-
+
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/bulkmt.cpp
+./library/homework_10.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/./library/homework_10.h
+stdexcept
+-
+iostream
+-
+
