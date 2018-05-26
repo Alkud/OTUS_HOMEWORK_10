@@ -63,9 +63,9 @@ CMAKE_BINARY_DIR = /home/travis/build/Alkud/OTUS_HOMEWORK_10
 # Target rules for target CMakeFiles/otus_hw_10_test.dir
 
 # All Build rule for target.
-CMakeFiles/otus_hw_10_test.dir/all: CMakeFiles/homework_10.dir/all
 CMakeFiles/otus_hw_10_test.dir/all: CMakeFiles/input_reader.dir/all
 CMakeFiles/otus_hw_10_test.dir/all: CMakeFiles/input_processor.dir/all
+CMakeFiles/otus_hw_10_test.dir/all: CMakeFiles/homework_10.dir/all
 CMakeFiles/otus_hw_10_test.dir/all: CMakeFiles/publisher_mt.dir/all
 	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/depend
 	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/build
@@ -253,9 +253,9 @@ clean: CMakeFiles/homework_10.dir/clean
 # Target rules for target CMakeFiles/bulkmt.dir
 
 # All Build rule for target.
-CMakeFiles/bulkmt.dir/all: CMakeFiles/homework_10.dir/all
 CMakeFiles/bulkmt.dir/all: CMakeFiles/input_reader.dir/all
 CMakeFiles/bulkmt.dir/all: CMakeFiles/input_processor.dir/all
+CMakeFiles/bulkmt.dir/all: CMakeFiles/homework_10.dir/all
 CMakeFiles/bulkmt.dir/all: CMakeFiles/publisher_mt.dir/all
 	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/depend
 	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/build
