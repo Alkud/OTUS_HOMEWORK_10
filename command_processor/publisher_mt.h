@@ -8,9 +8,12 @@
 #include <memory>
 #include <atomic>
 #include <thread>
+#include <condition_variable>
 
 class Publisher : public NotificationListener,
-                  public std::enable_shared_from_this<Publisher>
+                  public MessageListener,
+                  public MessageBroadcaster,
+                  public std::enable_shared_from_this<NotificationListener>
 {
 public:
 
@@ -20,7 +23,11 @@ public:
 
   ~Publisher();
 
+  void start();
+
   void reactNotification(NotificationBroadcaster* sender) override;
+
+  void reactMessage(MessageBroadcaster* sender, Message message) override;
 
 private:
 
@@ -32,14 +39,18 @@ private:
 
   void run();
 
-  void publish();
+  bool publish();
 
-  std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>> buffer;
+  using DataType = std::pair<size_t, std::string>;
+
+  std::shared_ptr<SmartBuffer<DataType>> buffer;
   std::ostream& output;
   std::mutex& outputLock;  
 
   bool shouldExit;
   std::atomic<size_t> notificationsCount;
+  std::condition_variable threadNotifier{};
+  std::mutex notifierLock;
 
   std::thread workingThread;
   MetricsRecord threadMetrics;

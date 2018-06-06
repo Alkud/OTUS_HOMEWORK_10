@@ -3,7 +3,12 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
+class MessageBroadcaster;
+class NotificationBroadcaster;
+
+enum class Message;
 /// Base class for message broadcast subscribers
 class MessageListener
 {
@@ -12,7 +17,7 @@ public:
   virtual ~MessageListener(){}
 
   /// Describes object's reaction to a message
-  virtual void reactMessage(class MessageBroadcaster* sender, std::string message) = 0;
+  virtual void reactMessage(MessageBroadcaster* sender, Message message) = 0;
 };
 
 class NotificationListener
@@ -22,5 +27,5 @@ public:
   virtual ~NotificationListener(){}
 
   /// Describes object's reaction to a notification
-  virtual void reactNotification(class NotificationBroadcaster* sender) = 0;
+  virtual void reactNotification(NotificationBroadcaster* sender) = 0;
 };

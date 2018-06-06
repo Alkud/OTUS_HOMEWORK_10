@@ -1,7 +1,7 @@
 // homework_10.cpp in Otus homework#10 project
 
 #include "homework_10.h"
-#include "command_processor_mt.h"
+#include "./command_processor/command_processor_mt.h"
 
 void homework(int argc, char* argv[], std::istream& inputStream, std::ostream& outputStream,
               std::ostream& errorStream, std::ostream& metricsStream)

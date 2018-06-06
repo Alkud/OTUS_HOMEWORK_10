@@ -12,19 +12,26 @@ enum class InputReaderSettings
   MaxInputStringSize = 80
 };
 
-class InputReader : public MessageBroadcaster
+class InputReader : public MessageBroadcaster,
+                    public MessageListener
 {
 public:
 
   InputReader(std::istream& newInput, std::mutex& newInputLock,
               const std::shared_ptr<SmartBuffer<std::string>>& newBuffer);
 
+  ~InputReader();
+
   /// Read from input stream until eof
   void read();
+
+  void reactMessage(class MessageBroadcaster* sender, Message message) override;
 
 private:
 
   std::istream& input;
   std::mutex& inputLock;
   std::shared_ptr<SmartBuffer<std::string>> buffer;
+
+  bool allDataReceived;
 };

@@ -30,26 +30,36 @@ public:
     outputBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>()},
     /* creating command reader */
     inputReader{std::make_shared<InputReader>(inputStream, inputStreamLock, inputBuffer)},
-    /* creating command processor */
-    inputProcessor{
-      std::make_shared<InputProcessor>
-      (
-        bulkSize,
-        bulkOpenDelimiter, bulkCloseDelimiter,
-        inputBuffer, outputBuffer
-      )
-    },
     /* creating logger */
     logger{std::make_shared<Logger<loggingThreadsCount>>(outputBuffer, "", errorStream, metricsStream)},
     /* creating publisher */
-    publisher{std::make_shared<Publisher>(outputBuffer, outputStream, outputStreamLock, errorStream, metricsStream)}
-
+    publisher{std::make_shared<Publisher>(outputBuffer, outputStream, outputStreamLock, errorStream, metricsStream)},
+    /* creating command processor */
+    inputProcessor{
+      std::make_shared<InputProcessor>(
+        bulkSize,
+        bulkOpenDelimiter, bulkCloseDelimiter,
+        inputBuffer, outputBuffer,
+        errorStream, metricsStream
+        )
+      }
   {
     /* connect broadcasters and listeners */
-    inputReader->addMessageListener(inputProcessor);
+    inputReader->addMessageListener(inputBuffer);
+
+    inputBuffer->addMessageListener(inputProcessor);
     inputBuffer->addNotificationListener(inputProcessor);
-    outputBuffer->addNotificationListener(logger);
+
+    inputProcessor->addMessageListener(outputBuffer);
+
     outputBuffer->addNotificationListener(publisher);
+    outputBuffer->addMessageListener(publisher);                
+    outputBuffer->addNotificationListener(logger);
+    outputBuffer->addMessageListener(logger);
+    outputBuffer->addMessageListener(inputReader);
+
+    publisher->start();
+    logger->start();
   }
 
   /// Runs input reader
@@ -73,9 +83,9 @@ private:
   std::shared_ptr<SmartBuffer<std::string>> inputBuffer;
   std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>> outputBuffer;
   std::shared_ptr<InputReader> inputReader;
-  std::shared_ptr<InputProcessor> inputProcessor;
   std::shared_ptr<Logger<loggingThreadsCount>> logger;
   std::shared_ptr<Publisher> publisher;
+  std::shared_ptr<InputProcessor> inputProcessor;
 
   std::mutex inputStreamLock{};
   std::mutex outputStreamLock{};

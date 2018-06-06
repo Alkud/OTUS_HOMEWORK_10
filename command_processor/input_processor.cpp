@@ -4,23 +4,42 @@
 
 InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpenDelimiter, const char& newBulkCloseDelimiter,
                                const std::shared_ptr<SmartBuffer<std::string> >& newInputBuffer,
-                               const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer) :
+                               const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer,
+                               std::ostream& newErrorOut, std::ostream& newMetricsOut) :
   bulkSize{newBulkSize > 1 ? newBulkSize : 1},
   bulkOpenDelimiter{newBulkOpenDelimiter},
   bulkCloseDelimiter{newBulkCloseDelimiter},
   inputBuffer{newInputBuffer},
   outputBuffer{newOutputBuffer},
   customBulkStarted{false},
-  nestingDepth{0}
-{
+  nestingDepth{0},
+  errorOut{newErrorOut}, metricsOut{newMetricsOut}
+{}
 
+InputProcessor::~InputProcessor()
+{
+  /* Output metrics */
+  metricsOut << "main thread"
+             << " - " << threadMetrics.totalStringsCount << " string(s), "
+             << threadMetrics.totalCommandsCount << " command(s), "
+             << threadMetrics.totalBulksCount << " bulk(s)" << std::endl;
 }
 
 void InputProcessor::reactNotification(NotificationBroadcaster* sender)
 {
   if (inputBuffer.get() == sender)
   {
-    std::string nextCommand{inputBuffer->getItem(shared_from_this())};
+    std::unique_lock<std::mutex> lockInputBuffer{inputBuffer->dataLock};
+    auto bufferReply{inputBuffer->getItem(shared_from_this())};
+    lockInputBuffer.unlock();
+
+    if (false == bufferReply.first)
+     {
+       return;
+     }
+
+    auto nextCommand{bufferReply.second};
+    ++threadMetrics.totalStringsCount;
 
     if (bulkOpenDelimiter == nextCommand)          // bulk open command received
     {
@@ -73,14 +92,16 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
   }
 }
 
-void InputProcessor::reactMessage(MessageBroadcaster* sender, std::string message)
+void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  if ("STOP" == message)
+  if (Message::NoMoreData == message
+      && inputBuffer.get() == sender)
   {
     if (customBulkStarted != true)
     {
       closeCurrentBulk();
-    }
+    }    
+    sendMessage(Message::NoMoreData);
   }
 }
 
@@ -110,7 +131,14 @@ void InputProcessor::sendCurrentBulk()
   };
 
   /* send the bulk to the output buffer */
-  outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
+  {
+    std::lock_guard<std::mutex> lockOutputBuffer{outputBuffer->dataLock};
+    outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
+  }
+
+  /* Refresh metrics */
+  threadMetrics.totalCommandsCount += tempBuffer.size();
+  ++threadMetrics.totalBulksCount;
 
   /*clear temporary buffer */
   tempBuffer.clear();

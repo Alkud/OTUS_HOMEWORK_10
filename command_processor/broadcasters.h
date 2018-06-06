@@ -8,6 +8,11 @@
 #include "listeners.h"
 #include "weak_ptr_less.h"
 
+enum class Message
+{
+  NoMoreData,
+  AllDataReceived
+};
 /// Base class for a brodcaster, sending messages,
 /// containing instructions for listeners
 class MessageBroadcaster
@@ -24,7 +29,7 @@ public:
   {
     if (newListener != nullptr)
     {
-      listeners.insert(std::weak_ptr<MessageListener>{newListener});
+      messageListeners.insert(std::weak_ptr<MessageListener>{newListener});
     }
   }
 
@@ -34,18 +39,22 @@ public:
   {
     if (listener != nullptr)
     {
-      listeners.erase(std::weak_ptr<MessageListener>{listener});
+      messageListeners.erase(std::weak_ptr<MessageListener>{listener});
     }
   }
 
   /// Send instruction to all registered listeners
-  virtual void sendMessage(std::string message)
+  virtual void sendMessage(Message message)
   {
-    for (const auto& listener : listeners)
+    for (const auto& listener : messageListeners)
     {
       if (listener.expired() != true)
       {
         listener.lock()->reactMessage(this, message);
+      }
+      else
+      {
+        messageListeners.erase(listener);
       }
     }
   }
@@ -53,11 +62,11 @@ public:
   /// Remove all listenenrs from the list
   virtual void clearMessageListenersList()
   {
-    listeners.clear();
+    messageListeners.clear();
   }
 
 protected:
-  std::set<std::weak_ptr<MessageListener>, WeakPtrLess<MessageListener>> listeners;
+  std::set<std::weak_ptr<MessageListener>, WeakPtrLess<MessageListener>> messageListeners;
 };
 
 
@@ -78,7 +87,7 @@ public:
   {
     if (newListener != nullptr)
     {
-      listeners.insert(std::weak_ptr<NotificationListener>{newListener});
+      notificationListeners.insert(std::weak_ptr<NotificationListener>{newListener});
     }
   }
 
@@ -88,18 +97,22 @@ public:
   {
     if (listener != nullptr)
     {
-      listeners.erase(std::weak_ptr<NotificationListener>{listener});
+      notificationListeners.erase(std::weak_ptr<NotificationListener>{listener});
     }
   }
 
   /// Send notification to all listeners in the list
   virtual void notify()
   {
-    for (const auto& listener : listeners)
+    for (const auto& listener : notificationListeners)
     {
       if (listener.expired() != true)
       {
         listener.lock()->reactNotification(this);
+      }
+      else
+      {
+        notificationListeners.erase(listener);
       }
     }
   }
@@ -107,9 +120,9 @@ public:
   /// Remove alll listenenrs from the list
   virtual void clearNotificationListenersList()
   {
-    listeners.clear();
+    notificationListeners.clear();
   }
 
 protected:
-  std::set<std::weak_ptr<NotificationListener>, WeakPtrLess<NotificationListener>> listeners;
+  std::set<std::weak_ptr<NotificationListener>, WeakPtrLess<NotificationListener>> notificationListeners;
 };
