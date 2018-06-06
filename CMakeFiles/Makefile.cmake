@@ -13,6 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/feature_tests.c"
   "CMakeFiles/feature_tests.cxx"
   "CMakeLists.txt"
+  "command_processor/CMakeLists.txt"
   "/usr/local/cmake-3.9.2/share/cmake-3.9/Modules/CMakeCCompiler.cmake.in"
   "/usr/local/cmake-3.9.2/share/cmake-3.9/Modules/CMakeCCompilerABI.c"
   "/usr/local/cmake-3.9.2/share/cmake-3.9/Modules/CMakeCInformation.cmake"
@@ -116,14 +117,12 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CPackConfig.cmake"
   "CPackSourceConfig.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "command_processor/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/otus_hw_10_test.dir/DependInfo.cmake"
-  "CMakeFiles/publisher_mt.dir/DependInfo.cmake"
-  "CMakeFiles/input_reader.dir/DependInfo.cmake"
-  "CMakeFiles/input_processor.dir/DependInfo.cmake"
-  "CMakeFiles/homework_10.dir/DependInfo.cmake"
   "CMakeFiles/bulkmt.dir/DependInfo.cmake"
+  "command_processor/CMakeFiles/command_processor.dir/DependInfo.cmake"
   )

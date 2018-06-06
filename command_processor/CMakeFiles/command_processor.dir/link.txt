@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcommand_processor.a  CMakeFiles/command_processor.dir/input_processor.cpp.o CMakeFiles/command_processor.dir/input_reader.cpp.o CMakeFiles/command_processor.dir/publisher_mt.cpp.o
+/usr/bin/ranlib libcommand_processor.a

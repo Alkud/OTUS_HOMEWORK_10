@@ -1,9 +1,0 @@
-Package: bulkmt
-Version: 0.0.1
-Section: devel
-Priority: optional
-Architecture: amd64
-Installed-Size: 552
-Maintainer: alexandr_kudinov@mail.ru
-Description: bulkmt built using CMake
-

@@ -56,29 +56,60 @@ CMAKE_BINARY_DIR = /home/travis/build/Alkud/OTUS_HOMEWORK_10
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
+	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackSourceConfig.cmake /home/travis/build/Alkud/OTUS_HOMEWORK_10/CPackSourceConfig.cmake
+.PHONY : package_source
 
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
+# Special rule for the target package_source
+package_source/fast: package_source
 
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/local/cmake-3.9.2/bin/cmake -P cmake_install.cmake
-.PHONY : install
+.PHONY : package_source/fast
 
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/local/cmake-3.9.2/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
+	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+
+.PHONY : package/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/local/cmake-3.9.2/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/local/cmake-3.9.2/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/local/cmake-3.9.2/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # Special rule for the target install/strip
 install/strip: preinstall
@@ -102,60 +133,29 @@ list_install_components/fast: list_install_components
 
 .PHONY : list_install_components/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/local/cmake-3.9.2/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : edit_cache
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/cmake-3.9.2/bin/cmake -P cmake_install.cmake
+.PHONY : install
 
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/cmake-3.9.2/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
 
-.PHONY : edit_cache/fast
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
 
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/local/cmake-3.9.2/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
-
-# Special rule for the target package
-package: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
-	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackConfig.cmake
-.PHONY : package
-
-# Special rule for the target package
-package/fast: package
-
-.PHONY : package/fast
-
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/cmake-3.9.2/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
-# Special rule for the target package_source
-package_source:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackSourceConfig.cmake /home/travis/build/Alkud/OTUS_HOMEWORK_10/CPackSourceConfig.cmake
-.PHONY : package_source
-
-# Special rule for the target package_source
-package_source/fast: package_source
-
-.PHONY : package_source/fast
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -203,58 +203,6 @@ otus_hw_10_test/fast:
 .PHONY : otus_hw_10_test/fast
 
 #=============================================================================
-# Target rules for targets named publisher_mt
-
-# Build rule for target.
-publisher_mt: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 publisher_mt
-.PHONY : publisher_mt
-
-# fast build rule for target.
-publisher_mt/fast:
-	$(MAKE) -f CMakeFiles/publisher_mt.dir/build.make CMakeFiles/publisher_mt.dir/build
-.PHONY : publisher_mt/fast
-
-#=============================================================================
-# Target rules for targets named input_reader
-
-# Build rule for target.
-input_reader: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 input_reader
-.PHONY : input_reader
-
-# fast build rule for target.
-input_reader/fast:
-	$(MAKE) -f CMakeFiles/input_reader.dir/build.make CMakeFiles/input_reader.dir/build
-.PHONY : input_reader/fast
-
-#=============================================================================
-# Target rules for targets named input_processor
-
-# Build rule for target.
-input_processor: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 input_processor
-.PHONY : input_processor
-
-# fast build rule for target.
-input_processor/fast:
-	$(MAKE) -f CMakeFiles/input_processor.dir/build.make CMakeFiles/input_processor.dir/build
-.PHONY : input_processor/fast
-
-#=============================================================================
-# Target rules for targets named homework_10
-
-# Build rule for target.
-homework_10: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 homework_10
-.PHONY : homework_10
-
-# fast build rule for target.
-homework_10/fast:
-	$(MAKE) -f CMakeFiles/homework_10.dir/build.make CMakeFiles/homework_10.dir/build
-.PHONY : homework_10/fast
-
-#=============================================================================
 # Target rules for targets named bulkmt
 
 # Build rule for target.
@@ -266,6 +214,19 @@ bulkmt: cmake_check_build_system
 bulkmt/fast:
 	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/build
 .PHONY : bulkmt/fast
+
+#=============================================================================
+# Target rules for targets named command_processor
+
+# Build rule for target.
+command_processor: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 command_processor
+.PHONY : command_processor
+
+# fast build rule for target.
+command_processor/fast:
+	$(MAKE) -f command_processor/CMakeFiles/command_processor.dir/build.make command_processor/CMakeFiles/command_processor.dir/build
+.PHONY : command_processor/fast
 
 bulkmt.o: bulkmt.cpp.o
 
@@ -294,113 +255,35 @@ bulkmt.cpp.s:
 	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/bulkmt.cpp.s
 .PHONY : bulkmt.cpp.s
 
-library/homework_10.o: library/homework_10.cpp.o
+homework_10.o: homework_10.cpp.o
 
-.PHONY : library/homework_10.o
-
-# target to build an object file
-library/homework_10.cpp.o:
-	$(MAKE) -f CMakeFiles/homework_10.dir/build.make CMakeFiles/homework_10.dir/library/homework_10.cpp.o
-.PHONY : library/homework_10.cpp.o
-
-library/homework_10.i: library/homework_10.cpp.i
-
-.PHONY : library/homework_10.i
-
-# target to preprocess a source file
-library/homework_10.cpp.i:
-	$(MAKE) -f CMakeFiles/homework_10.dir/build.make CMakeFiles/homework_10.dir/library/homework_10.cpp.i
-.PHONY : library/homework_10.cpp.i
-
-library/homework_10.s: library/homework_10.cpp.s
-
-.PHONY : library/homework_10.s
-
-# target to generate assembly for a file
-library/homework_10.cpp.s:
-	$(MAKE) -f CMakeFiles/homework_10.dir/build.make CMakeFiles/homework_10.dir/library/homework_10.cpp.s
-.PHONY : library/homework_10.cpp.s
-
-library/input_processor.o: library/input_processor.cpp.o
-
-.PHONY : library/input_processor.o
+.PHONY : homework_10.o
 
 # target to build an object file
-library/input_processor.cpp.o:
-	$(MAKE) -f CMakeFiles/input_processor.dir/build.make CMakeFiles/input_processor.dir/library/input_processor.cpp.o
-.PHONY : library/input_processor.cpp.o
+homework_10.cpp.o:
+	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o
+	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/homework_10.cpp.o
+.PHONY : homework_10.cpp.o
 
-library/input_processor.i: library/input_processor.cpp.i
+homework_10.i: homework_10.cpp.i
 
-.PHONY : library/input_processor.i
-
-# target to preprocess a source file
-library/input_processor.cpp.i:
-	$(MAKE) -f CMakeFiles/input_processor.dir/build.make CMakeFiles/input_processor.dir/library/input_processor.cpp.i
-.PHONY : library/input_processor.cpp.i
-
-library/input_processor.s: library/input_processor.cpp.s
-
-.PHONY : library/input_processor.s
-
-# target to generate assembly for a file
-library/input_processor.cpp.s:
-	$(MAKE) -f CMakeFiles/input_processor.dir/build.make CMakeFiles/input_processor.dir/library/input_processor.cpp.s
-.PHONY : library/input_processor.cpp.s
-
-library/input_reader.o: library/input_reader.cpp.o
-
-.PHONY : library/input_reader.o
-
-# target to build an object file
-library/input_reader.cpp.o:
-	$(MAKE) -f CMakeFiles/input_reader.dir/build.make CMakeFiles/input_reader.dir/library/input_reader.cpp.o
-.PHONY : library/input_reader.cpp.o
-
-library/input_reader.i: library/input_reader.cpp.i
-
-.PHONY : library/input_reader.i
+.PHONY : homework_10.i
 
 # target to preprocess a source file
-library/input_reader.cpp.i:
-	$(MAKE) -f CMakeFiles/input_reader.dir/build.make CMakeFiles/input_reader.dir/library/input_reader.cpp.i
-.PHONY : library/input_reader.cpp.i
+homework_10.cpp.i:
+	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.i
+	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/homework_10.cpp.i
+.PHONY : homework_10.cpp.i
 
-library/input_reader.s: library/input_reader.cpp.s
+homework_10.s: homework_10.cpp.s
 
-.PHONY : library/input_reader.s
-
-# target to generate assembly for a file
-library/input_reader.cpp.s:
-	$(MAKE) -f CMakeFiles/input_reader.dir/build.make CMakeFiles/input_reader.dir/library/input_reader.cpp.s
-.PHONY : library/input_reader.cpp.s
-
-library/publisher_mt.o: library/publisher_mt.cpp.o
-
-.PHONY : library/publisher_mt.o
-
-# target to build an object file
-library/publisher_mt.cpp.o:
-	$(MAKE) -f CMakeFiles/publisher_mt.dir/build.make CMakeFiles/publisher_mt.dir/library/publisher_mt.cpp.o
-.PHONY : library/publisher_mt.cpp.o
-
-library/publisher_mt.i: library/publisher_mt.cpp.i
-
-.PHONY : library/publisher_mt.i
-
-# target to preprocess a source file
-library/publisher_mt.cpp.i:
-	$(MAKE) -f CMakeFiles/publisher_mt.dir/build.make CMakeFiles/publisher_mt.dir/library/publisher_mt.cpp.i
-.PHONY : library/publisher_mt.cpp.i
-
-library/publisher_mt.s: library/publisher_mt.cpp.s
-
-.PHONY : library/publisher_mt.s
+.PHONY : homework_10.s
 
 # target to generate assembly for a file
-library/publisher_mt.cpp.s:
-	$(MAKE) -f CMakeFiles/publisher_mt.dir/build.make CMakeFiles/publisher_mt.dir/library/publisher_mt.cpp.s
-.PHONY : library/publisher_mt.cpp.s
+homework_10.cpp.s:
+	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.s
+	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/homework_10.cpp.s
+.PHONY : homework_10.cpp.s
 
 otus_hw_10_test.o: otus_hw_10_test.cpp.o
 
@@ -435,36 +318,24 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... install/local"
-	@echo "... install"
+	@echo "... package_source"
+	@echo "... package"
+	@echo "... test"
+	@echo "... otus_hw_10_test"
+	@echo "... rebuild_cache"
+	@echo "... bulkmt"
+	@echo "... edit_cache"
 	@echo "... install/strip"
 	@echo "... list_install_components"
-	@echo "... edit_cache"
-	@echo "... test"
-	@echo "... package"
-	@echo "... otus_hw_10_test"
-	@echo "... publisher_mt"
-	@echo "... input_reader"
-	@echo "... input_processor"
-	@echo "... rebuild_cache"
-	@echo "... homework_10"
-	@echo "... package_source"
-	@echo "... bulkmt"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... command_processor"
 	@echo "... bulkmt.o"
 	@echo "... bulkmt.i"
 	@echo "... bulkmt.s"
-	@echo "... library/homework_10.o"
-	@echo "... library/homework_10.i"
-	@echo "... library/homework_10.s"
-	@echo "... library/input_processor.o"
-	@echo "... library/input_processor.i"
-	@echo "... library/input_processor.s"
-	@echo "... library/input_reader.o"
-	@echo "... library/input_reader.i"
-	@echo "... library/input_reader.s"
-	@echo "... library/publisher_mt.o"
-	@echo "... library/publisher_mt.i"
-	@echo "... library/publisher_mt.s"
+	@echo "... homework_10.o"
+	@echo "... homework_10.i"
+	@echo "... homework_10.s"
 	@echo "... otus_hw_10_test.o"
 	@echo "... otus_hw_10_test.i"
 	@echo "... otus_hw_10_test.s"

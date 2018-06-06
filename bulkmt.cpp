@@ -1,6 +1,6 @@
 // bulk.cpp in Otus homework#10 project
 
-#include "./library/homework_10.h"
+#include "./homework_10.h"
 #include <stdexcept>
 #include <iostream>
 

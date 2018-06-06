@@ -4,7 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "homework_10.h"
-#include "command_processor_mt.h"
+#include "./command_processor/command_processor_mt.h"
 
 
 #include <string>
@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 enum class DebugOutput
 {
@@ -20,7 +21,7 @@ enum class DebugOutput
   debug_off
 };
 
-/* Helper function */
+/* Helper functions */
 std::array<std::vector<std::string>, 3>
 getProcessorOutput
 (
@@ -44,7 +45,7 @@ getProcessorOutput
 
   testProcessor.run();
 
-  std::this_thread::sleep_for(std::chrono::milliseconds{200});
+  //std::this_thread::sleep_for(std::chrono::milliseconds{200});
 
   }
 
@@ -73,6 +74,68 @@ getProcessorOutput
   return result;
 }
 
+
+auto parseMetrics(std::stringstream& metricsStream)
+{
+  std::string threadMetrics{};
+  size_t searchStartPosition{};
+  size_t digitPosition{};
+
+  std::vector<std::vector<int>> result;
+  while (std::getline(metricsStream, threadMetrics))
+  {
+    result.push_back(std::vector<int>{});
+    int nextNumber{};
+    std::string tempString{};
+    std::stringstream threadMetricsStream{threadMetrics};
+    while (!threadMetricsStream.eof())
+    {
+      threadMetricsStream >> tempString;
+      if (std::stringstream{tempString} >> nextNumber)
+      {
+        result.back().push_back(nextNumber);
+      }
+      tempString = " ";
+    }
+  }
+  return result;
+}
+
+void checkMetrics(std::stringstream& metricsStream,
+                  int stringsExpected, int commandsExpected, int bulksExpected)
+{
+  auto numericMetrics {parseMetrics(metricsStream)};
+
+  BOOST_CHECK(numericMetrics.size() == 4);
+  BOOST_CHECK(numericMetrics[0].size() == 3);
+  BOOST_CHECK(numericMetrics[1].size() == 2);
+  BOOST_CHECK(numericMetrics[2].size() == 2);
+  BOOST_CHECK(numericMetrics[3].size() == 2);
+
+  int mainStringsCount{numericMetrics[0][0]};
+  int mainCommandsCount{numericMetrics[0][1]};
+  int mainBulksCount{numericMetrics[0][2]};
+
+  int logBulksCount{numericMetrics[1][0]};
+  int logCommandsCount{numericMetrics[1][1]};
+
+  int fileOneBulksCount{numericMetrics[2][0]};
+  int fileOneCommandsCount{numericMetrics[2][1]};
+
+  int fileTwoBulksCount{numericMetrics[3][0]};
+  int fileTwoCommandsCount{numericMetrics[3][1]};
+
+  BOOST_CHECK(mainStringsCount == stringsExpected);
+  BOOST_CHECK(mainCommandsCount == commandsExpected);
+  BOOST_CHECK(mainBulksCount == bulksExpected);
+
+  BOOST_CHECK(logCommandsCount == commandsExpected);
+  BOOST_CHECK(logBulksCount == bulksExpected);
+
+  BOOST_CHECK(fileOneCommandsCount + fileTwoCommandsCount == commandsExpected);
+  BOOST_CHECK(fileOneBulksCount + fileTwoBulksCount == bulksExpected);
+}
+
 BOOST_AUTO_TEST_SUITE(homework_10_test)
 
 BOOST_AUTO_TEST_CASE(objects_creation_failure)
@@ -94,26 +157,30 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
   std::string badDirectoryName{"/non_existing_directory/"};
 
   {
-  /* use bad directory name as constructor parameter */
-  const auto badLogger{
-    std::make_shared<Logger<2>>(
-          bulkBuffer, badDirectoryName,
-          outputStream, metricsStream
-          )
-  };
-  /* connect buffer to logger */
-  bulkBuffer->addNotificationListener(badLogger);
-  /* putting some data to the buffer results in error message */
-  bulkBuffer->putItem(std::make_pair<size_t, std::string>(1234, "bulk"));
+    /* use bad directory name as constructor parameter */
+    const auto badLogger{
+      std::make_shared<Logger<2>>(
+            bulkBuffer, badDirectoryName,
+            outputStream, metricsStream
+            )
+    };
 
-  std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    /* create a dummy message broadcaster */
+    MessageBroadcaster dummyBroadcaster{};
+    dummyBroadcaster.addMessageListener(bulkBuffer);
 
-  /* imitating enexpected buffer exhaustion */
-  bulkBuffer->clear();
-  /* now buffer nitification should NOT throw an exception */
-  BOOST_CHECK_NO_THROW((bulkBuffer->notify()));
+    /* connect buffer to logger */
+    bulkBuffer->addNotificationListener(badLogger);
+    bulkBuffer->addMessageListener(badLogger);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    badLogger->start();
+
+    /* putting some data to the buffer results in error message */
+    bulkBuffer->putItem(std::make_pair<size_t, std::string>(1234, "bulk"));
+
+    dummyBroadcaster.sendMessage(Message::NoMoreData);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
   }
 
   /* get error message string */
@@ -121,11 +188,10 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
   /* error message sholud contain expected file name */
   BOOST_CHECK(errorMessage.find("1234_1.log") != std::string::npos);
-  /* error message sholud contain expected thread number */
-  BOOST_CHECK(errorMessage.find("Logger stopped. Thread #1") != std::string::npos);
 
   /* get metrics string */
   std::string metrics{metricsStream.str()};
+
   /* metrics sholud contain expected text */
   BOOST_CHECK(std::string("file thread #0 - 0 bulk(s), 0 command(s)\n"
                           "file thread #1 - 0 bulk(s), 0 command(s)\n") == metrics);
@@ -133,9 +199,15 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
 BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
-  SmartBuffer<std::pair<size_t, std::string>> emptyBuffer;
+  const auto emptyBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>()};
+
+  /* create a dummy message broadcaster */
+  MessageBroadcaster dummyBroadcaster{};
+  dummyBroadcaster.addMessageListener(emptyBuffer);
+
   /* emptyBuffer.getItem() should throw an exception */
-  BOOST_CHECK_THROW((emptyBuffer.getItem()), std::out_of_range);
+  BOOST_CHECK_THROW((emptyBuffer->getItem()), std::out_of_range);
+  dummyBroadcaster.sendMessage(Message::NoMoreData);
 }
 
 
@@ -155,7 +227,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
     char* arg[]{"/home/user/bulk"};
 
     {
-    homework(1, arg, inputStream, outputStream, errorStream, metricsStream);
+      homework(1, arg, inputStream, outputStream, errorStream, metricsStream);
     }
 
     /* application outpur should contain expected text*/
@@ -165,6 +237,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
     /* metrics sholud contain expected text */
     BOOST_CHECK(metricsStream.str() ==
+                "main thread - 0 string(s), 0 command(s), 0 bulk(s)\n"
                 "log thread - 0 bulk(s), 0 command(s)\n"
                 "file thread #0 - 0 bulk(s), 0 command(s)\n"
                 "file thread #1 - 0 bulk(s), 0 command(s)\n");
@@ -172,7 +245,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -186,17 +259,23 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
     };
 
     /* metrics sholud contain expected text */
+
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
     BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 0 bulk(s), 0 command(s)");
+                "main thread - 0 string(s), 0 command(s), 0 bulk(s)");
+
     BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 0 bulk(s), 0 command(s)");
+                "log thread - 0 bulk(s), 0 command(s)");
     BOOST_CHECK(processorOutput[2][2] ==
+                "file thread #0 - 0 bulk(s), 0 command(s)");
+    BOOST_CHECK(processorOutput[2][3] ==
                 "file thread #1 - 0 bulk(s), 0 command(s)");
 
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -212,23 +291,26 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
       getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
     };
 
-    /* main application output */
+    /* check main application output */
     BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, , cmd2");
 
-    /* application error output */
+    /* check application error output */
     BOOST_CHECK(processorOutput[1].size() == 0);
 
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 1 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 1 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 0 bulk(s), 0 command(s)");
+    /* check application metrics output */
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 3, 3, 1);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -246,24 +328,36 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
     };
 
     /* main application output */
+    BOOST_CHECK(processorOutput[0].size() == 2);
+
     BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, cmd2, cmd3");
     BOOST_CHECK(processorOutput[0][1] == "bulk: cmd4");
 
     /* application error output */
     BOOST_CHECK(processorOutput[1].size() == 0);
 
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 2 bulk(s), 4 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 1 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 1 bulk(s), 1 command(s)");
+    if (processorOutput[1].size() != 0)
+    {
+      for (const auto& string : processorOutput[1])
+      {
+        std::cout << string << '\n';
+      }
+    }
 
+    /* application metrics output */
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 4, 4, 2);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -286,6 +380,16 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
     };
 
     /* main application output */
+    BOOST_CHECK(processorOutput[0].size() == 3);
+
+    if (processorOutput[0].size() != 3)
+    {
+      for (const auto& string : processorOutput[0])
+      {
+        std::cout << string << '\n';
+      }
+    }
+
     BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1");
     BOOST_CHECK(processorOutput[0][1] == "bulk: cmd2, cmd3");
     BOOST_CHECK(processorOutput[0][2] == "bulk: cmd4");
@@ -294,16 +398,19 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 3 bulk(s), 4 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 2 bulk(s), 2 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 1 bulk(s), 2 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 6, 4, 3);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -338,6 +445,7 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
     };
 
     /* main application output */
+    BOOST_CHECK(processorOutput[0].size() == 3);
     BOOST_CHECK(processorOutput[0][0] ==
                 "bulk: cmd1, cmd2, cmd3");
     BOOST_CHECK(processorOutput[0][1] ==
@@ -349,16 +457,19 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 3 bulk(s), 13 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 2 bulk(s), 7 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 1 bulk(s), 6 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 19, 13, 3);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -399,16 +510,19 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 1 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 1 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 0 bulk(s), 0 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 18, 3, 1);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -446,16 +560,19 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 3 bulk(s), 8 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 2 bulk(s), 6 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 1 bulk(s), 2 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 11, 8, 3);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr<< ex.what();
   }
 }
@@ -486,16 +603,19 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 3 bulk(s), 5 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 2 bulk(s), 3 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 1 bulk(s), 2 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 5, 5, 3);
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -505,21 +625,17 @@ BOOST_AUTO_TEST_CASE(logging_test)
 {
   try
   {
-    /* wait a second to get separate log files for this test */
-    std::this_thread::sleep_for(std::chrono::seconds{1});
+    /* wait 2 seconds to get separate log files for this test */
+    std::this_thread::sleep_for(std::chrono::seconds{2});
 
     const std::string testString{
       "cmd1\n"
       "cmd2\n"
       "cmd3\n"
       "cmd4\n"
-      "cmd5\n"
-      "cmd6\n"
-      "cmd7\n"
-      "cmd8\n"
     };
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 8, DebugOutput::debug_off)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
     };
 
     /* get current time */
@@ -551,29 +667,32 @@ BOOST_AUTO_TEST_CASE(logging_test)
 
     /* main application output */
     BOOST_CHECK(processorOutput[0][0] ==
-                "bulk: cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8");
+                "bulk: cmd1, cmd2, cmd3, cmd4");
 
     /* application error output */
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 1 bulk(s), 8 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 1 bulk(s), 8 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 0 bulk(s), 0 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
+
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 4, 4, 1);
 
     /* check log file state */
     BOOST_CHECK(logFile);
 
     /* check log file content */
     BOOST_CHECK(logString ==
-                "bulk: cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8");
+                "bulk: cmd1, cmd2, cmd3, cmd4");
   }
   catch (const std::exception& ex)
   {
-    BOOST_CHECK(false);
+    BOOST_FAIL("");
     std::cerr << ex.what();
   }
 }
@@ -590,10 +709,6 @@ BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
       "cmd2\n"
       "cmd3\n"
       "cmd4\n"
-      "cmd5\n"
-      "cmd6\n"
-      "cmd7\n"
-      "cmd8\n"
     };
     auto processorOutput{
       getProcessorOutput(testString, '(', ')', 1, DebugOutput::debug_off)
@@ -621,7 +736,9 @@ BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
     std::ifstream logFile{};
     std::string logString{};
 
-    for (size_t i{1}; i <= 8; ++i)
+    const size_t filesCount{4};
+
+    for (size_t i{1}; i <= filesCount; ++i)
     {
       logFileName = std::to_string(ticksCount) +
                     + "_" + std::to_string(i) + ".log";
@@ -641,8 +758,8 @@ BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
     }
 
     /* main application output */
-    BOOST_CHECK(processorOutput[0].size() == 8);
-    for (size_t i{1}; i <= 8; ++i)
+    BOOST_CHECK(processorOutput[0].size() == 4);
+    for (size_t i{1}; i <= 4; ++i)
     {
       BOOST_CHECK(processorOutput[0][i - 1] ==
                   "bulk: cmd" + std::to_string(i));
@@ -652,13 +769,15 @@ BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
     BOOST_CHECK(processorOutput[1].size() == 0);
 
     /* application metrics output */
-    BOOST_CHECK(processorOutput[2][0] ==
-                "log thread - 8 bulk(s), 8 command(s)");
-    BOOST_CHECK(processorOutput[2][1] ==
-                "file thread #0 - 4 bulk(s), 4 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #1 - 4 bulk(s), 4 command(s)");
+    BOOST_CHECK(processorOutput[2].size() == 4);
 
+    std::stringstream metricsStream{};
+    for (const auto& tmpString : processorOutput[2])
+    {
+      metricsStream << tmpString << '\n';
+    }
+
+    checkMetrics(metricsStream, 4, 4, 4);
   }
   catch (const std::exception& ex)
   {

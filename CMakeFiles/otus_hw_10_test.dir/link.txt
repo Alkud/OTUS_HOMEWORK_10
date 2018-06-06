@@ -1,1 +1,1 @@
-/usr/bin/g++    -rdynamic CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o  -o otus_hw_10_test -lboost_unit_test_framework libhomework_10.a libinput_processor.a libinput_reader.a libpublisher_mt.a -lpthread 
+/usr/bin/g++    -rdynamic CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o  -o otus_hw_10_test -lpthread command_processor/libcommand_processor.a -lboost_unit_test_framework 

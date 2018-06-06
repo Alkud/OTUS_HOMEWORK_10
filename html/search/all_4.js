@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['errorout',['errorOut',['../class_logger.html#a22c9704046573a731558d6ebc254bf50',1,'Logger::errorOut()'],['../class_publisher.html#a78d06a735557ad4a2dcf4be8ef60a818',1,'Publisher::errorOut()']]]
+  ['homework',['homework',['../homework__10_8cpp.html#a33375d6a960a993d364d5fc78f257f8f',1,'homework(int argc, char *argv[], std::istream &amp;inputStream, std::ostream &amp;outputStream, std::ostream &amp;errorStream, std::ostream &amp;metricsStream):&#160;homework_10.cpp'],['../homework__10_8h.html#a0056f4cee6d53292b8b5c2a71a56d9cd',1,'homework(int argc, char *argv[], std::istream &amp;inputStream=std::cin, std::ostream &amp;outputStream=std::cout, std::ostream &amp;errorStream=std::cerr, std::ostream &amp;metricsStream=std::cout):&#160;homework_10.cpp']]],
+  ['homework_5f10_2ecpp',['homework_10.cpp',['../homework__10_8cpp.html',1,'']]],
+  ['homework_5f10_2eh',['homework_10.h',['../homework__10_8h.html',1,'']]]
 ];

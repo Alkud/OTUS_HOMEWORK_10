@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['homework_5f10_2ecpp',['homework_10.cpp',['../homework__10_8cpp.html',1,'']]],
-  ['homework_5f10_2eh',['homework_10.h',['../homework__10_8h.html',1,'']]]
+  ['otus_5fhw_5f10_5ftest_2ecpp',['otus_hw_10_test.cpp',['../otus__hw__10__test_8cpp.html',1,'']]]
 ];

@@ -6,5 +6,5 @@ CXX_FLAGS =   -std=gnu++14
 
 CXX_DEFINES = -DBOOST_TEST_DYN_LINK
 
-CXX_INCLUDES = -I/home/travis/build/Alkud/OTUS_HOMEWORK_10/library 
+CXX_INCLUDES = 
 

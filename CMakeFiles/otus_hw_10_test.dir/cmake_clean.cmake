@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o"
+  "CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o"
   "otus_hw_10_test.pdb"
   "otus_hw_10_test"
 )

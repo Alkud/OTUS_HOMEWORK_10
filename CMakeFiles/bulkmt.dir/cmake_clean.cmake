@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/bulkmt.dir/bulkmt.cpp.o"
+  "CMakeFiles/bulkmt.dir/homework_10.cpp.o"
   "bulkmt.pdb"
   "bulkmt"
 )

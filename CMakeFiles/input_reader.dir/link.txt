@@ -1,2 +1,0 @@
-/usr/bin/ar qc libinput_reader.a  CMakeFiles/input_reader.dir/library/input_reader.cpp.o
-/usr/bin/ranlib libinput_reader.a

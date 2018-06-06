@@ -1,2 +1,0 @@
-/usr/bin/ar qc libinput_processor.a  CMakeFiles/input_processor.dir/library/input_processor.cpp.o
-/usr/bin/ranlib libinput_processor.a

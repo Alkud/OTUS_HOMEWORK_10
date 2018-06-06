@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpublisher_mt.a  CMakeFiles/publisher_mt.dir/library/publisher_mt.cpp.o
-/usr/bin/ranlib libpublisher_mt.a
