@@ -119,7 +119,7 @@ public:
     {
       data.erase(iter);
       if (true == data.empty() && true == noMoreData)
-      {
+      {        
         std::unique_lock<std::mutex> lockNotifier{notifierLock};
         shouldExit = true;
         lockNotifier.unlock();
@@ -134,10 +134,6 @@ public:
   /// Get elements count in the queue
   size_t dataSize()
   {
-    //std::lock_guard<std::mutex> lockData{dataLock};
-    //while (lock.test_and_set(std::memory_order_acquire));
-    //std::cout << "------- dataSize()\n";
-    //lock.clear(std::memory_order_release);
     return data.size();
   }
 

@@ -110,10 +110,6 @@ private:
 
         lockNotifier.unlock();
       }
-      /* process remaining data */
-      while (log(threadNumber))
-      {
-      }
     }
     catch(const std::out_of_range& ex)
     {

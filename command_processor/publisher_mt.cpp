@@ -65,9 +65,12 @@ void Publisher::run()
   {
     while(shouldExit != true)
     {
+
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
 
       threadNotifier.wait(lockNotifier, [this](){return this->notificationsCount.load() > 0 || shouldExit;});
+
+      lockNotifier.unlock();
 
       if (notificationsCount.load() > 0)
       {
@@ -76,12 +79,6 @@ void Publisher::run()
           --notificationsCount;
         }
       }
-
-      lockNotifier.unlock();
-    }
-    /* publish remaining data */
-    while (publish())
-    {
     }
   }
   catch (const std::exception& ex)
@@ -89,7 +86,6 @@ void Publisher::run()
     sendMessage(Message::AllDataReceived);
     shouldExit = true;
     errorOut << "Publisher stopped. Reason: " << ex.what() << std::endl;
-    //std::cout << "Publisher stopped. Reason: " << ex.what() << std::endl;
   }
 }
 
