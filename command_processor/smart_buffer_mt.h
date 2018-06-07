@@ -152,20 +152,6 @@ public:
     }
   }
 
-  void sanitize()
-  {
-    std::lock_guard<std::mutex> lockData{dataLock};
-
-    auto record {data.begin()};
-    for (; record != data.end(); ++record)
-    {
-      if (record->recipients.empty() == true)
-      {
-        data.erase(record);
-      }
-    }
-  }
-
   void run()
   {
     while(shouldExit != true)
