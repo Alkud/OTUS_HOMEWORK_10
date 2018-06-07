@@ -39,7 +39,7 @@ void InputReader::read()
         nextString = nextString.substr((size_t)InputReaderSettings::MaxInputStringSize);
       }
       std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
-      buffer->putItem(std::move(nextString));
+      buffer->putItem(nextString);
       lockBuffer.unlock();
     }
   }
