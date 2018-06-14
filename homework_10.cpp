@@ -3,46 +3,20 @@
 #include "homework_10.h"
 #include "./command_processor/command_processor_mt.h"
 
-void homework(int argc, char* argv[], std::istream& inputStream, std::ostream& outputStream,
+int homework(int argc, char* argv[], std::istream& inputStream, std::ostream& outputStream,
               std::ostream& errorStream, std::ostream& metricsStream)
-{
-  int commandLineParam{};
-  try
+{  
+  if (argc != 2 || std::stoull(std::string{argv[1]}) < 1)
   {
-    commandLineParam = argc < 2 ? -1 : std::stoi(argv[1]);
-  }
-  catch(const std::exception& ex)
-  {
-    outputStream << "\nOnly integer numbers are allowed";
-    commandLineParam = -1;
+    errorStream << "usage: bulkmt [bulk size]" << std::endl;
+    return 1;
   }
 
-  std::string userInput{};
-  if (commandLineParam < 1)
-  {
-    while (commandLineParam < 1)
-    {
-      outputStream << "\nPlease enter bulk size (must be greater than 0): ";
-      if (!std::getline(inputStream, userInput))
-      {
-        outputStream << std::endl;
-        return;
-      }
-      try
-      {
-        commandLineParam = std::stoi(userInput);
-      }
-      catch(const std::exception& ex)
-      {
-        outputStream << "\nOnly integer numbers are allowed";
-        commandLineParam = -1;
-      }
-    }
-  }
+  size_t bulkSize{std::stoull(std::string{argv[1]})};
 
-  const size_t bulkSize{commandLineParam};
-
-  const CommandProcessor<2> processor{inputStream, outputStream, errorStream, metricsStream, bulkSize, '{', '}'};
+  CommandProcessor<2> processor{inputStream, outputStream, errorStream, metricsStream, bulkSize, '{', '}'};
 
   processor.run();
+
+  return 0;
 }

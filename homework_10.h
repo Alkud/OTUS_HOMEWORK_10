@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-void homework(int argc, char* argv[],
+int homework(int argc, char* argv[],
               std::istream& inputStream = std::cin,
               std::ostream& outputStream = std::cout,
               std::ostream& errorStream = std::cerr,

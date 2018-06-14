@@ -26,23 +26,29 @@ public:
     const char& bulkCloseDelimiter
    ) :
     /* creating buffers */
-    inputBuffer{std::make_shared<SmartBuffer<std::string>>()},
-    outputBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>()},
+    inputBuffer{std::make_shared<SmartBuffer<std::string>>("command buffer")},
+    outputBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")},
     /* creating command reader */
     inputReader{std::make_shared<InputReader>(inputStream, inputStreamLock, inputBuffer)},
     /* creating logger */
-    logger{std::make_shared<Logger<loggingThreadsCount>>(outputBuffer, "", errorStream, metricsStream)},
+    logger{std::make_shared<Logger<loggingThreadsCount>>(
+           "logger", outputBuffer, dataLogged, shouldExit, terminationNotifier, "", errorStream
+    )},
     /* creating publisher */
-    publisher{std::make_shared<Publisher>(outputBuffer, outputStream, outputStreamLock, errorStream, metricsStream)},
+    publisher{std::make_shared<Publisher>(
+              "publisher", outputBuffer, dataPublished, shouldExit, terminationNotifier, outputStream, outputStreamLock, errorStream)},
     /* creating command processor */
     inputProcessor{
       std::make_shared<InputProcessor>(
         bulkSize,
         bulkOpenDelimiter, bulkCloseDelimiter,
         inputBuffer, outputBuffer,
-        errorStream, metricsStream
+        errorStream
         )
-      }
+      },
+
+    dataPublished{false}, dataLogged{false}, shouldExit{false},
+    metricsOut{metricsStream}, errorOut{errorStream}, globalMetrics{}
   {
     /* connect broadcasters and listeners */
     inputReader->addMessageListener(inputBuffer);
@@ -56,27 +62,71 @@ public:
     outputBuffer->addMessageListener(publisher);                
     outputBuffer->addNotificationListener(logger);
     outputBuffer->addMessageListener(logger);
-    outputBuffer->addMessageListener(inputReader);
 
-    publisher->start();
-    logger->start();
+    logger->addMessageListener(publisher);
+    publisher->addMessageListener(logger);
+
+    /* creating metrics*/
+    globalMetrics["input processor"] = inputProcessor->getMetrics();
+    globalMetrics["publisher"] = publisher->getMetrics();
+
+    SharedMultyMetrics loggerMetrics{logger->getMetrics()};
+    for (size_t idx{0}; idx < loggingThreadsCount; ++idx)
+    {
+      auto threadName = std::string{"logger thread#"} + std::to_string(idx);
+      globalMetrics[threadName] = loggerMetrics[idx];
+    }
   }
 
-  /// Runs input reader
-  void run() const
+  /// Runs input reading and processing
+  void run()
   {
-    if (inputReader != nullptr)
+    inputBuffer->start();
+    outputBuffer->start();
+    publisher->start();
+    logger->start();
+
+    inputReader->read();
+
+    if (shouldExit != true)
     {
-      inputReader->read();
+      std::unique_lock<std::mutex> lockNotifier{notifierLock};
+      terminationNotifier.wait(lockNotifier, [this]()
+      {
+        return (shouldExit) || (dataLogged && dataPublished);
+      });
+      lockNotifier.unlock();
+    }
+
+
+    if (shouldExit == true)
+    {
+      errorOut << "Abnormal termination\n";
+    }
+    /* Output metrics */
+    metricsOut << "main thread - "
+               << globalMetrics["input processor"]->totalStringCount << " string(s), "
+               << globalMetrics["input processor"]->totalCommandCount << " command(s), "
+               << globalMetrics["input processor"]->totalBulkCount << " bulk(s)" << std::endl
+               << "log thread - "
+               << globalMetrics["publisher"]->totalBulkCount << " bulk(s), "
+               << globalMetrics["publisher"]->totalCommandCount << " command(s)" << std::endl;
+
+    for (size_t threadIndex{}; threadIndex < loggingThreadsCount; ++threadIndex)
+    {
+      auto threadName = std::string{"logger thread#"} + std::to_string(threadIndex);
+      metricsOut << "file thread #" << threadIndex << " - "
+                 << globalMetrics[threadName]->totalBulkCount << " bulk(s), "
+                 << globalMetrics[threadName]->totalCommandCount << " command(s)" << std::endl;
     }
   }
 
   const std::shared_ptr<SmartBuffer<std::string>>&
-  getCommandBuffer() const
+  getCommandBuffer()
   { return inputBuffer; }
 
   const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>&
-  getBulkBuffer() const
+  getBulkBuffer()
   { return outputBuffer; }
 
 private:
@@ -89,5 +139,16 @@ private:
 
   std::mutex inputStreamLock{};
   std::mutex outputStreamLock{};
+
+  bool dataPublished;
+  bool dataLogged;
+  bool shouldExit;
+
+  std::condition_variable terminationNotifier{};
+  std::mutex notifierLock;
+
+  std::ostream& errorOut;
+  std::ostream& metricsOut;
+  SharedGlobalMetrics globalMetrics;
 };
 

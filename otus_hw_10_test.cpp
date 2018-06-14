@@ -6,7 +6,6 @@
 #include "homework_10.h"
 #include "./command_processor/command_processor_mt.h"
 
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -32,13 +31,13 @@ getProcessorOutput
   DebugOutput debugOutput
 )
 {
-  std::stringstream inputStream{inputString};  
+  std::stringstream inputStream{inputString};
   std::stringstream outputStream{};
   std::stringstream errorStream{};
   std::stringstream metricsStream{};
 
   {
-  const CommandProcessor<2> testProcessor {
+  CommandProcessor<2> testProcessor {
     inputStream, outputStream, errorStream, metricsStream,
     bulkSize, openDelimiter, closeDelimiter
   };
@@ -136,74 +135,100 @@ void checkMetrics(std::stringstream& metricsStream,
   BOOST_CHECK(fileOneBulksCount + fileTwoBulksCount == bulksExpected);
 }
 
-BOOST_AUTO_TEST_SUITE(homework_10_test)
+BOOST_AUTO_TEST_SUITE( homework_10_test )
 
-BOOST_AUTO_TEST_CASE(objects_creation_failure)
+BOOST_AUTO_TEST_CASE( objects_creation_failure )
 {
   std::mutex dummyMutex{};
+  bool published{false};
+  bool logged{false};
+  bool shouldExit{false};
+  std::condition_variable notifier{};
+
   /* can't create input reader with null buffer pointer */
   BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr}), std::invalid_argument);
+
   /* can't create publisher with null buffer pointer */
-  BOOST_CHECK_THROW((Publisher{nullptr, std::cout, dummyMutex}), std::invalid_argument);
+  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, published, shouldExit, notifier, std::cout, dummyMutex}), std::invalid_argument);
+
   /* can't create logger with null buffer pointer */
-  BOOST_CHECK_THROW((Logger<2>{nullptr, ""}), std::invalid_argument);
+  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, logged, shouldExit, notifier, ""}), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 {
-  const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>()};
   std::stringstream outputStream{};
   std::stringstream metricsStream{};
   std::string badDirectoryName{"/non_existing_directory/"};
+  SharedMultyMetrics metrics{};
 
   {
+    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")};
+    const auto dummyBroadcaster {std::make_shared<MessageBroadcaster>()};
+    bool logged{false};
+    bool shouldExit{false};
+    std::condition_variable notifier{};
+    std::mutex notifierLock{};
+
     /* use bad directory name as constructor parameter */
     const auto badLogger{
       std::make_shared<Logger<2>>(
-            bulkBuffer, badDirectoryName,
-            outputStream, metricsStream
+            "bad logger",bulkBuffer,
+            logged, shouldExit, notifier,
+            badDirectoryName,
+            outputStream
             )
     };
 
-    /* create a dummy message broadcaster */
-    MessageBroadcaster dummyBroadcaster{};
-    dummyBroadcaster.addMessageListener(bulkBuffer);
-
     /* connect buffer to logger */
+    dummyBroadcaster->addMessageListener(bulkBuffer);
     bulkBuffer->addNotificationListener(badLogger);
     bulkBuffer->addMessageListener(badLogger);
+
+    bulkBuffer->start();
 
     badLogger->start();
 
     /* putting some data to the buffer results in error message */
     bulkBuffer->putItem(std::make_pair<size_t, std::string>(1234, "bulk"));
 
-    dummyBroadcaster.sendMessage(Message::NoMoreData);
+    dummyBroadcaster->sendMessage(Message::NoMoreData);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    std::unique_lock<std::mutex> lockNotifier{notifierLock};
+    notifier.wait(lockNotifier, [&logged, &shouldExit]{return logged || shouldExit;});
+    lockNotifier.unlock();
+
+    /* get metrics */
+    metrics = badLogger->getMetrics();
   }
 
   /* get error message string */
   std::string errorMessage{outputStream.str()};
 
-  /* error message sholud contain expected file name */
-  BOOST_CHECK(errorMessage.find("1234_1.log") != std::string::npos);
+  /* error message sholud contain expected text */
+  BOOST_CHECK(errorMessage.find("Cannot create log file") != std::string::npos);
 
-  /* get metrics string */
-  std::string metrics{metricsStream.str()};
 
-  /* metrics sholud contain expected text */
-  BOOST_CHECK(std::string("file thread #0 - 0 bulk(s), 0 command(s)\n"
-                          "file thread #1 - 0 bulk(s), 0 command(s)\n") == metrics);
+  /* metrics sholud contain expected values */
+  BOOST_CHECK(metrics[0]->totalBulkCount == 0
+              && metrics[0]->totalCommandCount == 0
+              && metrics[1]->totalBulkCount == 0
+              && metrics[1]->totalCommandCount == 0);
 }
 
 BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
-  const auto emptyBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>()};
+  const auto emptyBuffer{
+    std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
+          "empty buffer"
+          )
+  };
 
   /* create a dummy message broadcaster */
   MessageBroadcaster dummyBroadcaster{};
   dummyBroadcaster.addMessageListener(emptyBuffer);
+
+  emptyBuffer->start();
 
   /* emptyBuffer.getItem() should throw an exception */
   BOOST_CHECK_THROW((emptyBuffer->getItem()), std::out_of_range);
@@ -216,10 +241,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 {
   try
   {
-    /* user input imitation: entering bulk size */
-    std::stringstream inputStream{"-1\n"
-                                  "2\n"};
-
+    std::stringstream inputStream{};
     std::stringstream outputStream{};
     std::stringstream errorStream{};
     std::stringstream metricsStream{};
@@ -227,20 +249,16 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
     char* arg[]{"/home/user/bulk"};
 
     {
-      homework(1, arg, inputStream, outputStream, errorStream, metricsStream);
+      BOOST_CHECK(homework(1, arg, inputStream, outputStream, errorStream, metricsStream) == 1);
     }
 
-    /* application outpur should contain expected text*/
-    BOOST_CHECK(outputStream.str() ==
-                "\nPlease enter bulk size (must be greater than 0): "
-                "\nPlease enter bulk size (must be greater than 0): ");
+    /* error output should contain expected text*/
+    BOOST_CHECK(errorStream.str() ==
+                "usage: bulkmt [bulk size]\n");
 
-    /* metrics sholud contain expected text */
-    BOOST_CHECK(metricsStream.str() ==
-                "main thread - 0 string(s), 0 command(s), 0 bulk(s)\n"
-                "log thread - 0 bulk(s), 0 command(s)\n"
-                "file thread #0 - 0 bulk(s), 0 command(s)\n"
-                "file thread #1 - 0 bulk(s), 0 command(s)\n");
+    /* application metrics and output sholud be empty */
+    BOOST_CHECK(outputStream.str() == ""
+                && metricsStream.str() == "");
 
   }
   catch (const std::exception& ex)
@@ -651,13 +669,20 @@ BOOST_AUTO_TEST_CASE(logging_test)
 
     /* build log file name */
     --ticksCount;
-    while (!std::ifstream{std::to_string(ticksCount).append("_1.log")})
+    while (!std::ifstream{std::to_string(ticksCount).append("_11.log")}
+           &&!std::ifstream{std::to_string(ticksCount).append("_12.log")})
     {
       ++ticksCount;
     }
 
-    std::string logFileName{
-      std::to_string(ticksCount).append("_1.log")
+    std::string logFileName;
+    if (std::ifstream{std::to_string(ticksCount).append("_11.log")})
+    {
+      logFileName = std::to_string(ticksCount) + "_11.log";
+    }
+    else
+    {
+      logFileName = std::to_string(ticksCount) + "_12.log";
     };
 
     std::ifstream logFile(logFileName);
@@ -697,87 +722,35 @@ BOOST_AUTO_TEST_CASE(logging_test)
   }
 }
 
-BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
+BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
 {
   try
   {
-    /* wait 2 seconds to get separate log file for this test */
-    std::this_thread::sleep_for(std::chrono::seconds{2});
-
-    const std::string testString{
-      "cmd1\n"
-      "cmd2\n"
-      "cmd3\n"
-      "cmd4\n"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 1, DebugOutput::debug_off)
+    std::string inputString{
+      "a\nb\nc\nd\n"
     };
 
-    /* get current time */
-    std::chrono::time_point<std::chrono::system_clock>
-    bulkStartTime{std::chrono::system_clock::now()};
-    /* convert bulk start time to integer ticks count */
-    auto ticksCount{
-      std::chrono::duration_cast<std::chrono::seconds>
-      (
-        bulkStartTime.time_since_epoch()
-      ).count()
-    };
-
-    /* build log file name */
-    --ticksCount;
-    while (!std::ifstream{std::to_string(ticksCount).append("_1.log")})
-    {
-      ++ticksCount;
-    }
-
-    std::string logFileName{};
-    std::ifstream logFile{};
-    std::string logString{};
-
-    const size_t filesCount{4};
-
-    for (size_t i{1}; i <= filesCount; ++i)
-    {
-      logFileName = std::to_string(ticksCount) +
-                    + "_" + std::to_string(i) + ".log";
-
-      logFile.open(logFileName);
-
-      /* check log file state */
-      BOOST_CHECK(logFile);
-
-      std::getline(logFile, logString);
-
-      /* check log file content */
-      BOOST_CHECK(logString ==
-                  "bulk: cmd" + std::to_string(i));
-
-      logFile.close();
-    }
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0].size() == 4);
-    for (size_t i{1}; i <= 4; ++i)
-    {
-      BOOST_CHECK(processorOutput[0][i - 1] ==
-                  "bulk: cmd" + std::to_string(i));
-    }
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
+    std::stringstream inputStream{inputString};
+    std::stringstream outputStream{};
+    std::stringstream errorStream{};
     std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
 
-    checkMetrics(metricsStream, 4, 4, 4);
+    CommandProcessor<2> testProcessor {
+      inputStream, outputStream, errorStream, metricsStream,
+      3, '<', '>'
+    };
+
+    testProcessor.getBulkBuffer()->notify();
+
+    testProcessor.run();
+
+    auto errorMessage{errorStream.str()};
+
+    BOOST_CHECK(errorMessage.find("Abnormal termination")
+                != std::string::npos);
+
+    BOOST_CHECK(errorMessage.find("Buffer is empty!")
+                != std::string::npos);
   }
   catch (const std::exception& ex)
   {
@@ -787,4 +760,7 @@ BOOST_AUTO_TEST_CASE(log_file_name_uniqueness_test)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+
 

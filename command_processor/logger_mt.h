@@ -1,9 +1,7 @@
-// logger.h in Otus homework#7 project
+// logger.h in Otus homework#11 project
 
 #pragma once
 
-#include "listeners.h"
-#include "smart_buffer_mt.h"
 #include <chrono>
 #include <iostream>
 #include <memory>
@@ -11,134 +9,183 @@
 #include <vector>
 #include <thread>
 #include <fstream>
+#include "listeners.h"
+#include "smart_buffer_mt.h"
+#include "thread_metrics.h"
+#include "async_worker.h"
+
 
 template <size_t threadsCount = 2u>
 class Logger : public NotificationListener,
                public MessageListener,
                public MessageBroadcaster,
-               public std::enable_shared_from_this<NotificationListener>
+               public std::enable_shared_from_this<NotificationListener>,
+               public AsyncWorker<threadsCount>
 {
 public:
 
   using DataType = std::pair<size_t, std::string>;
 
-  Logger(const std::shared_ptr<SmartBuffer<DataType>>& newBuffer,
+  Logger(const std::string& newWorkerName,
+         const std::shared_ptr<SmartBuffer<DataType>>& newBuffer,
+         bool& newTerminationFlag, bool& newAbortFlag,
+         std::condition_variable& newTerminationNotifier,
          const std::string& newDestinationDirectory = "",
-         std::ostream& newErrorOut = std::cerr, std::ostream& newMetricsOut = std::cout) :
+         std::ostream& newErrorOut = std::cerr) :
+    AsyncWorker<threadsCount>{newWorkerName},
     buffer{newBuffer}, destinationDirectory{newDestinationDirectory}, errorOut{newErrorOut},
-    shouldExit{false}, notificationsCount{0},
     previousTimeStamp{}, additionalNameSection{},
-    workingThreads{}, threadMetrics{}, metricsOut{newMetricsOut}
+    threadMetrics{},
+    terminationFlag{newTerminationFlag}, abortFlag{newAbortFlag},
+    terminationNotifier{newTerminationNotifier}
   {
     if (nullptr == buffer)
     {
       throw(std::invalid_argument{"Logger source buffer not defined!"});
     }
+
+    for (size_t threadIndex{0}; threadIndex < threadsCount; ++threadIndex)
+    {
+      threadMetrics.push_back(std::make_shared<ThreadMetrics>(
+          std::string{"logger thread#"} + std::to_string(threadIndex)
+      ));
+      additionalNameSection.push_back(1);
+    }
+    threadFinished.resize(threadsCount, false);
   }
 
   ~Logger()
   {
-    shouldExit = true;
-    threadNotifier.notify_all();
-    for (auto& thread : workingThreads)
-    {
-      if (thread.joinable() == true)
-      {
-        thread.join();
-      }
-    }
-
-    /* Output metrics */
-    for (size_t threadNumber{}; threadNumber < threadsCount; ++threadNumber)
-    {
-      metricsOut << "file thread #" << threadNumber
-                 << " - " << threadMetrics[threadNumber].totalBulksCount
-                 << " bulk(s), " << threadMetrics[threadNumber].totalCommandsCount
-                 << " command(s)" << std::endl;
-    }
+    this->stop();
   }
 
   void reactNotification(NotificationBroadcaster* sender) override
   {
     if (buffer.get() == sender)
     {
-      {
-        std::lock_guard<std::mutex> lockNotifier{notifierLock};
-        ++notificationsCount;
-      }
-      threadNotifier.notify_one();
+      ++this->notificationCount;
+      this->threadNotifier.notify_one();
     }
   }
 
   void reactMessage(class MessageBroadcaster* sender, Message message) override
   {
-    if (Message::NoMoreData == message)
+    switch(message)
     {
-      shouldExit = true;
-      threadNotifier.notify_all();
+    case Message::NoMoreData :
+      if (buffer.get() == sender)
+      {
+        this->noMoreData = true;
+        this->threadNotifier.notify_all();
+      }
+      break;
+
+    case Message::Abort :
+      this->noMoreData = true;
+      this->shouldExit = true;
+      this->threadNotifier.notify_all();
+      sendMessage(Message::Abort);
     }
   }
 
-  void start()
+  const SharedMultyMetrics getMetrics()
   {
-    for (size_t threadNumber{0}; threadNumber < threadsCount; ++threadNumber)
-    {      
-      threadMetrics.push_back(MetricsRecord{});
-      additionalNameSection.push_back(0u);
-      workingThreads.push_back(std::thread{&Logger::run, this, threadNumber});
-    }
+    return threadMetrics;
   }
-
 
 private:
 
-  void run(const size_t threadNumber)
+  bool run(const size_t threadIndex) override
   {
     try
     {
-      while(shouldExit != true)
+      while(this->shouldExit != true
+            && (this->noMoreData != true || this->notificationCount > 0))
       {
-        std::unique_lock<std::mutex> lockNotifier{notifierLock};
+        std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
 
-        threadNotifier.wait(lockNotifier, [this](){return this->notificationsCount.load() > 0 || shouldExit;});
-
-        if (notificationsCount.load() > 0)
+        this->threadNotifier.wait(lockNotifier, [this]()
         {
-          log(threadNumber);
-          --notificationsCount;
+          return this->noMoreData || this->notificationCount.load() > 0 || this->shouldExit;
+        });        
+
+        if (this->shouldExit == true)
+        {
+          lockNotifier.unlock();
+          break;
         }
 
-        lockNotifier.unlock();
+        if (this->notificationCount.load() > 0)
+        {
+          --this->notificationCount;
+          lockNotifier.unlock();
+          if (log(threadIndex))
+          {            
+          }
+        }
+        else
+        {
+          lockNotifier.unlock();
+        }
       }
-    }
-    catch(const std::out_of_range& ex)
-    {
-      if (ex.what() == "Buffer is empty!"
-          && shouldExit != true)
+
+      /*check if this thread is the only active one */
+      std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
+
+      size_t activeThreadCount{};
+      for (size_t idx{0}; idx < threadsCount; ++idx)
       {
-        throw;
+        if (idx != threadIndex
+            && threadFinished[idx] != true)
+        {
+          ++activeThreadCount;
+        }
       }
+
+      if (0 == activeThreadCount)
+      {
+        //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+        //sendMessage(Message::AllDataLogged);
+        terminationFlag = true;
+
+        if (true == this->shouldExit)
+        {
+          abortFlag = true;
+        }
+
+        terminationNotifier.notify_all();
+      }
+
+      threadFinished[threadIndex] = true;
+
+      lockNotifier.unlock();
+
+      //std::cout << "\n                     " << this->workerName<< " finished\n";
+
+      return true;
     }
     catch (const std::exception& ex)
     {
-      shouldExit = true;
-      sendMessage(Message::AllDataReceived);
-      errorOut << "Logger stopped. Thread #" << threadNumber << ". Reason: " << ex.what() << std::endl;
-      std::cout << "Logger stopped. Thread #" << threadNumber << ". Reason: " << ex.what() << std::endl;
+      errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+
+      threadFinished[threadIndex] = true;
+      this->shouldExit = true;
+      this->threadNotifier.notify_all();
+
+      sendMessage(Message::Abort);
+
+      abortFlag = true;
+      terminationNotifier.notify_all();
+
+      return false;
     }
   }
 
-  struct MetricsRecord
-  {
-    size_t totalBulksCount{};
-    size_t totalCommandsCount{};
-  };
-
-  bool log(const size_t threadNumber)
+  bool log(const size_t threadIndex)
   {
     if (nullptr == buffer)
     {
-      return false;
+      throw(std::invalid_argument{"Logger source buffer not defined!"});
     }
 
     std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
@@ -146,7 +193,7 @@ private:
     if (buffer->dataSize() == 0)
     {
       lockBuffer.unlock();
-      return false;
+      throw std::out_of_range{"Buffer is empty!"};
     }
 
     auto bufferReply{buffer->getItem(shared_from_this())};    
@@ -154,7 +201,8 @@ private:
     lockBuffer.unlock();
 
     if (false == bufferReply.first)
-    {      
+    {
+     // std::cout << "\n                     " << this->workerName<< " FALSE received\n";
       return false;
     }
 
@@ -162,22 +210,25 @@ private:
 
     if (nextBulkInfo.first != previousTimeStamp)
     {
-      additionalNameSection[threadNumber] = 1u;
+      additionalNameSection[threadIndex] = 1u;
+      previousTimeStamp = nextBulkInfo.first;
     }
 
     std::string bulkFileName{
       destinationDirectory + std::to_string(nextBulkInfo.first)
     };
 
-    auto fileNameSuffix {std::to_string(additionalNameSection[threadNumber])};
+    auto fileNameSuffix {std::to_string(additionalNameSection[threadIndex])
+          + std::to_string(threadIndex + 1)};
     auto logFileName {bulkFileName + "_" + fileNameSuffix +  ".log"};
 
-    while (std::ifstream {logFileName})
-    {
-      ++additionalNameSection[threadNumber];
-      fileNameSuffix = std::to_string(additionalNameSection[threadNumber]);
-      logFileName = bulkFileName+ "_" + fileNameSuffix + ".log";
-    }    
+//    while (std::ifstream {logFileName})
+//    {
+//      ++additionalNameSection[threadIndex];
+//      fileNameSuffix = std::to_string(additionalNameSection[threadIndex])
+//                       + "_" + std::to_string(threadIndex + 1);
+//      logFileName = bulkFileName+ "_" + fileNameSuffix + ".log";
+//    }
 
     std::ofstream logFile{logFileName};
 
@@ -185,17 +236,17 @@ private:
     {
       errorOut << "Cannot create log file " <<
                   logFileName << " !" << std::endl;
-      return false;
+      throw(std::ios_base::failure{"Log file creation error!"});
     }
 
     logFile << nextBulkInfo.second << '\n';
     logFile.close();
 
-    ++additionalNameSection[threadNumber];
+    ++additionalNameSection[threadIndex];
 
     /* Refresh metrics */
-    ++threadMetrics[threadNumber].totalBulksCount;
-    threadMetrics[threadNumber].totalCommandsCount
+    ++threadMetrics[threadIndex]->totalBulkCount;
+    threadMetrics[threadIndex]->totalCommandCount
         += std::count(nextBulkInfo.second.begin(),
                       nextBulkInfo.second.end(), ',') + 1;
 
@@ -207,17 +258,16 @@ private:
   std::string destinationDirectory;
   std::ostream& errorOut;
 
-  bool shouldExit;
-  std::atomic<size_t> notificationsCount;
-  std::condition_variable threadNotifier{};
-  std::mutex notifierLock;
-
   size_t previousTimeStamp;
   std::vector<size_t> additionalNameSection;
 
-  std::vector<std::thread> workingThreads;
-  std::vector<MetricsRecord> threadMetrics;
-  std::ostream& metricsOut;
+  SharedMultyMetrics threadMetrics;
+
+  std::vector<bool> threadFinished;
+
+  bool& terminationFlag;
+  bool& abortFlag;
+  std::condition_variable& terminationNotifier;
 };
 
 

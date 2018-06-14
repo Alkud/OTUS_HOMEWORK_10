@@ -4,6 +4,7 @@
 CMakeFiles/bulkmt.dir/bulkmt.cpp.o: ./homework_10.h
 CMakeFiles/bulkmt.dir/bulkmt.cpp.o: bulkmt.cpp
 
+CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/async_worker.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/broadcasters.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/command_processor_mt.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/input_processor.h
@@ -12,6 +13,7 @@ CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/listeners.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/logger_mt.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/publisher_mt.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/smart_buffer_mt.h
+CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/thread_metrics.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/weak_ptr_less.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: homework_10.cpp
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: homework_10.h

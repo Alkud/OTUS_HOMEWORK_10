@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/async_worker.h
+thread
+-
+mutex
+-
+atomic
+-
+vector
+-
+future
+-
+cassert
+-
+
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/broadcasters.h
 set
 -
@@ -23,14 +37,16 @@ input_processor.h
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/input_processor.h
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/input_processor.h
-smart_buffer_mt.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
 memory
 -
 chrono
 -
 ctime
 -
+smart_buffer_mt.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
+thread_metrics.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/thread_metrics.h
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/input_reader.cpp
 input_reader.h
@@ -63,10 +79,6 @@ publisher_mt.h
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/publisher_mt.h
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/publisher_mt.h
-listeners.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/listeners.h
-smart_buffer_mt.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
 iostream
 -
 memory
@@ -77,10 +89,14 @@ thread
 -
 condition_variable
 -
+listeners.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/listeners.h
+smart_buffer_mt.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
+thread_metrics.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/thread_metrics.h
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
-broadcasters.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/broadcasters.h
 deque
 -
 algorithm
@@ -91,13 +107,29 @@ mutex
 -
 shared_mutex
 -
-weak_ptr_less.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h
 iostream
 -
 thread
 -
 atomic
+-
+async_worker.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/async_worker.h
+broadcasters.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/broadcasters.h
+weak_ptr_less.h
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h
+
+/home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/thread_metrics.h
+cstddef
+-
+string
+-
+unordered_map
+-
+vector
+-
+memory
 -
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h

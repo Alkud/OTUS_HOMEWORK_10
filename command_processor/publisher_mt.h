@@ -1,43 +1,43 @@
-// publisher.h in Otus homework#7 project
+// publisher.h in Otus homework#11 project
 
 #pragma once
 
-#include "listeners.h"
-#include "smart_buffer_mt.h"
 #include <iostream>
 #include <memory>
 #include <atomic>
 #include <thread>
 #include <condition_variable>
+#include "listeners.h"
+#include "smart_buffer_mt.h"
+#include "thread_metrics.h"
+
 
 class Publisher : public NotificationListener,
                   public MessageListener,
                   public MessageBroadcaster,
-                  public std::enable_shared_from_this<NotificationListener>
+                  public std::enable_shared_from_this<NotificationListener>,
+                  public AsyncWorker<1>
 {
 public:
 
-  Publisher(const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newBuffer,
+  Publisher(const std::string& newWorkerName,
+            const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newBuffer,
+            bool& newTerminationFlag, bool& newAbortFlag,
+            std::condition_variable& newTerminationNotifier,
             std::ostream& newOutput, std::mutex& newOutpuLock,
-            std::ostream& newErrorOut = std::cerr, std::ostream& newMetricksOut = std::cout);
+            std::ostream& newErrorOut = std::cerr);
 
   ~Publisher();
-
-  void start();
 
   void reactNotification(NotificationBroadcaster* sender) override;
 
   void reactMessage(MessageBroadcaster* sender, Message message) override;
 
+  const SharedMetrics getMetrics();
+
 private:
 
-  struct MetricsRecord
-  {
-    size_t totalBulksCount{};
-    size_t totalCommandsCount{};
-  };
-
-  void run();
+  bool run(const size_t) override;
 
   bool publish();
 
@@ -47,13 +47,10 @@ private:
   std::ostream& output;
   std::mutex& outputLock;  
 
-  bool shouldExit;
-  std::atomic<size_t> notificationsCount;
-  std::condition_variable threadNotifier{};
-  std::mutex notifierLock;
-
-  std::thread workingThread;
-  MetricsRecord threadMetrics;
+  SharedMetrics threadMetrics;
   std::ostream& errorOut;
-  std::ostream& metricsOut;
+
+  bool& terminationFlag;
+  bool& abortFlag;
+  std::condition_variable& terminationNotifier;
 };

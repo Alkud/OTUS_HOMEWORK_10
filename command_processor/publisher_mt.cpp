@@ -1,15 +1,18 @@
-// publisher.cpp in Otus homework#7 project
+// publisher.cpp in Otus homework#11 project
 
 #include "publisher_mt.h"
 
 
-Publisher::Publisher(const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newBuffer,
+Publisher::Publisher(const std::string& newWorkerName,
+                     const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newBuffer, bool& newTerminationFlag, bool& newAbortFlag, std::condition_variable& newTerminationNotifier,
                      std::ostream& newOutput, std::mutex& newOutpuLock,
-                     std::ostream& newErrorOut, std::ostream& newMetricksOut) :
+                     std::ostream& newErrorOut) :
+  AsyncWorker<1>{newWorkerName},
   buffer{newBuffer}, output{newOutput}, outputLock{newOutpuLock},
-  shouldExit{false}, notificationsCount{0},
-  workingThread{}, threadMetrics{},
-  errorOut{newErrorOut}, metricsOut{newMetricksOut}
+  threadMetrics{std::make_shared<ThreadMetrics>("publisher")},
+  errorOut{newErrorOut},
+  terminationFlag{newTerminationFlag}, abortFlag{newAbortFlag},
+  terminationNotifier{newTerminationNotifier}
 {
   if (nullptr == buffer)
   {
@@ -19,73 +22,110 @@ Publisher::Publisher(const std::shared_ptr<SmartBuffer<std::pair<size_t, std::st
 
 Publisher::~Publisher()
 {
-  shouldExit = true;
-  threadNotifier.notify_all();
-  if (workingThread.joinable())
-  {
-    workingThread.join();
-  }
-
-  /* Output metrics */
-  metricsOut << "log thread"
-             << " - " << threadMetrics.totalBulksCount << " bulk(s), "
-             << threadMetrics.totalCommandsCount << " command(s)" << std::endl;
+  stop();
 }
 
 void Publisher::reactNotification(NotificationBroadcaster* sender)
 {
   if (buffer.get() == sender)
-  {
-    std::lock_guard<std::mutex> lockNotifier{notifierLock};
-    ++notificationsCount;
+  {    
+    ++notificationCount;
     threadNotifier.notify_one();
   }
 }
 
 void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  if (Message::NoMoreData == message)
+  switch(message)
   {
-    shouldExit = true;
-    threadNotifier.notify_one();
+  case Message::NoMoreData :
+    if (buffer.get() == sender)
+    {
+      //std::cout << "\n                    publisher NoMoreData received\n";
+      this->noMoreData = true;
+      this->threadNotifier.notify_all();
+    }
+    break;
+
+  case Message::Abort :
+    this->noMoreData = true;
+    this->shouldExit = true;
+    this->threadNotifier.notify_all();
+    sendMessage(Message::Abort);
   }
 }
 
-void Publisher::start()
+const SharedMetrics Publisher::getMetrics()
 {
-  if (workingThread.joinable() != true)
-  {
-    workingThread = std::thread{&Publisher::run, this};
-  }
+  return threadMetrics;
 }
 
-void Publisher::run()
+bool Publisher::run(const size_t)
 {
   try
   {
-    while(shouldExit != true)
+    while(noMoreData != true)
     {
+      if (true == shouldExit)
+      {
+        break;
+      }
 
-      std::unique_lock<std::mutex> lockNotifier{notifierLock};
-
-      threadNotifier.wait(lockNotifier, [this](){return this->notificationsCount.load() > 0 || shouldExit;});
-
-      lockNotifier.unlock();
-
-      if (notificationsCount.load() > 0)
+      if (notificationCount.load() > 0)
       {
         if (publish() == true)
         {
-          --notificationsCount;
+          --notificationCount;
+        }
+      }
+      else if (noMoreData != true)
+      {
+        /* wait for new notifications or NoMoreData message */
+        std::unique_lock<std::mutex> lockNotifier{notifierLock};
+        threadNotifier.wait(lockNotifier, [this]()
+        {
+          return shouldExit || noMoreData || notificationCount.load() > 0;
+        });
+        lockNotifier.unlock();
+      }
+    }
+
+    if (shouldExit != true)
+    {
+      while (notificationCount.load() > 0)
+      {
+        if (publish() == true)
+        {
+          --notificationCount;
+        }
+        else
+        {
+          //std::cout << "\n                    publisher has wrong notification count \n";
+          break;
         }
       }
     }
+
+    //sendMessage(Message::AllDataPublsihed);
+    terminationFlag = true;
+    if (true == shouldExit)
+    {
+      abortFlag = true;
+    }
+    terminationNotifier.notify_all();
+
+    return true;
   }
   catch (const std::exception& ex)
   {
-    sendMessage(Message::AllDataReceived);
-    shouldExit = true;
-    errorOut << "Publisher stopped. Reason: " << ex.what() << std::endl;
+    errorOut << workerName << " stopped. Reason: " << ex.what() << std::endl;
+
+    sendMessage(Message::Abort);
+
+    abortFlag = true;
+    terminationNotifier.notify_all();
+
+    return false;
   }
 }
 
@@ -93,7 +133,7 @@ bool Publisher::publish()
 {
   if (nullptr == buffer)
   {
-    return false;
+    throw(std::invalid_argument{"Logger source buffer not defined!"});
   }
 
   std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
@@ -101,7 +141,7 @@ bool Publisher::publish()
   if (buffer->dataSize() == 0)
   {
     lockBuffer.unlock();
-    return false;
+    throw std::out_of_range{"Buffer is empty!"};
   }
 
   auto bufferReply{buffer->getItem(shared_from_this())};
@@ -119,8 +159,8 @@ bool Publisher::publish()
   output << nextBulkInfo.second << '\n';
 
   /* Refresh metrics */
-  ++threadMetrics.totalBulksCount;
-  threadMetrics.totalCommandsCount
+  ++threadMetrics->totalBulkCount;
+    threadMetrics->totalCommandCount
       += std::count(nextBulkInfo.second.begin(),
                     nextBulkInfo.second.end(), ',') + 1;
 

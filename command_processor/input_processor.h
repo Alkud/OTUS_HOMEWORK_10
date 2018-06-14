@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include "smart_buffer_mt.h"
 #include <memory>
 #include <chrono>
 #include <ctime>
+#include "smart_buffer_mt.h"
+#include "thread_metrics.h"
 
 
 class InputProcessor : public NotificationListener,
@@ -20,7 +21,7 @@ public:
                  const char& newBulkCloseDelimiter,
                  const std::shared_ptr<SmartBuffer<std::string>>& newInputBuffer,
                  const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newOutputBuffer,
-                 std::ostream& newErrorOut, std::ostream& newMetricsOut);
+                 std::ostream& newErrorOut);
 
   ~InputProcessor();
 
@@ -28,15 +29,9 @@ public:
 
   void reactMessage(MessageBroadcaster* sender, Message message) override;
 
+  const SharedMetrics getMetrics();
 
 private:
-  struct MetricsRecord
-  {
-    size_t totalStringsCount{};
-    size_t totalCommandsCount{};
-    size_t totalBulksCount{};
-  };
-
   void sendCurrentBulk();
   void startNewBulk();
   void closeCurrentBulk();
@@ -54,7 +49,7 @@ private:
   size_t nestingDepth;
   std::chrono::time_point<std::chrono::system_clock> bulkStartTime;
 
-  MetricsRecord threadMetrics;
   std::ostream& errorOut;
-  std::ostream& metricsOut;
+
+  SharedMetrics threadMetrics;
 };
