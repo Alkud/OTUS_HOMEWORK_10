@@ -33,5 +33,5 @@ private:
   std::mutex& inputLock;
   std::shared_ptr<SmartBuffer<std::string>> buffer;
 
-  bool allDataReceived;
+  bool shouldExit;
 };

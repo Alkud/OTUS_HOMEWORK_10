@@ -8,11 +8,10 @@ int main(int argc, char* argv[])
 {
   try
   {
-    homework(argc, argv, std::cin, std::cout);
+    return(homework(argc, argv, std::cin, std::cout));
   }
   catch(const std::exception& ex)
   {
     std::cerr << ex.what();
-  }
-  return 0;
+  }  
 }

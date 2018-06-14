@@ -5,7 +5,7 @@
 InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpenDelimiter, const char& newBulkCloseDelimiter,
                                const std::shared_ptr<SmartBuffer<std::string> >& newInputBuffer,
                                const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer,
-                               std::ostream& newErrorOut, std::ostream& newMetricsOut) :
+                               std::ostream& newErrorOut) :
   bulkSize{newBulkSize > 1 ? newBulkSize : 1},
   bulkOpenDelimiter{newBulkOpenDelimiter},
   bulkCloseDelimiter{newBulkCloseDelimiter},
@@ -13,96 +13,122 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
   outputBuffer{newOutputBuffer},
   customBulkStarted{false},
   nestingDepth{0},
-  errorOut{newErrorOut}, metricsOut{newMetricsOut}
+  errorOut{newErrorOut},
+  threadMetrics{std::make_shared<ThreadMetrics>("input processor")}
 {}
 
 InputProcessor::~InputProcessor()
 {
-  /* Output metrics */
-  metricsOut << "main thread"
-             << " - " << threadMetrics.totalStringsCount << " string(s), "
-             << threadMetrics.totalCommandsCount << " command(s), "
-             << threadMetrics.totalBulksCount << " bulk(s)" << std::endl;
 }
 
 void InputProcessor::reactNotification(NotificationBroadcaster* sender)
 {
   if (inputBuffer.get() == sender)
   {
-    std::unique_lock<std::mutex> lockInputBuffer{inputBuffer->dataLock};
-    auto bufferReply{inputBuffer->getItem(shared_from_this())};
-    lockInputBuffer.unlock();
+    try
+    {
+      std::unique_lock<std::mutex> lockInputBuffer{inputBuffer->dataLock};
+      auto bufferReply{inputBuffer->getItem(shared_from_this())};
+      lockInputBuffer.unlock();
 
-    if (false == bufferReply.first)
-     {
-       return;
+      if (false == bufferReply.first)
+       {
+         return;
+       }
+
+      auto nextCommand{bufferReply.second};
+      ++threadMetrics->totalStringCount;
+
+      if (bulkOpenDelimiter == nextCommand)          // bulk open command received
+      {
+        /* if a custom bulk isn't started,
+         * send accumulated commands to the output buffer,
+         * then start a new custom bulk */
+        if (customBulkStarted == false)
+        {
+          startNewBulk();
+        }
+
+        ++nestingDepth;
+      }
+      else if (bulkCloseDelimiter == nextCommand)    // bulk close command received
+      {
+        if (nestingDepth >= 1)
+        {
+           --nestingDepth;
+        }
+
+        /* if a custom bulk is started,
+        * send accumulated commands to the output buffer,
+        * then label custom bulk as closed */
+        if (true == customBulkStarted &&
+           0 == nestingDepth)
+        {
+         closeCurrentBulk();
+        }
+      }
+      else                                           // any other command received
+      {
+       /* if no custom bulk started and temporary buffer is empty,
+        * reset bulk start time */
+       if (false == customBulkStarted &&
+           true == tempBuffer.empty())
+       {
+         bulkStartTime = std::chrono::system_clock::now();
+       }
+       /* put new command to the temporary buffer */
+       addCommandToBulk(std::move(nextCommand));
+       /* if custom bulk isn't started,
+        * and current bulk is complete,
+        * send it to the output buffer */
+       if (tempBuffer.size() == bulkSize &&
+           customBulkStarted == false)
+       {
+         sendCurrentBulk();
+       }
      }
-
-    auto nextCommand{bufferReply.second};
-    ++threadMetrics.totalStringsCount;
-
-    if (bulkOpenDelimiter == nextCommand)          // bulk open command received
-    {
-      /* if a custom bulk isn't started,
-       * send accumulated commands to the output buffer,
-       * then start a new custom bulk */
-      if (customBulkStarted == false)
-      {
-        startNewBulk();
-      }
-
-      ++nestingDepth;
     }
-    else if (bulkCloseDelimiter == nextCommand)    // bulk close command received
+    catch(std::exception& ex)
     {
-      if (nestingDepth >= 1)
-      {
-         --nestingDepth;
-      }
+      std::cout << "\n                     processor ABORT\n";
 
-      /* if a custom bulk is started,
-       * send accumulated commands to the output buffer,
-       * then label custom bulk as closed */
-      if (true == customBulkStarted &&
-          0 == nestingDepth)
-      {
-        closeCurrentBulk();
-      }
-    }
-    else                                           // any other command received
-    {
-      /* if no custom bulk started and temporary buffer is empty,
-       * reset bulk start time */
-      if (false == customBulkStarted &&
-          true == tempBuffer.empty())
-      {
-        bulkStartTime = std::chrono::system_clock::now();
-      }
-      /* put new command to the temporary buffer */
-      addCommandToBulk(std::move(nextCommand));
-      /* if custom bulk isn't started,
-       * and current bulk is complete,
-       * send it to the output buffer */
-      if (tempBuffer.size() == bulkSize &&
-          customBulkStarted == false)
-      {
-        sendCurrentBulk();
-      }
+      sendMessage(Message::Abort);
+      std::cerr << ex.what();
     }
   }
 }
 
 void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  if (Message::NoMoreData == message
-      && inputBuffer.get() == sender)
+  switch (message)
   {
+  case Message::NoMoreData:
+    if (inputBuffer.get() == sender)
+    {
+      if (customBulkStarted != true)
+      {
+        closeCurrentBulk();
+      }
+      sendMessage(Message::NoMoreData);
+     }
+     break;
+
+  case Message::Abort :
     if (customBulkStarted != true)
     {
       closeCurrentBulk();
-    }    
-    sendMessage(Message::NoMoreData);
+    }
+    sendMessage(Message::Abort);
+    break;
+
+   default:
+     break;
   }
+}
+
+const SharedMetrics InputProcessor::getMetrics()
+{
+  return threadMetrics;
 }
 
 void InputProcessor::sendCurrentBulk()
@@ -137,8 +163,8 @@ void InputProcessor::sendCurrentBulk()
   }
 
   /* Refresh metrics */
-  threadMetrics.totalCommandsCount += tempBuffer.size();
-  ++threadMetrics.totalBulksCount;
+  threadMetrics->totalCommandCount += tempBuffer.size();
+  ++threadMetrics->totalBulkCount;
 
   /*clear temporary buffer */
   tempBuffer.clear();

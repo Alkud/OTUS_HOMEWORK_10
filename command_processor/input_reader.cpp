@@ -10,7 +10,7 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
   input{newInput},
   inputLock{newInputLock},
   buffer{newBuffer},
-  allDataReceived{false}
+  shouldExit{false}
 {
   if (nullptr == buffer)
   {
@@ -31,7 +31,8 @@ void InputReader::read()
   try
   {
     std::lock_guard<std::mutex> lockInput{inputLock};
-    while(std::getline(input, nextString))
+    while(shouldExit!= true
+          && std::getline(input, nextString))
     {
       if (nextString.size() > (size_t)InputReaderSettings::MaxInputStringSize)
       {
@@ -45,20 +46,20 @@ void InputReader::read()
   }
   catch(std::exception& ex)
   {
-    sendMessage(Message::NoMoreData);
-    throw;
+    std::cout << "\n                     reader ABORT\n";
+
+    sendMessage(Message::Abort);
+    std::cerr << ex.what();
   }
   sendMessage(Message::NoMoreData);
-
-  while(allDataReceived != true){
-    std::this_thread::sleep_for(std::chrono::milliseconds{20});
-  }
 }
 
 void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  if (Message::AllDataReceived == message)
+  switch(message)
   {
-    allDataReceived = true;
+  case Message::Abort :
+    shouldExit = true;
+    break;
   }
 }

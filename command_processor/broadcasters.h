@@ -8,11 +8,19 @@
 #include "listeners.h"
 #include "weak_ptr_less.h"
 
+/// inteprocess exchange messages
 enum class Message
 {
+  /// no more data will be committed
   NoMoreData,
-  AllDataReceived
+  /// all bulks  have been published
+  AllDataPublsihed,
+  /// all bulks have been written to files
+  AllDataLogged,
+  /// some exception caught, need stop all threads
+  Abort
 };
+
 /// Base class for a brodcaster, sending messages,
 /// containing instructions for listeners
 class MessageBroadcaster
@@ -20,7 +28,7 @@ class MessageBroadcaster
 public:  
   virtual ~MessageBroadcaster()
   {
-    clearMessageListenersList();
+    clearMessageListenerList();
   }
 
   /// Add a new listeners
@@ -60,7 +68,7 @@ public:
   }
 
   /// Remove all listenenrs from the list
-  virtual void clearMessageListenersList()
+  virtual void clearMessageListenerList()
   {
     messageListeners.clear();
   }
@@ -78,7 +86,7 @@ class NotificationBroadcaster
 public:
   virtual ~NotificationBroadcaster()
   {
-    clearNotificationListenersList();
+    clearNotificationListenerList();
   }
 
   /// Add a listener to the list
@@ -118,7 +126,7 @@ public:
   }
 
   /// Remove alll listenenrs from the list
-  virtual void clearNotificationListenersList()
+  virtual void clearNotificationListenerList()
   {
     notificationListeners.clear();
   }
