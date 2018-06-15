@@ -17,7 +17,7 @@ public:
 
   AsyncWorker(const std::string& newWorkerName) :
     shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{},
-    hreadFinished{}, workerName{newWorkerName}
+    threadFinished{}, workerName{newWorkerName}
   {
     futureResults.reserve(workingThreadsCount);
     threadFinished.resize(workingThreadsCount, false);
@@ -141,7 +141,7 @@ protected:
       std::unique_lock<std::mutex> lockTermination{terminationLock};
 
       size_t activeThreadCount{};
-      for (size_t idx{0}; idx < threadsCount; ++idx)
+      for (size_t idx{0}; idx < workingThreadsCount; ++idx)
       {
         if (idx != threadIndex
             && threadFinished[idx] != true)

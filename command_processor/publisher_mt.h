@@ -37,11 +37,11 @@ public:
 
 private:
 
-  virtual bool threadProcess(const size_t threadIndex) = 0;
+  bool threadProcess(const size_t threadIndex) override;
 
-  virtual void onThreadException(const std::exception& ex, const size_t threadIndex) = 0;
+  void onThreadException(const std::exception& ex, const size_t threadIndex) override;
 
-  virtual void onTermination(const size_t threadIndex) = 0;
+  void onTermination(const size_t threadIndex) override;
 
   using DataType = std::pair<size_t, std::string>;
 

@@ -88,10 +88,11 @@ public:
 
     inputReader->read();
 
-    if (shouldExit != true)
+    while (shouldExit != true
+           && ((dataLogged && dataPublished) != true))
     {
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
-      terminationNotifier.wait(lockNotifier, [this]()
+      terminationNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
         return (shouldExit) || (dataLogged && dataPublished);
       });

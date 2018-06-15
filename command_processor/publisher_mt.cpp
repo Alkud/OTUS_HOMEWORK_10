@@ -64,7 +64,7 @@ const SharedMetrics Publisher::getMetrics()
   return threadMetrics;
 }
 
-bool Publisher::threadProcess(const size_t threadIndex) override
+bool Publisher::threadProcess(const size_t threadIndex)
 {
   if (nullptr == buffer)
   {
@@ -96,7 +96,7 @@ bool Publisher::threadProcess(const size_t threadIndex) override
   return true;
 }
 
-void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex) override
+void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex)
 {
   errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
 
@@ -110,7 +110,7 @@ void Publisher::onThreadException(const std::exception& ex, const size_t threadI
   terminationNotifier.notify_all();
 }
 
-void Publisher::onTermination(const size_t threadIndex) override
+void Publisher::onTermination(const size_t threadIndex)
 {
   //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
   if (true == noMoreData && notificationCount.load() == 0)

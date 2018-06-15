@@ -138,10 +138,12 @@ public:
     switch(message)
     {
     case Message::NoMoreData :
+    {
       //std::cout << "\n                     " << workerName<< " NoMoreData received\n";
       std::lock_guard<std::mutex> lockControl{this->controlLock};
       noMoreData = true;
       threadNotifier.notify_one();
+    }
       break;
 
     case Message::Abort :

@@ -162,8 +162,8 @@ private:
     errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
 
     threadFinished[threadIndex] = true;
-    shouldExit = true;
-    threadNotifier.notify_all();
+    this->shouldExit = true;
+    this->threadNotifier.notify_all();
 
     sendMessage(Message::Abort);
 
@@ -174,12 +174,12 @@ private:
   void onTermination(const size_t threadIndex) override
   {
     //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
-    if (true == noMoreData && notificationCount.load() == 0)
+    if (true == this->noMoreData && this->notificationCount.load() == 0)
     {
       terminationFlag = true;
     }
 
-    if (true == shouldExit)
+    if (true == this->shouldExit)
     {
       abortFlag = true;
     }
