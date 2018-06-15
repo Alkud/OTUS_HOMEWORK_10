@@ -139,6 +139,8 @@ BOOST_AUTO_TEST_SUITE( homework_10_test )
 
 BOOST_AUTO_TEST_CASE( objects_creation_failure )
 {
+  std::cout << "test\n";
+
   std::mutex dummyMutex{};
   bool published{false};
   bool logged{false};
@@ -157,6 +159,8 @@ BOOST_AUTO_TEST_CASE( objects_creation_failure )
 
 BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 {
+  std::cout << "test\n";
+
   std::stringstream outputStream{};
   std::stringstream metricsStream{};
   std::string badDirectoryName{"/non_existing_directory/"};
@@ -218,6 +222,8 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
 BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
+  std::cout << "test\n";
+
   const auto emptyBuffer{
     std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
           "empty buffer"
@@ -239,6 +245,8 @@ BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 
 BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 {
+  std::cout << "test\n";
+
   try
   {
     std::stringstream inputStream{};
@@ -270,6 +278,8 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
 BOOST_AUTO_TEST_CASE(empty_input_test)
 {
+  std::cout << "test\n";
+
   try
   {
     auto processorOutput{
@@ -300,6 +310,8 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 
 BOOST_AUTO_TEST_CASE(empty_command_test)
 {
+  std::cout << "test\n";
+
   const std::string testString{"cmd1\n"
                                "\n"
                                "cmd2"};
@@ -335,6 +347,8 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString{"cmd1\n"
@@ -382,6 +396,8 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString
@@ -435,6 +451,8 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 
 BOOST_AUTO_TEST_CASE(nested_bulks_test)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString{
@@ -494,6 +512,8 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
 
 BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString{
@@ -547,6 +567,8 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 
 BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString{
@@ -598,6 +620,8 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 
 BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 {
+  std::cout << "test\n";
+
   try
   {
     const std::string testString
@@ -639,125 +663,127 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 }
 
 
-BOOST_AUTO_TEST_CASE(logging_test)
-{
-  try
-  {
-    /* wait 2 seconds to get separate log files for this test */
-    std::this_thread::sleep_for(std::chrono::seconds{2});
+//BOOST_AUTO_TEST_CASE(logging_test)
+//{
+//  std::cout << "test\n";
+//  try
+//  {
+//    /* wait 2 seconds to get separate log files for this test */
+//    std::this_thread::sleep_for(std::chrono::seconds{2});
 
-    const std::string testString{
-      "cmd1\n"
-      "cmd2\n"
-      "cmd3\n"
-      "cmd4\n"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
-    };
+//    const std::string testString{
+//      "cmd1\n"
+//      "cmd2\n"
+//      "cmd3\n"
+//      "cmd4\n"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+//    };
 
-    /* get current time */
-    std::chrono::time_point<std::chrono::system_clock>
-    bulkStartTime{std::chrono::system_clock::now()};
-    /* convert bulk start time to integer ticks count */
-    auto ticksCount{
-      std::chrono::duration_cast<std::chrono::seconds>
-      (
-        bulkStartTime.time_since_epoch()
-      ).count()
-    };
+//    /* get current time */
+//    std::chrono::time_point<std::chrono::system_clock>
+//    bulkStartTime{std::chrono::system_clock::now()};
+//    /* convert bulk start time to integer ticks count */
+//    auto ticksCount{
+//      std::chrono::duration_cast<std::chrono::seconds>
+//      (
+//        bulkStartTime.time_since_epoch()
+//      ).count()
+//    };
 
-    /* build log file name */
-    --ticksCount;
-    while (!std::ifstream{std::to_string(ticksCount).append("_11.log")}
-           &&!std::ifstream{std::to_string(ticksCount).append("_12.log")})
-    {
-      ++ticksCount;
-    }
+//    /* build log file name */
+//    --ticksCount;
+//    while (!std::ifstream{std::to_string(ticksCount).append("_11.log")}
+//           &&!std::ifstream{std::to_string(ticksCount).append("_12.log")})
+//    {
+//      ++ticksCount;
+//    }
 
-    std::string logFileName;
-    if (std::ifstream{std::to_string(ticksCount).append("_11.log")})
-    {
-      logFileName = std::to_string(ticksCount) + "_11.log";
-    }
-    else
-    {
-      logFileName = std::to_string(ticksCount) + "_12.log";
-    };
+//    std::string logFileName;
+//    if (std::ifstream{std::to_string(ticksCount).append("_11.log")})
+//    {
+//      logFileName = std::to_string(ticksCount) + "_11.log";
+//    }
+//    else
+//    {
+//      logFileName = std::to_string(ticksCount) + "_12.log";
+//    };
 
-    std::ifstream logFile(logFileName);
+//    std::ifstream logFile(logFileName);
 
-    std::string logString{};
-    std::getline(logFile, logString);
+//    std::string logString{};
+//    std::getline(logFile, logString);
 
-    /* main application output */
-    BOOST_CHECK(processorOutput[0][0] ==
-                "bulk: cmd1, cmd2, cmd3, cmd4");
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0][0] ==
+//                "bulk: cmd1, cmd2, cmd3, cmd4");
 
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
 
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
 
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
 
-    checkMetrics(metricsStream, 4, 4, 1);
+//    checkMetrics(metricsStream, 4, 4, 1);
 
-    /* check log file state */
-    BOOST_CHECK(logFile);
+//    /* check log file state */
+//    BOOST_CHECK(logFile);
 
-    /* check log file content */
-    BOOST_CHECK(logString ==
-                "bulk: cmd1, cmd2, cmd3, cmd4");
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
+//    /* check log file content */
+//    BOOST_CHECK(logString ==
+//                "bulk: cmd1, cmd2, cmd3, cmd4");
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
 
-BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
-{
-  try
-  {
-    std::string inputString{
-      "a\nb\nc\nd\n"
-    };
+//BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
+//{
+//  std::cout << "test\n";
+//  try
+//  {
+//    std::string inputString{
+//      "a\nb\nc\nd\n"
+//    };
 
-    std::stringstream inputStream{inputString};
-    std::stringstream outputStream{};
-    std::stringstream errorStream{};
-    std::stringstream metricsStream{};
+//    std::stringstream inputStream{inputString};
+//    std::stringstream outputStream{};
+//    std::stringstream errorStream{};
+//    std::stringstream metricsStream{};
 
-    CommandProcessor<2> testProcessor {
-      inputStream, outputStream, errorStream, metricsStream,
-      3, '<', '>'
-    };
+//    CommandProcessor<2> testProcessor {
+//      inputStream, outputStream, errorStream, metricsStream,
+//      3, '<', '>'
+//    };
 
-    testProcessor.getBulkBuffer()->notify();
+//    testProcessor.getBulkBuffer()->notify();
 
-    testProcessor.run();
+//    testProcessor.run();
 
-    auto errorMessage{errorStream.str()};
+//    auto errorMessage{errorStream.str()};
 
-    BOOST_CHECK(errorMessage.find("Abnormal termination")
-                != std::string::npos);
+//    BOOST_CHECK(errorMessage.find("Abnormal termination")
+//                != std::string::npos);
 
-    BOOST_CHECK(errorMessage.find("Buffer is empty!")
-                != std::string::npos);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_CHECK(false);
-    std::cerr << ex.what();
-  }
-}
+//    BOOST_CHECK(errorMessage.find("Buffer is empty!")
+//                != std::string::npos);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_CHECK(false);
+//    std::cerr << ex.what();
+//  }
+//}
 
 BOOST_AUTO_TEST_SUITE_END()
 

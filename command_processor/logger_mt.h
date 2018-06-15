@@ -75,6 +75,7 @@ public:
     case Message::NoMoreData :
       if (buffer.get() == sender)
       {
+         std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
         std::lock_guard<std::mutex> lockControl{this->controlLock};
         this->noMoreData = true;
         this->threadNotifier.notify_all();

@@ -185,59 +185,6 @@ private:
     sendMessage(Message::NoMoreData);
   }
 
-  bool run(const size_t) override
-  {
-    try
-    {
-      while(noMoreData != true)
-      {
-        if (true == shouldExit)
-        {
-          break;
-        }
-
-        if (notificationCount.load() > 0)
-        {
-
-          --notificationCount;
-        }
-//        else if (noMoreData == true && data.size() == 0)
-//        {
-//          break;
-//        }
-        else if (noMoreData != true)
-        {
-          /* wait for new notifications or exit request */
-          std::unique_lock<std::mutex> lockNotifier{notifierLock};
-
-          threadNotifier.wait(lockNotifier,
-                              [this](){return this->notificationCount.load() > 0
-                              || shouldExit
-                              || noMoreData;});
-
-          lockNotifier.unlock();
-        }
-      }
-
-      if (shouldExit != true)
-      {
-        while (notificationCount.load() > 0)
-        {
-          notify();
-          --notificationCount;
-        }
-      }
-
-
-      //std::cout << "\n                    buffer finished\n";
-
-    }
-    catch (const std::exception& ex)
-    {
-      return false;
-    }
-  }
-
 
   std::ostream& errorOut;
 

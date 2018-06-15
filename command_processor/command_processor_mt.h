@@ -88,9 +88,13 @@ public:
 
     inputReader->read();
 
+    std::cout << "\n                     CP is going to wait. dataLogged = "
+              << dataLogged << " dataPublished = " << dataPublished << "\n";
+
     while (shouldExit != true
            && ((dataLogged && dataPublished) != true))
     {
+      std::cout << "\n                     CP waiting\n";
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
       terminationNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
@@ -99,6 +103,7 @@ public:
       lockNotifier.unlock();
     }
 
+    std::cout << "\n                     CP waiting ended\n";
 
     if (shouldExit == true)
     {
