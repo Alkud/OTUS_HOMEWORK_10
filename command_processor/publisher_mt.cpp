@@ -42,16 +42,20 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
     if (buffer.get() == sender)
     {
       //std::cout << "\n                    publisher NoMoreData received\n";
-      this->noMoreData = true;
-      this->threadNotifier.notify_all();
+      std::lock_guard<std::mutex> lockControl{this->controlLock};
+      noMoreData = true;
+      threadNotifier.notify_all();
     }
     break;
 
   case Message::Abort :
-    this->noMoreData = true;
-    this->shouldExit = true;
-    this->threadNotifier.notify_all();
+  {
+    std::lock_guard<std::mutex> lockControl{this->controlLock};
+    shouldExit = true;
+    threadNotifier.notify_all();
+  }
     sendMessage(Message::Abort);
+    break;
   }
 }
 
@@ -60,108 +64,18 @@ const SharedMetrics Publisher::getMetrics()
   return threadMetrics;
 }
 
-void Publisher::onTermination(const size_t threadIndex)
-{
-
-}
-
-void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex)
-{
-
-}
-
-bool Publisher::threadProcess(const size_t threadIndex)
-{
-
-}
-
-bool Publisher::run(const size_t)
-{
-  try
-  {
-    while(noMoreData != true)
-    {
-      if (true == shouldExit)
-      {
-        break;
-      }
-
-      if (notificationCount.load() > 0)
-      {
-        if (publish() == true)
-        {
-          --notificationCount;
-        }
-      }
-      else if (noMoreData != true)
-      {
-        /* wait for new notifications or NoMoreData message */
-        std::unique_lock<std::mutex> lockNotifier{notifierLock};
-        threadNotifier.wait(lockNotifier, [this]()
-        {
-          return shouldExit || noMoreData || notificationCount.load() > 0;
-        });
-        lockNotifier.unlock();
-      }
-    }
-
-    if (shouldExit != true)
-    {
-      while (notificationCount.load() > 0)
-      {
-        if (publish() == true)
-        {
-          --notificationCount;
-        }
-        else
-        {
-          //std::cout << "\n                    publisher has wrong notification count \n";
-          break;
-        }
-      }
-    }
-
-    //sendMessage(Message::AllDataPublsihed);
-    terminationFlag = true;
-    if (true == shouldExit)
-    {
-      abortFlag = true;
-    }
-    terminationNotifier.notify_all();
-
-    return true;
-  }
-  catch (const std::exception& ex)
-  {
-    errorOut << workerName << " stopped. Reason: " << ex.what() << std::endl;
-
-    sendMessage(Message::Abort);
-
-    abortFlag = true;
-    terminationNotifier.notify_all();
-
-    return false;
-  }
-}
-
-bool Publisher::publish()
+bool Publisher::threadProcess(const size_t threadIndex) override
 {
   if (nullptr == buffer)
   {
     throw(std::invalid_argument{"Logger source buffer not defined!"});
   }
 
-  std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
-
-  if (buffer->dataSize() == 0)
+  decltype(buffer->getItem()) bufferReply{};
   {
-    lockBuffer.unlock();
-    throw std::out_of_range{"Buffer is empty!"};
+    std::lock_guard<std::mutex> lockBuffer{buffer->dataLock};
+    bufferReply = buffer->getItem(shared_from_this());
   }
-
-  auto bufferReply{buffer->getItem(shared_from_this())};
-
-  lockBuffer.unlock();
 
   if (false == bufferReply.first)
   {
@@ -180,4 +94,34 @@ bool Publisher::publish()
                     nextBulkInfo.second.end(), ',') + 1;
 
   return true;
+}
+
+void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex) override
+{
+  errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+
+  threadFinished[threadIndex] = true;
+  shouldExit = true;
+  threadNotifier.notify_all();
+
+  sendMessage(Message::Abort);
+
+  abortFlag = true;
+  terminationNotifier.notify_all();
+}
+
+void Publisher::onTermination(const size_t threadIndex) override
+{
+  //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+  if (true == noMoreData && notificationCount.load() == 0)
+  {
+    terminationFlag = true;
+  }
+
+  if (true == shouldExit)
+  {
+    abortFlag = true;
+  }
+
+  terminationNotifier.notify_all();
 }
