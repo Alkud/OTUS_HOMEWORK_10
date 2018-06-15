@@ -60,6 +60,21 @@ const SharedMetrics Publisher::getMetrics()
   return threadMetrics;
 }
 
+void Publisher::onTermination(const size_t threadIndex)
+{
+
+}
+
+void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex)
+{
+
+}
+
+bool Publisher::threadProcess(const size_t threadIndex)
+{
+
+}
+
 bool Publisher::run(const size_t)
 {
   try

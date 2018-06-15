@@ -37,9 +37,11 @@ public:
 
 private:
 
-  bool run(const size_t) override;
+  virtual bool threadProcess(const size_t threadIndex) = 0;
 
-  bool publish();
+  virtual void onThreadException(const std::exception& ex, const size_t threadIndex) = 0;
+
+  virtual void onTermination(const size_t threadIndex) = 0;
 
   using DataType = std::pair<size_t, std::string>;
 

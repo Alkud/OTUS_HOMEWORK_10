@@ -17,9 +17,10 @@ public:
 
   AsyncWorker(const std::string& newWorkerName) :
     shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{},
-    workerName{newWorkerName}
+    hreadFinished{}, workerName{newWorkerName}
   {
     futureResults.reserve(workingThreadsCount);
+    threadFinished.resize(workingThreadsCount, false);
   }
 
   virtual ~AsyncWorker()
@@ -102,9 +103,82 @@ protected:
     return workSuccess;
   }
 
-  virtual bool run(const size_t threadIndex) = 0;
+  virtual bool run(const size_t threadIndex)
+  {
+    try
+    {
+      while(this->shouldExit != true
+            && (this->noMoreData != true || this->notificationCount > 0))
+      {
+        std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
+
+        if (notificationCount.load() > 0)
+        {
+          --notificationCount;
+          lockNotifier.unlock();
+          threadProcess(threadIndex);
+        }
+        else
+        {
+          std::unique_lock<std::mutex> lockControl{controlLock};
+          if (shouldExit != true || noMoreData != true)
+          {
+            lockControl.unlock();
+            threadNotifier.wait_for(lockNotifier, std::chrono::seconds(1), [this]()
+            {
+              return this->noMoreData || this->notificationCount.load() > 0 || this->shouldExit;
+            });
+          }
+          else
+          {
+            lockControl.unlock();
+          }
+          lockNotifier.unlock();
+        }
+      }
+
+      /*check if this thread is the only active one */
+      std::unique_lock<std::mutex> lockTermination{terminationLock};
+
+      size_t activeThreadCount{};
+      for (size_t idx{0}; idx < threadsCount; ++idx)
+      {
+        if (idx != threadIndex
+            && threadFinished[idx] != true)
+        {
+          ++activeThreadCount;
+        }
+      }
+
+      if (0 == activeThreadCount)
+      {
+        //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+        onTermination(threadIndex);
+      }
+
+      threadFinished[threadIndex] = true;
+
+      lockTermination.unlock();
+
+      //std::cout << "\n                     " << this->workerName<< " finished\n";
+
+      return true;
+    }
+    catch (const std::exception& ex)
+    {
+      onThreadException(ex, threadIndex);
+      return false;
+    }
+  }
+
+  virtual bool threadProcess(const size_t threadIndex) = 0;
+
+  virtual void onThreadException(const std::exception& ex, const size_t threadIndex) = 0;
+
+  virtual void onTermination(const size_t threadIndex) = 0;
 
   std::vector<std::future<bool>> futureResults{};
+  std::mutex controlLock;
   bool shouldExit;
   bool noMoreData;
   bool isStopped;
@@ -112,6 +186,9 @@ protected:
   std::atomic<size_t> notificationCount;
   std::condition_variable threadNotifier{};
   std::mutex notifierLock;
+
+  std::vector<bool> threadFinished;
+  std::mutex terminationLock;
 
   const std::string workerName;
 };
