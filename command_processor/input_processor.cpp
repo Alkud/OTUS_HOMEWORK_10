@@ -90,7 +90,7 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
     }
     catch(std::exception& ex)
     {
-      std::cout << "\n                     processor ABORT\n";
+      //std::cout << "\n                     processor ABORT\n";
 
       sendMessage(Message::Abort);
       std::cerr << ex.what();

@@ -29,7 +29,8 @@ void Publisher::reactNotification(NotificationBroadcaster* sender)
 {
   if (buffer.get() == sender)
   {    
-    ++notificationCount;
+    std::cout << this->workerName << " reactNotification\n";
+    ++notificationCount;    
     threadNotifier.notify_one();
   }
 }

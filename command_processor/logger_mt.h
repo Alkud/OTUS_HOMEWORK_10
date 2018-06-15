@@ -51,7 +51,6 @@ public:
       ));
       additionalNameSection.push_back(1);
     }
-    threadFinished.resize(threadsCount, false);
   }
 
   ~Logger()
@@ -63,6 +62,7 @@ public:
   {
     if (buffer.get() == sender)
     {
+      std::cout << this->workerName << " reactNotification\n";
       ++this->notificationCount;
       this->threadNotifier.notify_one();
     }
@@ -75,7 +75,7 @@ public:
     case Message::NoMoreData :
       if (buffer.get() == sender)
       {
-         std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
         std::lock_guard<std::mutex> lockControl{this->controlLock};
         this->noMoreData = true;
         this->threadNotifier.notify_all();
@@ -162,7 +162,7 @@ private:
   {
     errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
 
-    threadFinished[threadIndex] = true;
+    this->threadFinished[threadIndex] = true;
     this->shouldExit = true;
     this->threadNotifier.notify_all();
 
@@ -197,8 +197,6 @@ private:
   std::vector<size_t> additionalNameSection;
 
   SharedMultyMetrics threadMetrics;
-
-  std::vector<bool> threadFinished;
 
   bool& terminationFlag;
   bool& abortFlag;

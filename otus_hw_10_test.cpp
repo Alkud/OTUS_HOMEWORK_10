@@ -137,535 +137,535 @@ void checkMetrics(std::stringstream& metricsStream,
 
 BOOST_AUTO_TEST_SUITE( homework_10_test )
 
-BOOST_AUTO_TEST_CASE( objects_creation_failure )
-{
-  std::cout << "test\n";
-
-  std::mutex dummyMutex{};
-  bool published{false};
-  bool logged{false};
-  bool shouldExit{false};
-  std::condition_variable notifier{};
-
-  /* can't create input reader with null buffer pointer */
-  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr}), std::invalid_argument);
+//BOOST_AUTO_TEST_CASE( objects_creation_failure )
+//{
+//  std::cout << "test\n";
+
+//  std::mutex dummyMutex{};
+//  bool published{false};
+//  bool logged{false};
+//  bool shouldExit{false};
+//  std::condition_variable notifier{};
+
+//  /* can't create input reader with null buffer pointer */
+//  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr}), std::invalid_argument);
 
-  /* can't create publisher with null buffer pointer */
-  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, published, shouldExit, notifier, std::cout, dummyMutex}), std::invalid_argument);
-
-  /* can't create logger with null buffer pointer */
-  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, logged, shouldExit, notifier, ""}), std::invalid_argument);
-}
-
-BOOST_AUTO_TEST_CASE(log_file_creation_failure)
-{
-  std::cout << "test\n";
-
-  std::stringstream outputStream{};
-  std::stringstream metricsStream{};
-  std::string badDirectoryName{"/non_existing_directory/"};
-  SharedMultyMetrics metrics{};
-
-  {
-    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")};
-    const auto dummyBroadcaster {std::make_shared<MessageBroadcaster>()};
-    bool logged{false};
-    bool shouldExit{false};
-    std::condition_variable notifier{};
-    std::mutex notifierLock{};
-
-    /* use bad directory name as constructor parameter */
-    const auto badLogger{
-      std::make_shared<Logger<2>>(
-            "bad logger",bulkBuffer,
-            logged, shouldExit, notifier,
-            badDirectoryName,
-            outputStream
-            )
-    };
-
-    /* connect buffer to logger */
-    dummyBroadcaster->addMessageListener(bulkBuffer);
-    bulkBuffer->addNotificationListener(badLogger);
-    bulkBuffer->addMessageListener(badLogger);
-
-    bulkBuffer->start();
-
-    badLogger->start();
-
-    /* putting some data to the buffer results in error message */
-    bulkBuffer->putItem(std::make_pair<size_t, std::string>(1234, "bulk"));
-
-    dummyBroadcaster->sendMessage(Message::NoMoreData);
-
-    std::unique_lock<std::mutex> lockNotifier{notifierLock};
-    notifier.wait(lockNotifier, [&logged, &shouldExit]{return logged || shouldExit;});
-    lockNotifier.unlock();
-
-    /* get metrics */
-    metrics = badLogger->getMetrics();
-  }
-
-  /* get error message string */
-  std::string errorMessage{outputStream.str()};
-
-  /* error message sholud contain expected text */
-  BOOST_CHECK(errorMessage.find("Cannot create log file") != std::string::npos);
-
-
-  /* metrics sholud contain expected values */
-  BOOST_CHECK(metrics[0]->totalBulkCount == 0
-              && metrics[0]->totalCommandCount == 0
-              && metrics[1]->totalBulkCount == 0
-              && metrics[1]->totalCommandCount == 0);
-}
-
-BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
-{
-  std::cout << "test\n";
-
-  const auto emptyBuffer{
-    std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
-          "empty buffer"
-          )
-  };
-
-  /* create a dummy message broadcaster */
-  MessageBroadcaster dummyBroadcaster{};
-  dummyBroadcaster.addMessageListener(emptyBuffer);
-
-  emptyBuffer->start();
-
-  /* emptyBuffer.getItem() should throw an exception */
-  BOOST_CHECK_THROW((emptyBuffer->getItem()), std::out_of_range);
-  dummyBroadcaster.sendMessage(Message::NoMoreData);
-}
-
-
-
-BOOST_AUTO_TEST_CASE(no_command_line_parameters)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    std::stringstream inputStream{};
-    std::stringstream outputStream{};
-    std::stringstream errorStream{};
-    std::stringstream metricsStream{};
-    /* comand line arguments */
-    char* arg[]{"/home/user/bulk"};
-
-    {
-      BOOST_CHECK(homework(1, arg, inputStream, outputStream, errorStream, metricsStream) == 1);
-    }
-
-    /* error output should contain expected text*/
-    BOOST_CHECK(errorStream.str() ==
-                "usage: bulkmt [bulk size]\n");
-
-    /* application metrics and output sholud be empty */
-    BOOST_CHECK(outputStream.str() == ""
-                && metricsStream.str() == "");
-
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(empty_input_test)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    auto processorOutput{
-      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off)
-    };
-
-    /* metrics sholud contain expected text */
-
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    BOOST_CHECK(processorOutput[2][0] ==
-                "main thread - 0 string(s), 0 command(s), 0 bulk(s)");
-
-    BOOST_CHECK(processorOutput[2][1] ==
-                "log thread - 0 bulk(s), 0 command(s)");
-    BOOST_CHECK(processorOutput[2][2] ==
-                "file thread #0 - 0 bulk(s), 0 command(s)");
-    BOOST_CHECK(processorOutput[2][3] ==
-                "file thread #1 - 0 bulk(s), 0 command(s)");
-
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(empty_command_test)
-{
-  std::cout << "test\n";
-
-  const std::string testString{"cmd1\n"
-                               "\n"
-                               "cmd2"};
-  try
-  {
-    auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
-    };
-
-    /* check main application output */
-    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, , cmd2");
-
-    /* check application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* check application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 3, 3, 1);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString{"cmd1\n"
-                           "cmd2\n"
-                           "cmd3\n"
-                           "cmd4"};
-    auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0].size() == 2);
-
-    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, cmd2, cmd3");
-    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd4");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    if (processorOutput[1].size() != 0)
-    {
-      for (const auto& string : processorOutput[1])
-      {
-        std::cout << string << '\n';
-      }
-    }
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 4, 4, 2);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString
-    {
-      "cmd1\n"
-      "<\n"
-      "cmd2\n"
-      "cmd3\n"
-      ">\n"
-      "cmd4"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0].size() == 3);
-
-    if (processorOutput[0].size() != 3)
-    {
-      for (const auto& string : processorOutput[0])
-      {
-        std::cout << string << '\n';
-      }
-    }
-
-    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1");
-    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd2, cmd3");
-    BOOST_CHECK(processorOutput[0][2] == "bulk: cmd4");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 6, 4, 3);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(nested_bulks_test)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString{
-      "cmd1\n"
-      "cmd2\n"
-      "cmd3\n"
-      "(\n"
-        "cmd4\n"
-        "cmd5\n"
-        "(\n"
-          "cmd6\n"
-          "(\n"
-              "cmd7\n"
-          ")\n"
-          "cmd8\n"
-        ")\n"
-        "cmd9\n"
-      ")\n"
-      "cmd10\n"
-      "cmd11\n"
-      "cmd12\n"
-      "cmd13\n"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0].size() == 3);
-    BOOST_CHECK(processorOutput[0][0] ==
-                "bulk: cmd1, cmd2, cmd3");
-    BOOST_CHECK(processorOutput[0][1] ==
-                "bulk: cmd4, cmd5, cmd6, cmd7, cmd8, cmd9");
-    BOOST_CHECK(processorOutput[0][2] ==
-                "bulk: cmd10, cmd11, cmd12, cmd13");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 19, 13, 3);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString{
-      "cmd1\n"
-      "cmd2\n"
-      "cmd3\n"
-      "(\n"
-        "cmd4\n"
-        "cmd5\n"
-        "(\n"
-          "cmd6\n"
-          "(\n"
-            "cmd7\n"
-            "cmd8\n"
-          ")\n"
-          "cmd9\n"
-        ")\n"
-        "cmd10\n"
-        "cmd11\n"
-        "cmd12\n"
-        "cmd13\n"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0][0] ==
-                "bulk: cmd1, cmd2, cmd3");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 18, 3, 1);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
-
-BOOST_AUTO_TEST_CASE(incorrect_closing_test)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString{
-      "cmd1\n"
-      "cmd2\n"
-      "cmd3\n"
-      "(\n"
-        "cmd4\n"
-        "cmd5\n"
-      ")\n"
-      "cmd6\n"
-      ")\n"
-      "cmd7\n"
-      "cmd8\n"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0][0] ==
-                "bulk: cmd1, cmd2, cmd3");
-    BOOST_CHECK(processorOutput[0][1] ==
-                "bulk: cmd4, cmd5");
-    BOOST_CHECK(processorOutput[0][2] ==
-                "bulk: cmd6, cmd7, cmd8");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 11, 8, 3);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr<< ex.what();
-  }
-}
-
-
-BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
-{
-  std::cout << "test\n";
-
-  try
-  {
-    const std::string testString
-    {
-      "cmd1\n"
-      "{cmd2\n"
-      "cmd3\n"
-      "cmd4}\n"
-      "cmd5"
-    };
-    auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off)
-    };
-
-    /* main application output */
-    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, {cmd2");
-    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd3, cmd4}");
-    BOOST_CHECK(processorOutput[0][2] == "bulk: cmd5");
-
-    /* application error output */
-    BOOST_CHECK(processorOutput[1].size() == 0);
-
-    /* application metrics output */
-    BOOST_CHECK(processorOutput[2].size() == 4);
-
-    std::stringstream metricsStream{};
-    for (const auto& tmpString : processorOutput[2])
-    {
-      metricsStream << tmpString << '\n';
-    }
-
-    checkMetrics(metricsStream, 5, 5, 3);
-  }
-  catch (const std::exception& ex)
-  {
-    BOOST_FAIL("");
-    std::cerr << ex.what();
-  }
-}
+//  /* can't create publisher with null buffer pointer */
+//  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, published, shouldExit, notifier, std::cout, dummyMutex}), std::invalid_argument);
+
+//  /* can't create logger with null buffer pointer */
+//  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, logged, shouldExit, notifier, ""}), std::invalid_argument);
+//}
+
+//BOOST_AUTO_TEST_CASE(log_file_creation_failure)
+//{
+//  std::cout << "test\n";
+
+//  std::stringstream outputStream{};
+//  std::stringstream metricsStream{};
+//  std::string badDirectoryName{"/non_existing_directory/"};
+//  SharedMultyMetrics metrics{};
+
+//  {
+//    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")};
+//    const auto dummyBroadcaster {std::make_shared<MessageBroadcaster>()};
+//    bool logged{false};
+//    bool shouldExit{false};
+//    std::condition_variable notifier{};
+//    std::mutex notifierLock{};
+
+//    /* use bad directory name as constructor parameter */
+//    const auto badLogger{
+//      std::make_shared<Logger<2>>(
+//            "bad logger",bulkBuffer,
+//            logged, shouldExit, notifier,
+//            badDirectoryName,
+//            outputStream
+//            )
+//    };
+
+//    /* connect buffer to logger */
+//    dummyBroadcaster->addMessageListener(bulkBuffer);
+//    bulkBuffer->addNotificationListener(badLogger);
+//    bulkBuffer->addMessageListener(badLogger);
+
+//    bulkBuffer->start();
+
+//    badLogger->start();
+
+//    /* putting some data to the buffer results in error message */
+//    bulkBuffer->putItem(std::make_pair<size_t, std::string>(1234, "bulk"));
+
+//    dummyBroadcaster->sendMessage(Message::NoMoreData);
+
+//    std::unique_lock<std::mutex> lockNotifier{notifierLock};
+//    notifier.wait(lockNotifier, [&logged, &shouldExit]{return logged || shouldExit;});
+//    lockNotifier.unlock();
+
+//    /* get metrics */
+//    metrics = badLogger->getMetrics();
+//  }
+
+//  /* get error message string */
+//  std::string errorMessage{outputStream.str()};
+
+//  /* error message sholud contain expected text */
+//  BOOST_CHECK(errorMessage.find("Cannot create log file") != std::string::npos);
+
+
+//  /* metrics sholud contain expected values */
+//  BOOST_CHECK(metrics[0]->totalBulkCount == 0
+//              && metrics[0]->totalCommandCount == 0
+//              && metrics[1]->totalBulkCount == 0
+//              && metrics[1]->totalCommandCount == 0);
+//}
+
+//BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
+//{
+//  std::cout << "test\n";
+
+//  const auto emptyBuffer{
+//    std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
+//          "empty buffer"
+//          )
+//  };
+
+//  /* create a dummy message broadcaster */
+//  MessageBroadcaster dummyBroadcaster{};
+//  dummyBroadcaster.addMessageListener(emptyBuffer);
+
+//  emptyBuffer->start();
+
+//  /* emptyBuffer.getItem() should throw an exception */
+//  BOOST_CHECK_THROW((emptyBuffer->getItem()), std::out_of_range);
+//  dummyBroadcaster.sendMessage(Message::NoMoreData);
+//}
+
+
+
+//BOOST_AUTO_TEST_CASE(no_command_line_parameters)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    std::stringstream inputStream{};
+//    std::stringstream outputStream{};
+//    std::stringstream errorStream{};
+//    std::stringstream metricsStream{};
+//    /* comand line arguments */
+//    char* arg[]{"/home/user/bulk"};
+
+//    {
+//      BOOST_CHECK(homework(1, arg, inputStream, outputStream, errorStream, metricsStream) == 1);
+//    }
+
+//    /* error output should contain expected text*/
+//    BOOST_CHECK(errorStream.str() ==
+//                "usage: bulkmt [bulk size]\n");
+
+//    /* application metrics and output sholud be empty */
+//    BOOST_CHECK(outputStream.str() == ""
+//                && metricsStream.str() == "");
+
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(empty_input_test)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    auto processorOutput{
+//      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off)
+//    };
+
+//    /* metrics sholud contain expected text */
+
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    BOOST_CHECK(processorOutput[2][0] ==
+//                "main thread - 0 string(s), 0 command(s), 0 bulk(s)");
+
+//    BOOST_CHECK(processorOutput[2][1] ==
+//                "log thread - 0 bulk(s), 0 command(s)");
+//    BOOST_CHECK(processorOutput[2][2] ==
+//                "file thread #0 - 0 bulk(s), 0 command(s)");
+//    BOOST_CHECK(processorOutput[2][3] ==
+//                "file thread #1 - 0 bulk(s), 0 command(s)");
+
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(empty_command_test)
+//{
+//  std::cout << "test\n";
+
+//  const std::string testString{"cmd1\n"
+//                               "\n"
+//                               "cmd2"};
+//  try
+//  {
+//    auto processorOutput{
+//      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
+//    };
+
+//    /* check main application output */
+//    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, , cmd2");
+
+//    /* check application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* check application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 3, 3, 1);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString{"cmd1\n"
+//                           "cmd2\n"
+//                           "cmd3\n"
+//                           "cmd4"};
+//    auto processorOutput{
+//      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0].size() == 2);
+
+//    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, cmd2, cmd3");
+//    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd4");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    if (processorOutput[1].size() != 0)
+//    {
+//      for (const auto& string : processorOutput[1])
+//      {
+//        std::cout << string << '\n';
+//      }
+//    }
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 4, 4, 2);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString
+//    {
+//      "cmd1\n"
+//      "<\n"
+//      "cmd2\n"
+//      "cmd3\n"
+//      ">\n"
+//      "cmd4"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0].size() == 3);
+
+//    if (processorOutput[0].size() != 3)
+//    {
+//      for (const auto& string : processorOutput[0])
+//      {
+//        std::cout << string << '\n';
+//      }
+//    }
+
+//    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1");
+//    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd2, cmd3");
+//    BOOST_CHECK(processorOutput[0][2] == "bulk: cmd4");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 6, 4, 3);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(nested_bulks_test)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString{
+//      "cmd1\n"
+//      "cmd2\n"
+//      "cmd3\n"
+//      "(\n"
+//        "cmd4\n"
+//        "cmd5\n"
+//        "(\n"
+//          "cmd6\n"
+//          "(\n"
+//              "cmd7\n"
+//          ")\n"
+//          "cmd8\n"
+//        ")\n"
+//        "cmd9\n"
+//      ")\n"
+//      "cmd10\n"
+//      "cmd11\n"
+//      "cmd12\n"
+//      "cmd13\n"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0].size() == 3);
+//    BOOST_CHECK(processorOutput[0][0] ==
+//                "bulk: cmd1, cmd2, cmd3");
+//    BOOST_CHECK(processorOutput[0][1] ==
+//                "bulk: cmd4, cmd5, cmd6, cmd7, cmd8, cmd9");
+//    BOOST_CHECK(processorOutput[0][2] ==
+//                "bulk: cmd10, cmd11, cmd12, cmd13");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 19, 13, 3);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString{
+//      "cmd1\n"
+//      "cmd2\n"
+//      "cmd3\n"
+//      "(\n"
+//        "cmd4\n"
+//        "cmd5\n"
+//        "(\n"
+//          "cmd6\n"
+//          "(\n"
+//            "cmd7\n"
+//            "cmd8\n"
+//          ")\n"
+//          "cmd9\n"
+//        ")\n"
+//        "cmd10\n"
+//        "cmd11\n"
+//        "cmd12\n"
+//        "cmd13\n"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0][0] ==
+//                "bulk: cmd1, cmd2, cmd3");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 18, 3, 1);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
+
+//BOOST_AUTO_TEST_CASE(incorrect_closing_test)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString{
+//      "cmd1\n"
+//      "cmd2\n"
+//      "cmd3\n"
+//      "(\n"
+//        "cmd4\n"
+//        "cmd5\n"
+//      ")\n"
+//      "cmd6\n"
+//      ")\n"
+//      "cmd7\n"
+//      "cmd8\n"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0][0] ==
+//                "bulk: cmd1, cmd2, cmd3");
+//    BOOST_CHECK(processorOutput[0][1] ==
+//                "bulk: cmd4, cmd5");
+//    BOOST_CHECK(processorOutput[0][2] ==
+//                "bulk: cmd6, cmd7, cmd8");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 11, 8, 3);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr<< ex.what();
+//  }
+//}
+
+
+//BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
+//{
+//  std::cout << "test\n";
+
+//  try
+//  {
+//    const std::string testString
+//    {
+//      "cmd1\n"
+//      "{cmd2\n"
+//      "cmd3\n"
+//      "cmd4}\n"
+//      "cmd5"
+//    };
+//    auto processorOutput{
+//      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off)
+//    };
+
+//    /* main application output */
+//    BOOST_CHECK(processorOutput[0][0] == "bulk: cmd1, {cmd2");
+//    BOOST_CHECK(processorOutput[0][1] == "bulk: cmd3, cmd4}");
+//    BOOST_CHECK(processorOutput[0][2] == "bulk: cmd5");
+
+//    /* application error output */
+//    BOOST_CHECK(processorOutput[1].size() == 0);
+
+//    /* application metrics output */
+//    BOOST_CHECK(processorOutput[2].size() == 4);
+
+//    std::stringstream metricsStream{};
+//    for (const auto& tmpString : processorOutput[2])
+//    {
+//      metricsStream << tmpString << '\n';
+//    }
+
+//    checkMetrics(metricsStream, 5, 5, 3);
+//  }
+//  catch (const std::exception& ex)
+//  {
+//    BOOST_FAIL("");
+//    std::cerr << ex.what();
+//  }
+//}
 
 
 //BOOST_AUTO_TEST_CASE(logging_test)
 //{
-//  std::cout << "test\n";
+//  std::cout << "logging test\n";
 //  try
 //  {
 //    /* wait 2 seconds to get separate log files for this test */
@@ -747,43 +747,47 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 //  }
 //}
 
-//BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
-//{
-//  std::cout << "test\n";
-//  try
-//  {
-//    std::string inputString{
-//      "a\nb\nc\nd\n"
-//    };
+BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
+{
+  std::cout << "buffer exhaustion test\n";
 
-//    std::stringstream inputStream{inputString};
-//    std::stringstream outputStream{};
-//    std::stringstream errorStream{};
-//    std::stringstream metricsStream{};
+  try
+  {
+    std::string inputString{
+      "a\nb\nc\nd\n"
+    };
 
-//    CommandProcessor<2> testProcessor {
-//      inputStream, outputStream, errorStream, metricsStream,
-//      3, '<', '>'
-//    };
+    std::stringstream inputStream{inputString};
+    std::stringstream outputStream{};
+    std::stringstream errorStream{};
+    std::stringstream metricsStream{};
 
-//    testProcessor.getBulkBuffer()->notify();
+    CommandProcessor<2> testProcessor {
+      inputStream, outputStream, errorStream, metricsStream,
+      3, '<', '>'
+    };
 
-//    testProcessor.run();
+    //testProcessor.getBulkBuffer()->putItem(std::make_pair(121212u, std::string{"121212"}));
 
-//    auto errorMessage{errorStream.str()};
+    testProcessor.getBulkBuffer()->notify();
+    testProcessor.run();
 
-//    BOOST_CHECK(errorMessage.find("Abnormal termination")
-//                != std::string::npos);
+    auto errorMessage{errorStream.str()};
 
-//    BOOST_CHECK(errorMessage.find("Buffer is empty!")
-//                != std::string::npos);
-//  }
-//  catch (const std::exception& ex)
-//  {
-//    BOOST_CHECK(false);
-//    std::cerr << ex.what();
-//  }
-//}
+    //std::cout << "Error message:" << errorMessage << std::endl;
+
+    BOOST_CHECK(errorMessage.find("Abnormal termination")
+                != std::string::npos);
+
+    BOOST_CHECK(errorMessage.find("Buffer is empty!")
+                != std::string::npos);
+  }
+  catch (const std::exception& ex)
+  {
+    BOOST_CHECK(false);
+    std::cerr << ex.what();
+  }
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

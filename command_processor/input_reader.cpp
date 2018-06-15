@@ -46,7 +46,7 @@ void InputReader::read()
   }
   catch(std::exception& ex)
   {
-    std::cout << "\n                     reader ABORT\n";
+    //std::cout << "\n                     reader ABORT\n";
 
     sendMessage(Message::Abort);
     std::cerr << ex.what();
@@ -60,6 +60,7 @@ void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
   {
   case Message::Abort :
     shouldExit = true;
+    sendMessage(Message::Abort);
     break;
   }
 }

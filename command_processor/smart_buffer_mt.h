@@ -83,6 +83,8 @@ public:
 
     if (data.empty() == true)
     {
+      shouldExit = true;
+      threadNotifier.notify_one();
       throw std::out_of_range{"Buffer is empty!"};
     }
 
@@ -131,6 +133,7 @@ public:
   void clear()
   {
     data.clear();
+    notificationCount.store(0);
   }
 
   void reactMessage(MessageBroadcaster* sender, Message message) override

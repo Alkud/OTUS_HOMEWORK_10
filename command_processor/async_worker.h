@@ -114,9 +114,11 @@ protected:
 
         if (notificationCount.load() > 0)
         {
+          std::cout << this->workerName << " decrement notificationCount\n";
           --notificationCount;
           lockNotifier.unlock();
           threadProcess(threadIndex);
+          std::cout << this->workerName << " threadProcess success\n";
         }
         else
         {
@@ -124,7 +126,7 @@ protected:
           if (shouldExit != true || noMoreData != true)
           {
             lockControl.unlock();
-            std::cout << "\n                     " << this->workerName<< " waiting. shouldExit="<< shouldExit << ", noMoreData=" << noMoreData << "\n";
+            //std::cout << "\n                     " << this->workerName<< " waiting. shouldExit="<< shouldExit << ", noMoreData=" << noMoreData << "\n";
             threadNotifier.wait_for(lockNotifier, std::chrono::seconds(1), [this]()
             {
               return this->noMoreData || this->notificationCount.load() > 0 || this->shouldExit;
@@ -151,7 +153,7 @@ protected:
         }
       }
 
-      std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
+      //std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
 
       if (0 == activeThreadCount)
       {
