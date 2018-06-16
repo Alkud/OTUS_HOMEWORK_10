@@ -4,8 +4,8 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = bulk
-PROJECT_NUMBER         = 0.0.1
+PROJECT_NAME           = bulkmt
+PROJECT_NUMBER         = 0.0.7
 PROJECT_BRIEF          = processing user commands
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       =
