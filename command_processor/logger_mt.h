@@ -62,7 +62,10 @@ public:
   {
     if (buffer.get() == sender)
     {
-      std::cout << this->workerName << " reactNotification\n";
+      #ifdef _DEBUG
+        std::cout << this->workerName << " reactNotification\n";
+      #endif
+
       ++this->notificationCount;
       this->threadNotifier.notify_one();
     }
@@ -75,7 +78,10 @@ public:
     case Message::NoMoreData :
       if (this->noMoreData != true && buffer.get() == sender)
       {
-        //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        #ifdef _DEBUG
+          std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        #endif
+
         std::lock_guard<std::mutex> lockControl{this->controlLock};
         this->noMoreData = true;
         this->threadNotifier.notify_all();
@@ -118,7 +124,10 @@ private:
 
     if (false == bufferReply.first)
     {
-     // std::cout << "\n                     " << this->workerName<< " FALSE received\n";
+      #ifdef _DEBUG
+        std::cout << "\n                     " << this->workerName<< " FALSE received\n";
+      #endif
+
       return false;
     }
 
@@ -177,7 +186,10 @@ private:
 
   void onTermination(const size_t threadIndex) override
   {
-    //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+    #ifdef _DEBUG
+      std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+    #endif
+
     if (true == this->noMoreData && this->notificationCount.load() == 0)
     {
       terminationFlag = true;

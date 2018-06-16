@@ -31,6 +31,8 @@ public:
 
   const SharedMetrics getMetrics();
 
+  WorkerState getWorkerState();
+
 private:
   void sendCurrentBulk();
   void startNewBulk();
@@ -54,4 +56,6 @@ private:
   std::ostream& errorOut;
 
   SharedMetrics threadMetrics;
+
+  WorkerState state;
 };

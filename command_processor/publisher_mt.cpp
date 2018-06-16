@@ -28,8 +28,11 @@ Publisher::~Publisher()
 void Publisher::reactNotification(NotificationBroadcaster* sender)
 {
   if (buffer.get() == sender)
-  {    
-    std::cout << this->workerName << " reactNotification\n";
+  {
+    #ifdef _DEBUG
+      std::cout << this->workerName << " reactNotification\n";
+    #endif
+
     ++notificationCount;    
     threadNotifier.notify_one();
   }
@@ -42,7 +45,10 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
   case Message::NoMoreData :
     if (noMoreData != true && buffer.get() == sender)
     {
-      //std::cout << "\n                    publisher NoMoreData received\n";
+      #ifdef _DEBUG
+        std::cout << "\n                    publisher NoMoreData received\n";
+      #endif
+
       std::lock_guard<std::mutex> lockControl{this->controlLock};
       noMoreData = true;
       threadNotifier.notify_all();
@@ -116,7 +122,10 @@ void Publisher::onThreadException(const std::exception& ex, const size_t threadI
 
 void Publisher::onTermination(const size_t threadIndex)
 {
-  //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+  #ifdef _DEBUG
+    std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+  #endif
+
   if (true == noMoreData && notificationCount.load() == 0)
   {
     terminationFlag = true;

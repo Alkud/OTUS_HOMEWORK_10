@@ -84,7 +84,7 @@ public:
     if (data.empty() == true)
     {
       shouldExit = true;
-      threadNotifier.notify_one();
+      threadNotifier.notify_all();
       throw std::out_of_range{"Buffer is empty!"};
     }
 
@@ -115,7 +115,10 @@ public:
       data.erase(iter);
       if (true == data.empty() && true == noMoreData)
       {
-        //std::cout << "\n                    " << workerName<< " all data received\n";
+        #ifdef _DEBUG
+          std::cout << "\n                    " << workerName<< " all data received\n";
+        #endif
+
         threadNotifier.notify_all();
       }
     }
@@ -143,7 +146,10 @@ public:
     case Message::NoMoreData :
       if (noMoreData != true)
       {
-        //std::cout << "\n                     " << workerName<< " NoMoreData received\n";
+        #ifdef _DEBUG
+          std::cout << "\n                     " << workerName<< " NoMoreData received\n";
+        #endif
+
         std::lock_guard<std::mutex> lockControl{this->controlLock};
         noMoreData = true;
         threadNotifier.notify_one();

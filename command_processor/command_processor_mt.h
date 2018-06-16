@@ -90,13 +90,18 @@ public:
 
     inputReader->read();
 
-    std::cout << "\n                     CP is going to wait. dataLogged = "
-              << dataLogged << " dataPublished = " << dataPublished << "\n";
+    #ifdef _DEBUG
+      std::cout << "\n                     CP is going to wait. dataLogged = "
+                << dataLogged << " dataPublished = " << dataPublished << "\n";
+    #endif
 
     while (shouldExit != true
            && ((dataLogged && dataPublished) != true))
     {
-      std::cout << "\n                     CP waiting\n";
+      #ifdef _DEBUG
+        std::cout << "\n                     CP waiting\n";
+      #endif
+
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
       terminationNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
@@ -105,14 +110,29 @@ public:
       lockNotifier.unlock();
     }
 
-    std::cout << "\n                     CP waiting ended\n";
+    #ifdef _DEBUG
+      std::cout << "\n                     CP waiting ended\n";
+    #endif
 
     if (shouldExit == true)
     {
       sendMessage(Message::Abort);
-      while()
       errorOut << "Abnormal termination\n";
     }
+
+    /* waiting for all workers to finish */
+    while(inputReader->getWorkerState() != WorkerState::Finished
+          && inputProcessor->getWorkerState() != WorkerState::Finished
+          && inputBuffer->getWorkerState() != WorkerState::Finished
+          && outputBuffer->getWorkerState() != WorkerState::Finished
+          && logger->getWorkerState() != WorkerState::Finished
+          && publisher->getWorkerState() != WorkerState::Finished)
+    {}
+
+    #ifdef _DEBUG
+      std::cout << "\n                     CP metrics output\n";
+    #endif
+
     /* Output metrics */
     metricsOut << "main thread - "
                << globalMetrics["input processor"]->totalStringCount << " string(s), "
