@@ -11,7 +11,7 @@
 #include "logger_mt.h"
 
 template <size_t loggingThreadsCount = 2u>
-class CommandProcessor
+class CommandProcessor : public MessageBroadcaster
 {
 public:
 
@@ -51,6 +51,8 @@ public:
     metricsOut{metricsStream}, errorOut{errorStream}, globalMetrics{}
   {
     /* connect broadcasters and listeners */
+    this->addMessageListener(inputReader);
+
     inputReader->addMessageListener(inputBuffer);
 
     inputBuffer->addMessageListener(inputProcessor);
@@ -88,21 +90,49 @@ public:
 
     inputReader->read();
 
-    if (shouldExit != true)
+    #ifdef _DEBUG
+      std::cout << "\n                     CP is going to wait. dataLogged = "
+                << dataLogged << " dataPublished = " << dataPublished << "\n";
+    #endif
+
+    while (shouldExit != true
+           && ((dataLogged && dataPublished) != true))
     {
+      #ifdef _DEBUG
+        std::cout << "\n                     CP waiting\n";
+      #endif
+
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
-      terminationNotifier.wait(lockNotifier, [this]()
+      terminationNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
         return (shouldExit) || (dataLogged && dataPublished);
       });
       lockNotifier.unlock();
     }
 
+    #ifdef _DEBUG
+      std::cout << "\n                     CP waiting ended\n";
+    #endif
 
     if (shouldExit == true)
     {
+      sendMessage(Message::Abort);
       errorOut << "Abnormal termination\n";
     }
+
+    /* waiting for all workers to finish */
+    while(inputReader->getWorkerState() != WorkerState::Finished
+          && inputProcessor->getWorkerState() != WorkerState::Finished
+          && inputBuffer->getWorkerState() != WorkerState::Finished
+          && outputBuffer->getWorkerState() != WorkerState::Finished
+          && logger->getWorkerState() != WorkerState::Finished
+          && publisher->getWorkerState() != WorkerState::Finished)
+    {}
+
+    #ifdef _DEBUG
+      std::cout << "\n                     CP metrics output\n";
+    #endif
+
     /* Output metrics */
     metricsOut << "main thread - "
                << globalMetrics["input processor"]->totalStringCount << " string(s), "

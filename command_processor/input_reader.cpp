@@ -10,7 +10,7 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
   input{newInput},
   inputLock{newInputLock},
   buffer{newBuffer},
-  shouldExit{false}
+  shouldExit{false}, state{WorkerState::NotStarted}
 {
   if (nullptr == buffer)
   {
@@ -20,7 +20,9 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
 
 InputReader::~InputReader()
 {
-
+  #ifdef _DEBUG
+    std::cout << "IR destructor\n";
+  #endif
 }
 
 
@@ -28,6 +30,7 @@ InputReader::~InputReader()
 void InputReader::read()
 {
   std::string nextString{};
+  state = WorkerState::Started;
   try
   {
     std::lock_guard<std::mutex> lockInput{inputLock};
@@ -43,15 +46,20 @@ void InputReader::read()
       buffer->putItem(nextString);
       lockBuffer.unlock();
     }
+    sendMessage(Message::NoMoreData);
+    state = WorkerState::Finished;
   }
   catch(std::exception& ex)
   {
-    std::cout << "\n                     reader ABORT\n";
+    #ifdef _DEBUG
+      std::cout << "\n                     reader ABORT\n";
+    #endif
 
     sendMessage(Message::Abort);
     std::cerr << ex.what();
+    state = WorkerState::Finished;
   }
-  sendMessage(Message::NoMoreData);
+
 }
 
 void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
@@ -59,7 +67,16 @@ void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
   switch(message)
   {
   case Message::Abort :
-    shouldExit = true;
+    if (shouldExit != true)
+    {
+      shouldExit = true;
+      sendMessage(Message::Abort);
+    }
     break;
   }
+}
+
+WorkerState InputReader::getWorkerState()
+{
+  return state;
 }
