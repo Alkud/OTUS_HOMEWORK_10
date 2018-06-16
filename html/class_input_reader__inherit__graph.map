@@ -1,0 +1,4 @@
+<map id="InputReader" name="InputReader">
+<area shape="rect" id="node2" href="$class_message_broadcaster.html" title="MessageBroadcaster" alt="" coords="5,5,149,32"/>
+<area shape="rect" id="node3" href="$class_message_listener.html" title="Base class for message broadcast subscribers. " alt="" coords="174,5,295,32"/>
+</map>
