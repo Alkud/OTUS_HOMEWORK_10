@@ -11,7 +11,7 @@
 #include "logger_mt.h"
 
 template <size_t loggingThreadsCount = 2u>
-class CommandProcessor
+class CommandProcessor : public MessageBroadcaster
 {
 public:
 
@@ -51,6 +51,8 @@ public:
     metricsOut{metricsStream}, errorOut{errorStream}, globalMetrics{}
   {
     /* connect broadcasters and listeners */
+    this->addMessageListener(inputReader);
+
     inputReader->addMessageListener(inputBuffer);
 
     inputBuffer->addMessageListener(inputProcessor);
@@ -107,6 +109,8 @@ public:
 
     if (shouldExit == true)
     {
+      sendMessage(Message::Abort);
+      while()
       errorOut << "Abnormal termination\n";
     }
     /* Output metrics */

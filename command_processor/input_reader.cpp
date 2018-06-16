@@ -20,7 +20,7 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
 
 InputReader::~InputReader()
 {
-
+  std::cout << "IR destructor\n";
 }
 
 
@@ -59,8 +59,11 @@ void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
   switch(message)
   {
   case Message::Abort :
-    shouldExit = true;
-    sendMessage(Message::Abort);
+    if (shouldExit != true)
+    {
+      shouldExit = true;
+      sendMessage(Message::Abort);
+    }
     break;
   }
 }

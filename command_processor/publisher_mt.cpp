@@ -40,7 +40,7 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
   switch(message)
   {
   case Message::NoMoreData :
-    if (buffer.get() == sender)
+    if (noMoreData != true && buffer.get() == sender)
     {
       //std::cout << "\n                    publisher NoMoreData received\n";
       std::lock_guard<std::mutex> lockControl{this->controlLock};
@@ -50,12 +50,15 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
     break;
 
   case Message::Abort :
-  {
-    std::lock_guard<std::mutex> lockControl{this->controlLock};
-    shouldExit = true;
-    threadNotifier.notify_all();
-  }
-    sendMessage(Message::Abort);
+    if (shouldExit != true)
+    {
+      {
+        std::lock_guard<std::mutex> lockControl{this->controlLock};
+        shouldExit = true;
+        threadNotifier.notify_all();
+      }
+        sendMessage(Message::Abort);
+    }
     break;
   }
 }

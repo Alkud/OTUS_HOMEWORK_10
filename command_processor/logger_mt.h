@@ -73,7 +73,7 @@ public:
     switch(message)
     {
     case Message::NoMoreData :
-      if (buffer.get() == sender)
+      if (this->noMoreData != true && buffer.get() == sender)
       {
         //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
         std::lock_guard<std::mutex> lockControl{this->controlLock};
@@ -83,12 +83,15 @@ public:
       break;
 
     case Message::Abort :
-    {
-      std::lock_guard<std::mutex> lockControl{this->controlLock};
-      this->shouldExit = true;
-      this->threadNotifier.notify_all();
-    }
-      sendMessage(Message::Abort);
+      if (this->shouldExit != true)
+      {
+        {
+          std::lock_guard<std::mutex> lockControl{this->controlLock};
+          this->shouldExit = true;
+          this->threadNotifier.notify_all();
+        }
+        sendMessage(Message::Abort);
+      }
       break;
     }
   }

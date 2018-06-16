@@ -49,6 +49,8 @@ private:
   size_t nestingDepth;
   std::chrono::time_point<std::chrono::system_clock> bulkStartTime;
 
+  bool shouldExit;
+
   std::ostream& errorOut;
 
   SharedMetrics threadMetrics;

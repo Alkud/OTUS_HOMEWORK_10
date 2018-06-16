@@ -141,21 +141,25 @@ public:
     switch(message)
     {
     case Message::NoMoreData :
-    {
-      //std::cout << "\n                     " << workerName<< " NoMoreData received\n";
-      std::lock_guard<std::mutex> lockControl{this->controlLock};
-      noMoreData = true;
-      threadNotifier.notify_one();
-    }
+      if (noMoreData != true)
+      {
+        //std::cout << "\n                     " << workerName<< " NoMoreData received\n";
+        std::lock_guard<std::mutex> lockControl{this->controlLock};
+        noMoreData = true;
+        threadNotifier.notify_one();
+      }
       break;
 
     case Message::Abort :
-    {
-      std::lock_guard<std::mutex> lockControl{this->controlLock};
-      shouldExit = true;
-      threadNotifier.notify_all();
-    }
-      sendMessage(Message::Abort);
+      if (shouldExit != true)
+      {
+        {
+          std::lock_guard<std::mutex> lockControl{this->controlLock};
+          shouldExit = true;
+          threadNotifier.notify_all();
+        }
+          sendMessage(Message::Abort);
+      }
       break;
     }
   }

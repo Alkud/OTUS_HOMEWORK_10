@@ -25,7 +25,7 @@ public:
 
   virtual ~AsyncWorker()
   {
-    //std::cout << "\n                    " << workerName << " destructor\n";
+    std::cout << "\n                    " << workerName << " destructor\n";
     assert(isStopped == true);
   }
 
