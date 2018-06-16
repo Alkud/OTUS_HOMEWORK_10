@@ -27,6 +27,8 @@ public:
 
   void reactMessage(class MessageBroadcaster* sender, Message message) override;
 
+  WorkerState getWorkerState();
+
 private:
 
   std::istream& input;
@@ -34,4 +36,6 @@ private:
   std::shared_ptr<SmartBuffer<std::string>> buffer;
 
   bool shouldExit;
+
+  WorkerState state;
 };

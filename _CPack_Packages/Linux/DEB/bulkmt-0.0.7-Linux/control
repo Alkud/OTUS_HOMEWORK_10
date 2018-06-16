@@ -1,9 +1,9 @@
 Package: bulkmt
-Version: 0.0.6
+Version: 0.0.7
 Section: devel
 Priority: optional
 Architecture: amd64
-Installed-Size: 1063
+Installed-Size: 1076
 Maintainer: alexandr_kudinov@mail.ru
 Description: bulkmt built using CMake
 

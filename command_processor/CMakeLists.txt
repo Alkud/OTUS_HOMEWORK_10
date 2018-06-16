@@ -12,4 +12,5 @@ add_library(command_processor
   publisher_mt.h publisher_mt.cpp
   weak_ptr_less.h
   thread_metrics.h
+  worker_state.h
 )

@@ -13,12 +13,17 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
   outputBuffer{newOutputBuffer},
   customBulkStarted{false},
   nestingDepth{0},
+  shouldExit{false},
   errorOut{newErrorOut},
-  threadMetrics{std::make_shared<ThreadMetrics>("input processor")}
+  threadMetrics{std::make_shared<ThreadMetrics>("input processor")},
+  state{WorkerState::Started}
 {}
 
 InputProcessor::~InputProcessor()
 {
+  #ifdef _DEBUG
+    std::cout << "IP destructor\n";
+  #endif
 }
 
 void InputProcessor::reactNotification(NotificationBroadcaster* sender)
@@ -90,8 +95,11 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
     }
     catch(std::exception& ex)
     {
-      std::cout << "\n                     processor ABORT\n";
+      #ifdef _DEBUG
+        std::cout << "\n                     processor ABORT\n";
+      #endif
 
+      shouldExit = true;
       sendMessage(Message::Abort);
       std::cerr << ex.what();
     }
@@ -110,15 +118,17 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
         closeCurrentBulk();
       }
       sendMessage(Message::NoMoreData);
+      state = WorkerState::Finished;
      }
      break;
 
   case Message::Abort :
-    if (customBulkStarted != true)
+    if (shouldExit != true)
     {
-      closeCurrentBulk();
+      shouldExit = true;
+      sendMessage(Message::Abort);
+      state = WorkerState::Finished;
     }
-    sendMessage(Message::Abort);
     break;
 
    default:
@@ -128,7 +138,12 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 
 const SharedMetrics InputProcessor::getMetrics()
 {
-  return threadMetrics;
+           return threadMetrics;
+           }
+
+WorkerState InputProcessor::getWorkerState()
+{
+  return state;
 }
 
 void InputProcessor::sendCurrentBulk()

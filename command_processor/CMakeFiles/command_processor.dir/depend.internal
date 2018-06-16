@@ -10,6 +10,7 @@ command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/thread_metrics.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h
+ /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/worker_state.h
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/async_worker.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/broadcasters.h
@@ -18,6 +19,7 @@ command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/listeners.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h
+ /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/worker_state.h
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/async_worker.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/broadcasters.h
@@ -27,3 +29,4 @@ command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/smart_buffer_mt.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/thread_metrics.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/weak_ptr_less.h
+ /home/travis/build/Alkud/OTUS_HOMEWORK_10/command_processor/worker_state.h

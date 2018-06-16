@@ -83,25 +83,14 @@ public:
 
     if (data.empty() == true)
     {
+      shouldExit = true;
+      threadNotifier.notify_all();
       throw std::out_of_range{"Buffer is empty!"};
     }
 
     if (nullptr == recipient)
     {
-      auto result {std::make_pair(true, data.front().value)};
-
-      if (data.front().recipients.empty() == true)
-      {
-        data.pop_front();
-
-        if (true == data.empty() && true == noMoreData)
-        {
-          shouldExit = true;
-          threadNotifier.notify_all();
-        }
-      }
-
-      return result;
+      return std::make_pair(false, data.front().value);
     }
 
     auto iter {data.begin()};
@@ -126,8 +115,10 @@ public:
       data.erase(iter);
       if (true == data.empty() && true == noMoreData)
       {
-        //std::cout << "\n                    " << workerName<< " should exit\n";
-        shouldExit = true;
+        #ifdef _DEBUG
+          std::cout << "\n                    " << workerName<< " all data received\n";
+        #endif
+
         threadNotifier.notify_all();
       }
     }
@@ -145,6 +136,7 @@ public:
   void clear()
   {
     data.clear();
+    notificationCount.store(0);
   }
 
   void reactMessage(MessageBroadcaster* sender, Message message) override
@@ -152,100 +144,58 @@ public:
     switch(message)
     {
     case Message::NoMoreData :
-      //std::cout << "\n                     " << workerName<< " NoMoreData received\n";
-      noMoreData = true;
-      threadNotifier.notify_one();
+      if (noMoreData != true)
+      {
+        #ifdef _DEBUG
+          std::cout << "\n                     " << workerName<< " NoMoreData received\n";
+        #endif
+
+        std::lock_guard<std::mutex> lockControl{this->controlLock};
+        noMoreData = true;
+        threadNotifier.notify_one();
+      }
       break;
 
     case Message::Abort :
-      shouldExit = true;
-      noMoreData = true;
-      threadNotifier.notify_all();
-      sendMessage(Message::Abort);
-      break;
-    }
-  }
-
-  void sanitize()
-  {
-    std::lock_guard<std::mutex> lockData{dataLock};
-
-    auto record {data.begin()};
-    for (; record != data.end(); ++record)
-    {
-      if (record->recipients.empty() == true)
+      if (shouldExit != true)
       {
-        data.erase(record);
+        {
+          std::lock_guard<std::mutex> lockControl{this->controlLock};
+          shouldExit = true;
+          threadNotifier.notify_all();
+        }
+          sendMessage(Message::Abort);
       }
+      break;
     }
   }
 
 private:
 
-  bool run(const size_t) override
+  bool threadProcess(const size_t threadIndex) override
   {
-    try
+    notify();
+  }
+
+  void onThreadException(const std::exception& ex, const size_t threadIndex) override
+  {
+    errorOut << workerName << " stopped. Reason: " << ex.what() << std::endl;
+    sendMessage(Message::Abort);
+  }
+
+  void onTermination(const size_t threadIndex) override
+  {
+    while (data.empty() != true)
     {
-      while(noMoreData != true)
+      std::unique_lock<std::mutex> lockNotifier{notifierLock};
+      threadNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
-        if (true == shouldExit)
-        {
-          break;
-        }
-
-        if (notificationCount.load() > 0)
-        {
-          notify();
-          --notificationCount;
-        }
-//        else if (noMoreData == true && data.size() == 0)
-//        {
-//          break;
-//        }
-        else if (noMoreData != true)
-        {
-          /* wait for new notifications or exit request */
-          std::unique_lock<std::mutex> lockNotifier{notifierLock};
-
-          threadNotifier.wait(lockNotifier,
-                              [this](){return this->notificationCount.load() > 0
-                              || shouldExit
-                              || noMoreData;});
-
-          lockNotifier.unlock();
-        }
-      }
-
-      if (shouldExit != true)
-      {
-        while (notificationCount.load() > 0)
-        {
-          notify();
-          --notificationCount;
-        }
-      }
-
-      if (data.empty() != true)
-      {
-        while(shouldExit != true)
-        {
-          std::unique_lock<std::mutex> lockNotifier{notifierLock};
-          threadNotifier.wait(lockNotifier, [this](){return shouldExit;});
-          lockNotifier.unlock();
-        }
-      }
-
-      sendMessage(Message::NoMoreData);      
-
-      //std::cout << "\n                    buffer finished\n";
-
+        return data.empty();
+      });
+      lockNotifier.unlock();
     }
-    catch (const std::exception& ex)
-    {
-      sendMessage(Message::Abort);
-      errorOut << workerName << " stopped. Reason: " << ex.what() << std::endl;
-      return false;
-    }
+
+    sendMessage(Message::NoMoreData);
   }
 
 

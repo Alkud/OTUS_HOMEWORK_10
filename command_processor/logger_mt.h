@@ -51,7 +51,6 @@ public:
       ));
       additionalNameSection.push_back(1);
     }
-    threadFinished.resize(threadsCount, false);
   }
 
   ~Logger()
@@ -63,6 +62,10 @@ public:
   {
     if (buffer.get() == sender)
     {
+      #ifdef _DEBUG
+        std::cout << this->workerName << " reactNotification\n";
+      #endif
+
       ++this->notificationCount;
       this->threadNotifier.notify_one();
     }
@@ -73,18 +76,29 @@ public:
     switch(message)
     {
     case Message::NoMoreData :
-      if (buffer.get() == sender)
+      if (this->noMoreData != true && buffer.get() == sender)
       {
+        #ifdef _DEBUG
+          std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        #endif
+
+        std::lock_guard<std::mutex> lockControl{this->controlLock};
         this->noMoreData = true;
         this->threadNotifier.notify_all();
       }
       break;
 
     case Message::Abort :
-      this->noMoreData = true;
-      this->shouldExit = true;
-      this->threadNotifier.notify_all();
-      sendMessage(Message::Abort);
+      if (this->shouldExit != true)
+      {
+        {
+          std::lock_guard<std::mutex> lockControl{this->controlLock};
+          this->shouldExit = true;
+          this->threadNotifier.notify_all();
+        }
+        sendMessage(Message::Abort);
+      }
+      break;
     }
   }
 
@@ -95,114 +109,25 @@ public:
 
 private:
 
-  bool run(const size_t threadIndex) override
-  {
-    try
-    {
-      while(this->shouldExit != true
-            && (this->noMoreData != true || this->notificationCount > 0))
-      {
-        std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
-
-        this->threadNotifier.wait(lockNotifier, [this]()
-        {
-          return this->noMoreData || this->notificationCount.load() > 0 || this->shouldExit;
-        });        
-
-        if (this->shouldExit == true)
-        {
-          lockNotifier.unlock();
-          break;
-        }
-
-        if (this->notificationCount.load() > 0)
-        {
-          --this->notificationCount;
-          lockNotifier.unlock();
-          if (log(threadIndex))
-          {            
-          }
-        }
-        else
-        {
-          lockNotifier.unlock();
-        }
-      }
-
-      /*check if this thread is the only active one */
-      std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
-
-      size_t activeThreadCount{};
-      for (size_t idx{0}; idx < threadsCount; ++idx)
-      {
-        if (idx != threadIndex
-            && threadFinished[idx] != true)
-        {
-          ++activeThreadCount;
-        }
-      }
-
-      if (0 == activeThreadCount)
-      {
-        //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
-        //sendMessage(Message::AllDataLogged);
-        terminationFlag = true;
-
-        if (true == this->shouldExit)
-        {
-          abortFlag = true;
-        }
-
-        terminationNotifier.notify_all();
-      }
-
-      threadFinished[threadIndex] = true;
-
-      lockNotifier.unlock();
-
-      //std::cout << "\n                     " << this->workerName<< " finished\n";
-
-      return true;
-    }
-    catch (const std::exception& ex)
-    {
-      errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
-
-      threadFinished[threadIndex] = true;
-      this->shouldExit = true;
-      this->threadNotifier.notify_all();
-
-      sendMessage(Message::Abort);
-
-      abortFlag = true;
-      terminationNotifier.notify_all();
-
-      return false;
-    }
-  }
-
-  bool log(const size_t threadIndex)
+  bool threadProcess(const size_t threadIndex) override
   {
     if (nullptr == buffer)
     {
       throw(std::invalid_argument{"Logger source buffer not defined!"});
     }
 
-    std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
-
-    if (buffer->dataSize() == 0)
+    decltype(buffer->getItem()) bufferReply{};
     {
-      lockBuffer.unlock();
-      throw std::out_of_range{"Buffer is empty!"};
+      std::lock_guard<std::mutex> lockBuffer{buffer->dataLock};
+      bufferReply = buffer->getItem(shared_from_this());
     }
-
-    auto bufferReply{buffer->getItem(shared_from_this())};    
-
-    lockBuffer.unlock();
 
     if (false == bufferReply.first)
     {
-     // std::cout << "\n                     " << this->workerName<< " FALSE received\n";
+      #ifdef _DEBUG
+        std::cout << "\n                     " << this->workerName<< " FALSE received\n";
+      #endif
+
       return false;
     }
 
@@ -221,14 +146,6 @@ private:
     auto fileNameSuffix {std::to_string(additionalNameSection[threadIndex])
           + std::to_string(threadIndex + 1)};
     auto logFileName {bulkFileName + "_" + fileNameSuffix +  ".log"};
-
-//    while (std::ifstream {logFileName})
-//    {
-//      ++additionalNameSection[threadIndex];
-//      fileNameSuffix = std::to_string(additionalNameSection[threadIndex])
-//                       + "_" + std::to_string(threadIndex + 1);
-//      logFileName = bulkFileName+ "_" + fileNameSuffix + ".log";
-//    }
 
     std::ofstream logFile{logFileName};
 
@@ -253,6 +170,39 @@ private:
     return true;
   }
 
+  void onThreadException(const std::exception& ex, const size_t threadIndex) override
+  {
+    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+
+    this->threadFinished[threadIndex] = true;
+    this->shouldExit = true;
+    this->threadNotifier.notify_all();
+
+    sendMessage(Message::Abort);
+
+    abortFlag = true;
+    terminationNotifier.notify_all();
+  }
+
+  void onTermination(const size_t threadIndex) override
+  {
+    #ifdef _DEBUG
+      std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+    #endif
+
+    if (true == this->noMoreData && this->notificationCount.load() == 0)
+    {
+      terminationFlag = true;
+    }
+
+    if (true == this->shouldExit)
+    {
+      abortFlag = true;
+    }
+
+    terminationNotifier.notify_all();
+  }
+
 
   std::shared_ptr<SmartBuffer<DataType>> buffer;
   std::string destinationDirectory;
@@ -262,8 +212,6 @@ private:
   std::vector<size_t> additionalNameSection;
 
   SharedMultyMetrics threadMetrics;
-
-  std::vector<bool> threadFinished;
 
   bool& terminationFlag;
   bool& abortFlag;

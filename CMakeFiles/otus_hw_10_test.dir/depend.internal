@@ -13,6 +13,7 @@ CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/smart_buffer_mt.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/thread_metrics.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/weak_ptr_less.h
+ /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/worker_state.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/homework_10.cpp
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/homework_10.h
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o
@@ -27,5 +28,6 @@ CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/smart_buffer_mt.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/thread_metrics.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/weak_ptr_less.h
+ /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/worker_state.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/homework_10.h
  /home/travis/build/Alkud/OTUS_HOMEWORK_10/otus_hw_10_test.cpp

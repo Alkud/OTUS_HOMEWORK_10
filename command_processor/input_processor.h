@@ -31,6 +31,8 @@ public:
 
   const SharedMetrics getMetrics();
 
+  WorkerState getWorkerState();
+
 private:
   void sendCurrentBulk();
   void startNewBulk();
@@ -49,7 +51,11 @@ private:
   size_t nestingDepth;
   std::chrono::time_point<std::chrono::system_clock> bulkStartTime;
 
+  bool shouldExit;
+
   std::ostream& errorOut;
 
   SharedMetrics threadMetrics;
+
+  WorkerState state;
 };

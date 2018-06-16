@@ -135,10 +135,14 @@ void checkMetrics(std::stringstream& metricsStream,
   BOOST_CHECK(fileOneBulksCount + fileTwoBulksCount == bulksExpected);
 }
 
-BOOST_AUTO_TEST_SUITE( homework_10_test )
+BOOST_AUTO_TEST_SUITE(homework_10_test)
 
-BOOST_AUTO_TEST_CASE( objects_creation_failure )
+BOOST_AUTO_TEST_CASE(objects_creation_failure)
 {
+  #ifdef _DEBUG
+    std::cout << "objects_creation_failure test\n";
+  #endif
+
   std::mutex dummyMutex{};
   bool published{false};
   bool logged{false};
@@ -157,6 +161,10 @@ BOOST_AUTO_TEST_CASE( objects_creation_failure )
 
 BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 {
+  #ifdef _DEBUG
+    std::cout << "log_file_creation_failure test\n";
+  #endif
+
   std::stringstream outputStream{};
   std::stringstream metricsStream{};
   std::string badDirectoryName{"/non_existing_directory/"};
@@ -218,6 +226,10 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
 BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
+  #ifdef _DEBUG
+    std::cout << "trying_get_from_empty_buffer test\n";
+  #endif
+
   const auto emptyBuffer{
     std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
           "empty buffer"
@@ -239,6 +251,10 @@ BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 
 BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 {
+  #ifdef _DEBUG
+    std::cout << "no_command_line_parameters test\n";
+  #endif
+
   try
   {
     std::stringstream inputStream{};
@@ -270,6 +286,10 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
 BOOST_AUTO_TEST_CASE(empty_input_test)
 {
+  #ifdef _DEBUG
+    std::cout << "empty_input_test test\n";
+  #endif
+
   try
   {
     auto processorOutput{
@@ -300,6 +320,10 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 
 BOOST_AUTO_TEST_CASE(empty_command_test)
 {
+  #ifdef _DEBUG
+    std::cout << "empty_command_test test\n";
+  #endif
+
   const std::string testString{"cmd1\n"
                                "\n"
                                "cmd2"};
@@ -335,6 +359,10 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 {
+  #ifdef _DEBUG
+    std::cout << "bulk_segmentation_test1 test\n";
+  #endif
+
   try
   {
     const std::string testString{"cmd1\n"
@@ -382,6 +410,10 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 {
+  #ifdef _DEBUG
+    std::cout << "bulk_segmentation_test2 test\n";
+  #endif
+
   try
   {
     const std::string testString
@@ -435,6 +467,10 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 
 BOOST_AUTO_TEST_CASE(nested_bulks_test)
 {
+  #ifdef _DEBUG
+    std::cout << "nested_bulks_test test\n";
+  #endif
+
   try
   {
     const std::string testString{
@@ -494,6 +530,10 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
 
 BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 {
+  #ifdef _DEBUG
+    std::cout << "unexpected_bulk_end_test test\n";
+  #endif
+
   try
   {
     const std::string testString{
@@ -547,6 +587,10 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 
 BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 {
+  #ifdef _DEBUG
+    std::cout << "incorrect_closing_test test\n";
+  #endif
+
   try
   {
     const std::string testString{
@@ -598,6 +642,10 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 
 BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 {
+  #ifdef _DEBUG
+    std::cout << "commands_containing_delimiter_test test\n";
+  #endif
+
   try
   {
     const std::string testString
@@ -639,8 +687,12 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 }
 
 
-BOOST_AUTO_TEST_CASE(logging_test)
+BOOST_AUTO_TEST_CASE(logging)
 {
+  #ifdef _DEBUG
+    std::cout << "logging test\n";
+  #endif
+
   try
   {
     /* wait 2 seconds to get separate log files for this test */
@@ -724,6 +776,10 @@ BOOST_AUTO_TEST_CASE(logging_test)
 
 BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
 {
+  #ifdef _DEBUG
+    std::cout << "unexpected_buffer_exhaustion test\n";
+  #endif
+
   try
   {
     std::string inputString{
@@ -735,16 +791,19 @@ BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
     std::stringstream errorStream{};
     std::stringstream metricsStream{};
 
-    CommandProcessor<2> testProcessor {
-      inputStream, outputStream, errorStream, metricsStream,
-      3, '<', '>'
-    };
+    {
+      CommandProcessor<2> testProcessor {
+        inputStream, outputStream, errorStream, metricsStream,
+        3, '<', '>'
+      };
+      testProcessor.getBulkBuffer()->notify();
+      testProcessor.run();
+    }
 
-    testProcessor.getBulkBuffer()->notify();
-
-    testProcessor.run();
 
     auto errorMessage{errorStream.str()};
+
+    //std::cout << "Error message:" << errorMessage << std::endl;
 
     BOOST_CHECK(errorMessage.find("Abnormal termination")
                 != std::string::npos);
