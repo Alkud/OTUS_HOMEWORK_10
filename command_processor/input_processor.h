@@ -19,7 +19,7 @@ public:
   InputProcessor(const size_t& newBulkSize,
                  const char& newBulkOpenDelimiter,
                  const char& newBulkCloseDelimiter,
-                 const std::shared_ptr<SmartBuffer<std::string>>& newInputBuffer,
+                 const SharedStringBuffer& newInputBuffer,
                  const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newOutputBuffer,
                  std::ostream& newErrorOut);
 

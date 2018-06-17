@@ -169,10 +169,11 @@ private:
 
   std::mutex inputStreamLock{};
   std::mutex outputStreamLock{};
+  std::mutex errorStreamLock{};
 
-  bool dataPublished;
-  bool dataLogged;
-  bool shouldExit;
+  std::atomic<bool> dataPublished;
+  std::atomic<bool> dataLogged;
+  std::atomic<bool> shouldExit;
 
   std::condition_variable terminationNotifier{};
   std::mutex notifierLock;

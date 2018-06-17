@@ -18,7 +18,7 @@ class InputReader : public MessageBroadcaster,
 public:
 
   InputReader(std::istream& newInput, std::mutex& newInputLock,
-              const std::shared_ptr<SmartBuffer<std::string>>& newBuffer);
+              const SharedStringBuffer& newBuffer);
 
   ~InputReader();
 
@@ -33,7 +33,7 @@ private:
 
   std::istream& input;
   std::mutex& inputLock;
-  std::shared_ptr<SmartBuffer<std::string>> buffer;
+  SharedStringBuffer buffer;
 
   bool shouldExit;
 

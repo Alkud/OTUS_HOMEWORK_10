@@ -17,7 +17,7 @@ public:
   AsyncWorker() = delete;
 
   AsyncWorker(const std::string& newWorkerName) :
-    shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{},
+    shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{0},
     threadFinished{}, workerName{newWorkerName}, state{WorkerState::NotStarted}
   {
     futureResults.reserve(workingThreadsCount);
@@ -62,7 +62,7 @@ public:
       std::cout << "\n                    " << workerName << " trying to stop\n";
     #endif
 
-    shouldExit = true;
+    shouldExit.store(true);
     threadNotifier.notify_all();
 
     for (auto& result : futureResults)
@@ -70,7 +70,7 @@ public:
       while (result.wait_for(std::chrono::milliseconds(0))
           != std::future_status::ready)
       {
-        shouldExit = true;
+        shouldExit.store(true);
         threadNotifier.notify_all();
         result.wait_for(std::chrono::milliseconds(150));
       }
@@ -129,10 +129,10 @@ protected:
   {
     try
     {
-      while(this->shouldExit != true
-            && (this->noMoreData != true || this->notificationCount > 0))
+      while(shouldExit.load() != true
+            && (noMoreData.load() != true || notificationCount > 0))
       {
-        std::unique_lock<std::mutex> lockNotifier{this->notifierLock};
+        std::unique_lock<std::mutex> lockNotifier{notifierLock};
 
         if (notificationCount.load() > 0)
         {
@@ -149,26 +149,21 @@ protected:
           #endif
         }
         else
-        {
-          std::unique_lock<std::mutex> lockControl{controlLock};
-          if (shouldExit != true || noMoreData != true)
+        {          
+          if (shouldExit.load() != true || noMoreData.load() != true)
           {
-            lockControl.unlock();
-
             #ifdef _DEBUG
               std::cout << "\n                     " << this->workerName<< " waiting. shouldExit="<< shouldExit << ", noMoreData=" << noMoreData << "\n";
             #endif
 
             threadNotifier.wait_for(lockNotifier, std::chrono::seconds(1), [this]()
             {
-              return this->noMoreData || this->notificationCount.load() > 0 || this->shouldExit;
+              return this->noMoreData.load() || this->notificationCount.load() > 0 || this->shouldExit.load();
             });
-          }
-          else
-          {
-            lockControl.unlock();
-          }
-          lockNotifier.unlock();
+
+            lockNotifier.unlock();
+          }          
+
         }
       }
 
@@ -199,7 +194,7 @@ protected:
           std::cout << "\n                     " << this->workerName<< " finishing\n";
         #endif
 
-        if (shouldExit != true)
+        if (shouldExit.load() != true)
         {
           onTermination(threadIndex);
         }
@@ -227,9 +222,9 @@ protected:
   virtual void onTermination(const size_t threadIndex) = 0;
 
   std::vector<std::future<bool>> futureResults{};
-  std::mutex controlLock;
-  bool shouldExit;
-  bool noMoreData;
+  std::atomic<bool> shouldExit;
+  std::atomic<bool> noMoreData;
+
   bool isStopped;
 
   std::atomic<size_t> notificationCount;

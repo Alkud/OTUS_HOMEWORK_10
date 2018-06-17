@@ -1,4 +1,4 @@
-// smart_buffer.h in Otus homework#11 project
+// smart_buffer.h in Otus homework#10 project
 
 #pragma once
 
@@ -23,9 +23,9 @@ class SmartBuffer : public NotificationBroadcaster,
 {
 public:
 
-  std::mutex dataLock;
-
   using ListenerSet = std::set<std::weak_ptr<NotificationListener>, WeakPtrLess<NotificationListener>>;
+
+  std::mutex dataLock;
 
   SmartBuffer() = delete;
 
@@ -46,7 +46,7 @@ public:
   /// When all recipients have received this element, we can remove
   /// it from the buffer.
   struct Record
-  {    
+  {
     Record(T newValue) :
       value{newValue} {}
 
@@ -60,7 +60,11 @@ public:
   /// Copy new element to the buffer
   void putItem(const T& newItem)
   {
-    data.emplace_back(newItem, notificationListeners);
+    {
+      std::lock_guard<std::mutex> lockData{dataLock};
+      data.emplace_back(newItem, notificationListeners);
+    }
+
     ++notificationCount;
     threadNotifier.notify_one();
   }
@@ -68,10 +72,14 @@ public:
   /// Move new element to the buffer
   void putItem(T&& newItem)
   {
-    data.emplace_back(std::move(newItem), notificationListeners);
+    {
+      std::lock_guard<std::mutex> lockData{dataLock};
+      data.emplace_back(std::move(newItem), notificationListeners);
+    }
+
     ++notificationCount;
     threadNotifier.notify_one();
-  }  
+  }
 
   /// Each recipient starts looking from the first element in the queue.
   /// When an element is found that wasn't received yet by this recipient,
@@ -79,17 +87,22 @@ public:
   /// for this element.
   std::pair<bool, T> getItem(const std::shared_ptr<NotificationListener> recipient = nullptr)
   {
+    std::unique_lock<std::mutex> lockData{dataLock};
+
     std::weak_ptr<NotificationListener> weakRecipient{recipient};
 
     if (data.empty() == true)
     {
-      shouldExit = true;
+      lockData.unlock();
+      shouldExit.store(true);
       threadNotifier.notify_all();
+      errorMessage = Message::BufferEmpty;
       throw std::out_of_range{"Buffer is empty!"};
     }
 
     if (nullptr == recipient)
     {
+      lockData.unlock();
       return std::make_pair(false, data.front().value);
     }
 
@@ -103,7 +116,8 @@ public:
     if (iter == data.end()
         && (notificationListeners.find(weakRecipient) != notificationListeners.end()))
     {
-        return std::make_pair(false, data.front().value);
+      lockData.unlock();
+      return std::make_pair(false, data.front().value);
     }
 
     auto result {std::make_pair(true, iter->value)};
@@ -123,50 +137,59 @@ public:
       }
     }
 
+    lockData.unlock();
     return result;
   }
 
   /// Get elements count in the queue
   size_t dataSize()
   {
-    return data.size();
+    std::unique_lock<std::mutex> lockData{dataLock};
+    auto result{ data.size()};
+    lockData.unlock();
+
+    return result;
   }
 
   /// Clear data
   void clear()
   {
+    std::unique_lock<std::mutex> lockData{dataLock};
     data.clear();
+    lockData.unlock();
+
     notificationCount.store(0);
   }
 
   void reactMessage(MessageBroadcaster* sender, Message message) override
   {
-    switch(message)
+    if (messageCode(message) < 1000) // non error message
     {
-    case Message::NoMoreData :
-      if (noMoreData != true)
+      switch(message)
       {
-        #ifdef _DEBUG
-          std::cout << "\n                     " << workerName<< " NoMoreData received\n";
-        #endif
-
-        std::lock_guard<std::mutex> lockControl{this->controlLock};
-        noMoreData = true;
-        threadNotifier.notify_one();
-      }
-      break;
-
-    case Message::Abort :
-      if (shouldExit != true)
-      {
+      case Message::NoMoreData :
+        if (noMoreData != true)
         {
-          std::lock_guard<std::mutex> lockControl{this->controlLock};
-          shouldExit = true;
+          #ifdef _DEBUG
+            std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+          #endif
+
+          noMoreData.store(true);
           threadNotifier.notify_all();
         }
-          sendMessage(Message::Abort);
+        break;
+
+      default:
+        break;
       }
-      break;
+    }
+    else                             // error message
+    {
+      if (shouldExit.load() != true)
+      {
+        shouldExit.store(true);
+        sendMessage(message);
+      }
     }
   }
 
@@ -179,18 +202,28 @@ private:
 
   void onThreadException(const std::exception& ex, const size_t threadIndex) override
   {
-    errorOut << workerName << " stopped. Reason: " << ex.what() << std::endl;
-    sendMessage(Message::Abort);
+    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+
+    if (ex.what() == "Buffer is empty!")
+    {
+      errorMessage = Message::BufferEmpty;
+    }
+
+    threadFinished[threadIndex] = true;
+    shouldExit.store(true);
+    threadNotifier.notify_all();
+
+    sendMessage(errorMessage);
   }
 
   void onTermination(const size_t threadIndex) override
   {
-    while (data.empty() != true)
+    while (dataSize() != 0)
     {
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
       threadNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
       {
-        return data.empty();
+        return dataSize() != 0;
       });
       lockNotifier.unlock();
     }
@@ -202,5 +235,12 @@ private:
   std::ostream& errorOut;
 
   std::deque<Record> data;
+
+  Message errorMessage{Message::SystemError};
 };
 
+
+using StringBuffer = SmartBuffer<std::string>;
+using SharedStringBuffer = std::shared_ptr<StringBuffer>;
+using SizeStringBuffer = SmartBuffer<std::pair<size_t, std::string>>;
+using SharedSizeStringBuffer = std::shared_ptr<SizeStringBuffer>;

@@ -6,7 +6,7 @@
 #include <mutex>
 
 InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
-                         const std::shared_ptr<SmartBuffer<std::string> >& newBuffer) :
+                         const SharedStringBuffer& newBuffer) :
   input{newInput},
   inputLock{newInputLock},
   buffer{newBuffer},
@@ -34,7 +34,7 @@ void InputReader::read()
   try
   {
     std::lock_guard<std::mutex> lockInput{inputLock};
-    while(shouldExit!= true
+    while(shouldExit != true
           && std::getline(input, nextString))
     {
       if (nextString.size() > (size_t)InputReaderSettings::MaxInputStringSize)
