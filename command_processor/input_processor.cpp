@@ -42,9 +42,7 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
   {
     try
     {
-      std::unique_lock<std::mutex> lockInputBuffer{inputBuffer->dataLock};
       auto bufferReply{inputBuffer->getItem(shared_from_this())};
-      lockInputBuffer.unlock();
 
       if (false == bufferReply.first)
        {

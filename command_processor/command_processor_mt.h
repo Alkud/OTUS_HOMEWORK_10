@@ -157,7 +157,8 @@ public:
 
     inputReader->read();
 
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     CP is going to wait. dataLogged = "
                 << dataLogged << " dataPublished = " << dataPublished << "\n";
     #endif
@@ -165,7 +166,8 @@ public:
     while (shouldExit.load() != true
            && ((dataLogged.load() && dataPublished.load()) != true))
     {
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << "\n                     CP waiting\n";
       #endif
 

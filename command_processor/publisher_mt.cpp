@@ -126,7 +126,7 @@ void Publisher::onTermination(const size_t threadIndex)
     std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
   #endif
 
-  if (true == noMoreData && notificationCount.load() == 0)
+  if (true == noMoreData.load() && notificationCount.load() == 0)
   {
     sendMessage(Message::AllDataPublsihed);
   }

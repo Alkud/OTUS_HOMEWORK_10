@@ -188,7 +188,7 @@ private:
       std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
     #endif
 
-    if (true == this->noMoreData && this->notificationCount.load() == 0)
+    if (true == this->noMoreData.load() && this->notificationCount.load() == 0)
     {
       sendMessage(Message::AllDataLogged);
     }

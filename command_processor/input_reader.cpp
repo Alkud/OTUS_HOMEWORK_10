@@ -43,10 +43,8 @@ void InputReader::read()
       {
         std::cerr << "Maximum command length exceeded! String truncated";
         nextString = nextString.substr((size_t)InputReaderSettings::MaxInputStringSize);
-      }
-      std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
+      }      
       buffer->putItem(nextString);
-      lockBuffer.unlock();
     }
     sendMessage(Message::AllDataReceived);
     sendMessage(Message::NoMoreData);

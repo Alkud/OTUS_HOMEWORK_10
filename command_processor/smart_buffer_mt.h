@@ -31,7 +31,8 @@ public:
 
   SmartBuffer(const std::string& newWorkerName, std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
     AsyncWorker<1>{newWorkerName},
-    errorOut{newErrorOut}, errorOutLock{newErrorOutLock}
+    errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
+    dataEmpty{true}
   {
     data.clear();
   }
@@ -65,6 +66,7 @@ public:
       data.emplace_back(newItem, notificationListeners);
     }
 
+    dataEmpty.store(false);
     ++notificationCount;
     threadNotifier.notify_one();
   }
@@ -77,6 +79,7 @@ public:
       data.emplace_back(std::move(newItem), notificationListeners);
     }
 
+    dataEmpty.store(false);
     ++notificationCount;
     threadNotifier.notify_one();
   }
@@ -133,6 +136,7 @@ public:
           std::cout << "\n                    " << workerName<< " all data received\n";
         #endif
 
+        dataEmpty.store(true);
         threadNotifier.notify_all();
       }
     }
@@ -168,7 +172,7 @@ public:
       switch(message)
       {
       case Message::NoMoreData :
-        if (noMoreData != true)
+        if (noMoreData.load() != true)
         {
           #ifdef _DEBUG
             std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
@@ -221,12 +225,12 @@ private:
 
   void onTermination(const size_t threadIndex) override
   {
-    while (dataSize() != 0)
+    while (dataEmpty.load() != true)
     {
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
-      threadNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
+      threadNotifier.wait_for(lockNotifier, std::chrono::milliseconds{1000}, [this]()
       {
-        return dataSize() != 0;
+        return dataEmpty.load() == true;
       });
       lockNotifier.unlock();
     }
@@ -239,6 +243,8 @@ private:
   std::mutex& errorOutLock;
 
   std::deque<Record> data;
+
+  std::atomic_bool dataEmpty;
 
   Message errorMessage{Message::SystemError};
 };

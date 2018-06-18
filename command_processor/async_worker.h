@@ -26,7 +26,8 @@ public:
 
   virtual ~AsyncWorker()
   {
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                    " << workerName << " destructor, shouldExit = " << shouldExit << "\n";
     #endif
 
@@ -58,7 +59,8 @@ public:
       return;
     }
 
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                    " << workerName << " trying to stop\n";
     #endif
 
@@ -72,7 +74,7 @@ public:
       {
         shouldExit.store(true);
         threadNotifier.notify_all();
-        result.wait_for(std::chrono::milliseconds(150));
+        result.wait_for(std::chrono::milliseconds(500));
       }
     }
 
@@ -136,27 +138,30 @@ protected:
 
         if (notificationCount.load() > 0)
         {
-          #ifdef _DEBUG
-            std::cout << this->workerName << " decrement notificationCount\n";
+          #ifdef NDEBUG
+          #else
+            //std::cout << this->workerName << " decrement notificationCount\n";
           #endif
 
           --notificationCount;
           lockNotifier.unlock();
           threadProcess(threadIndex);
 
-          #ifdef _DEBUG
-            std::cout << this->workerName << " threadProcess success\n";
+          #ifdef NDEBUG
+          #else
+            //std::cout << this->workerName << " threadProcess success\n";
           #endif
         }
         else
         {          
           if (shouldExit.load() != true || noMoreData.load() != true)
           {
-            #ifdef _DEBUG
+            #ifdef NDEBUG
+            #else
               std::cout << "\n                     " << this->workerName<< " waiting. shouldExit="<< shouldExit << ", noMoreData=" << noMoreData << "\n";
             #endif
 
-            threadNotifier.wait_for(lockNotifier, std::chrono::seconds(1), [this]()
+            threadNotifier.wait_for(lockNotifier, std::chrono::milliseconds(1000), [this]()
             {
               return this->noMoreData.load() || this->notificationCount.load() > 0 || this->shouldExit.load();
             });
@@ -180,8 +185,9 @@ protected:
         }
       }
 
-      #ifdef _DEBUG
-        std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
+      #ifdef NDEBUG
+      #else
+        //std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
       #endif
 
       threadFinished[threadIndex] = true;
@@ -190,8 +196,9 @@ protected:
 
       if (0 == activeThreadCount)
       {
-        #ifdef _DEBUG
-          std::cout << "\n                     " << this->workerName<< " finishing\n";
+        #ifdef NDEBUG
+        #else
+          //std::cout << "\n                     " << this->workerName<< " finishing\n";
         #endif
 
         if (shouldExit.load() != true)
@@ -201,7 +208,8 @@ protected:
         state = WorkerState::Finished;
       }
 
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << "\n                     " << this->workerName<< " finished\n";
       #endif
 

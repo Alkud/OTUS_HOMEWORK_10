@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(objects_creation_failure)
     std::cout << "objects_creation_failure test\n";
   #endif
 
-  std::mutex dummyMutex{};  
+  std::mutex dummyMutex{};
 
   /* can't create input reader with null buffer pointer */
   BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr, std::cerr, dummyMutex}), std::invalid_argument);
