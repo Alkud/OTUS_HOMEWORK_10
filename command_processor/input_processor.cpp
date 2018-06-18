@@ -5,7 +5,7 @@
 InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpenDelimiter, const char& newBulkCloseDelimiter,
                                const std::shared_ptr<SmartBuffer<std::string> >& newInputBuffer,
                                const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer,
-                               std::ostream& newErrorOut) :
+                               std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
   bulkSize{newBulkSize > 1 ? newBulkSize : 1},
   bulkOpenDelimiter{newBulkOpenDelimiter},
   bulkCloseDelimiter{newBulkCloseDelimiter},
@@ -14,7 +14,7 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
   customBulkStarted{false},
   nestingDepth{0},
   shouldExit{false},
-  errorOut{newErrorOut},
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
   threadMetrics{std::make_shared<ThreadMetrics>("input processor")},
   state{WorkerState::Started}
 {}
@@ -101,6 +101,7 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
 
       shouldExit = true;
       sendMessage(Message::Abort);
+      std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
       std::cerr << ex.what();
     }
   }

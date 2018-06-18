@@ -178,6 +178,9 @@ private:
   std::condition_variable terminationNotifier{};
   std::mutex notifierLock;
 
+  std::mutex outputStreamLock;
+  std::mutex errorStreamLock;
+
   std::ostream& errorOut;
   std::ostream& metricsOut;
   SharedGlobalMetrics globalMetrics;

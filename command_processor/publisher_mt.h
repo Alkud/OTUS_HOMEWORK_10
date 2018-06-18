@@ -21,11 +21,9 @@ class Publisher : public NotificationListener,
 public:
 
   Publisher(const std::string& newWorkerName,
-            const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newBuffer,
-            bool& newTerminationFlag, bool& newAbortFlag,
-            std::condition_variable& newTerminationNotifier,
+            const SharedSizeStringBuffer& newBuffer,
             std::ostream& newOutput, std::mutex& newOutpuLock,
-            std::ostream& newErrorOut = std::cerr);
+            std::ostream& newErrorOut, std::mutex& newErrorOutLock);
 
   ~Publisher();
 
@@ -49,10 +47,8 @@ private:
   std::ostream& output;
   std::mutex& outputLock;  
 
-  SharedMetrics threadMetrics;
   std::ostream& errorOut;
+  std::mutex& errorOutLock;
 
-  bool& terminationFlag;
-  bool& abortFlag;
-  std::condition_variable& terminationNotifier;
+  SharedMetrics threadMetrics;
 };

@@ -6,11 +6,13 @@
 #include <mutex>
 
 InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
-                         const SharedStringBuffer& newBuffer) :
+                         const SharedStringBuffer& newBuffer, std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
   input{newInput},
   inputLock{newInputLock},
   buffer{newBuffer},
-  shouldExit{false}, state{WorkerState::NotStarted}
+  shouldExit{false},
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
+  state{WorkerState::NotStarted}
 {
   if (nullptr == buffer)
   {
@@ -56,7 +58,8 @@ void InputReader::read()
     #endif
 
     sendMessage(Message::Abort);
-    std::cerr << ex.what();
+    std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+    errorOut << ex.what();
     state = WorkerState::Finished;
   }
 

@@ -29,9 +29,9 @@ public:
 
   SmartBuffer() = delete;
 
-  SmartBuffer(const std::string& newWorkerName, std::ostream& newErrorOut = std::cerr) :
+  SmartBuffer(const std::string& newWorkerName, std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
     AsyncWorker<1>{newWorkerName},
-    errorOut{newErrorOut}
+    errorOut{newErrorOut}, errorOutLock{newErrorOutLock}
   {
     data.clear();
   }
@@ -202,7 +202,10 @@ private:
 
   void onThreadException(const std::exception& ex, const size_t threadIndex) override
   {
-    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+    {
+      std::lock_guard<std::mutex> lockErrorOutm{errorOutLock};
+      errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+    }
 
     if (ex.what() == "Buffer is empty!")
     {
@@ -233,6 +236,7 @@ private:
 
 
   std::ostream& errorOut;
+  std::mutex& errorOutLock;
 
   std::deque<Record> data;
 

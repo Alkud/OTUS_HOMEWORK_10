@@ -28,16 +28,13 @@ public:
 
   Logger(const std::string& newWorkerName,
          const std::shared_ptr<SmartBuffer<DataType>>& newBuffer,
-         bool& newTerminationFlag, bool& newAbortFlag,
-         std::condition_variable& newTerminationNotifier,
          const std::string& newDestinationDirectory = "",
-         std::ostream& newErrorOut = std::cerr) :
+         std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
     AsyncWorker<threadsCount>{newWorkerName},
-    buffer{newBuffer}, destinationDirectory{newDestinationDirectory}, errorOut{newErrorOut},
+    buffer{newBuffer}, destinationDirectory{newDestinationDirectory},
     previousTimeStamp{}, additionalNameSection{},
-    threadMetrics{},
-    terminationFlag{newTerminationFlag}, abortFlag{newAbortFlag},
-    terminationNotifier{newTerminationNotifier}
+    errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
+    threadMetrics{}
   {
     if (nullptr == buffer)
     {
@@ -206,16 +203,14 @@ private:
 
   std::shared_ptr<SmartBuffer<DataType>> buffer;
   std::string destinationDirectory;
-  std::ostream& errorOut;
 
   size_t previousTimeStamp;
   std::vector<size_t> additionalNameSection;
 
-  SharedMultyMetrics threadMetrics;
+  std::ostream& errorOut;
+  std::mutex& errorOutLock;
 
-  bool& terminationFlag;
-  bool& abortFlag;
-  std::condition_variable& terminationNotifier;
+  SharedMultyMetrics threadMetrics;
 };
 
 

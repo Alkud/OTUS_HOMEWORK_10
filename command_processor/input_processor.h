@@ -20,8 +20,8 @@ public:
                  const char& newBulkOpenDelimiter,
                  const char& newBulkCloseDelimiter,
                  const SharedStringBuffer& newInputBuffer,
-                 const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newOutputBuffer,
-                 std::ostream& newErrorOut);
+                 const SharedSizeStringBuffer& newOutputBuffer,
+                 std::ostream& newErrorOut, std::mutex& newErrorOutLock);
 
   ~InputProcessor();
 
@@ -43,8 +43,8 @@ private:
   const std::string bulkOpenDelimiter;
   const std::string bulkCloseDelimiter;
 
-  std::shared_ptr<SmartBuffer<std::string>> inputBuffer;
-  std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>> outputBuffer;
+  SharedStringBuffer inputBuffer;
+  SharedSizeStringBuffer outputBuffer;
 
   std::deque<std::string> tempBuffer;
   bool customBulkStarted;
@@ -54,6 +54,7 @@ private:
   bool shouldExit;
 
   std::ostream& errorOut;
+  std::mutex& errorOutLock;
 
   SharedMetrics threadMetrics;
 

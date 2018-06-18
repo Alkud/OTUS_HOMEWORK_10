@@ -4,9 +4,9 @@
 
 
 Publisher::Publisher(const std::string& newWorkerName,
-                     const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newBuffer, bool& newTerminationFlag, bool& newAbortFlag, std::condition_variable& newTerminationNotifier,
+                     const SharedSizeStringBuffer& newBuffer,
                      std::ostream& newOutput, std::mutex& newOutpuLock,
-                     std::ostream& newErrorOut) :
+                     std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
   AsyncWorker<1>{newWorkerName},
   buffer{newBuffer}, output{newOutput}, outputLock{newOutpuLock},
   threadMetrics{std::make_shared<ThreadMetrics>("publisher")},
@@ -108,7 +108,11 @@ bool Publisher::threadProcess(const size_t threadIndex)
 
 void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex)
 {
-  errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+  {
+    std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+  }
+
 
   threadFinished[threadIndex] = true;
   shouldExit = true;
