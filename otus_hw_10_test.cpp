@@ -143,20 +143,16 @@ BOOST_AUTO_TEST_CASE(objects_creation_failure)
     std::cout << "objects_creation_failure test\n";
   #endif
 
-  std::mutex dummyMutex{};
-  bool published{false};
-  bool logged{false};
-  bool shouldExit{false};
-  std::condition_variable notifier{};
+  std::mutex dummyMutex{};  
 
   /* can't create input reader with null buffer pointer */
-  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr}), std::invalid_argument);
+  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr, std::cerr, dummyMutex}), std::invalid_argument);
 
   /* can't create publisher with null buffer pointer */
-  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, published, shouldExit, notifier, std::cout, dummyMutex}), std::invalid_argument);
+  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, std::cout, dummyMutex, std::cerr, dummyMutex}), std::invalid_argument);
 
   /* can't create logger with null buffer pointer */
-  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, logged, shouldExit, notifier, ""}), std::invalid_argument);
+  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, std::cerr, dummyMutex, ""}), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(log_file_creation_failure)
@@ -165,26 +161,22 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
     std::cout << "log_file_creation_failure test\n";
   #endif
 
-  std::stringstream outputStream{};
+  std::stringstream errorStream{};
+  std::mutex errorStreamLock;
   std::stringstream metricsStream{};
   std::string badDirectoryName{"/non_existing_directory/"};
   SharedMultyMetrics metrics{};
 
   {
-    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")};
+    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer", errorStream, errorStreamLock)};
     const auto dummyBroadcaster {std::make_shared<MessageBroadcaster>()};
-    bool logged{false};
-    bool shouldExit{false};
-    std::condition_variable notifier{};
-    std::mutex notifierLock{};
 
     /* use bad directory name as constructor parameter */
     const auto badLogger{
       std::make_shared<Logger<2>>(
-            "bad logger",bulkBuffer,
-            logged, shouldExit, notifier,
-            badDirectoryName,
-            outputStream
+            "bad logger", bulkBuffer,
+            errorStream, errorStreamLock,
+            badDirectoryName
             )
     };
 
@@ -202,16 +194,14 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
     dummyBroadcaster->sendMessage(Message::NoMoreData);
 
-    std::unique_lock<std::mutex> lockNotifier{notifierLock};
-    notifier.wait(lockNotifier, [&logged, &shouldExit]{return logged || shouldExit;});
-    lockNotifier.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds{200});
 
     /* get metrics */
     metrics = badLogger->getMetrics();
   }
 
   /* get error message string */
-  std::string errorMessage{outputStream.str()};
+  std::string errorMessage{errorStream.str()};
 
   /* error message sholud contain expected text */
   BOOST_CHECK(errorMessage.find("Cannot create log file") != std::string::npos);
@@ -230,9 +220,11 @@ BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
     std::cout << "trying_get_from_empty_buffer test\n";
   #endif
 
+  std::mutex dummyMutex;
+
   const auto emptyBuffer{
     std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
-          "empty buffer"
+          "empty buffer", std::cerr, dummyMutex
           )
   };
 

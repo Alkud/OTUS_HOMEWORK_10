@@ -10,9 +10,7 @@ Publisher::Publisher(const std::string& newWorkerName,
   AsyncWorker<1>{newWorkerName},
   buffer{newBuffer}, output{newOutput}, outputLock{newOutpuLock},
   threadMetrics{std::make_shared<ThreadMetrics>("publisher")},
-  errorOut{newErrorOut},
-  terminationFlag{newTerminationFlag}, abortFlag{newAbortFlag},
-  terminationNotifier{newTerminationNotifier}
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock}
 {
   if (nullptr == buffer)
   {
@@ -82,11 +80,7 @@ bool Publisher::threadProcess(const size_t threadIndex)
     throw(std::invalid_argument{"Logger source buffer not defined!"});
   }
 
-  decltype(buffer->getItem()) bufferReply{};
-  {
-    std::lock_guard<std::mutex> lockBuffer{buffer->dataLock};
-    bufferReply = buffer->getItem(shared_from_this());
-  }
+  auto bufferReply{buffer->getItem(shared_from_this())};
 
   if (false == bufferReply.first)
   {
@@ -114,15 +108,16 @@ void Publisher::onThreadException(const std::exception& ex, const size_t threadI
     errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
   }
 
-
   threadFinished[threadIndex] = true;
   shouldExit = true;
   threadNotifier.notify_all();
 
-  sendMessage(Message::Abort);
+  if (ex.what() == "Buffer is empty!")
+  {
+    errorMessage = Message::BufferEmpty;
+  }
 
-  abortFlag = true;
-  terminationNotifier.notify_all();
+  sendMessage(errorMessage);
 }
 
 void Publisher::onTermination(const size_t threadIndex)
@@ -133,13 +128,6 @@ void Publisher::onTermination(const size_t threadIndex)
 
   if (true == noMoreData && notificationCount.load() == 0)
   {
-    terminationFlag = true;
+    sendMessage(Message::AllDataPublsihed);
   }
-
-  if (true == shouldExit)
-  {
-    abortFlag = true;
-  }
-
-  terminationNotifier.notify_all();
 }

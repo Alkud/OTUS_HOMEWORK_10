@@ -58,9 +58,12 @@ void InputReader::read()
       std::cout << "\n                     reader ABORT\n";
     #endif
 
-    sendMessage(Message::Abort);
-    std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
-    errorOut << ex.what();
+    {
+      std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+      errorOut << ex.what();
+    }
+
+    sendMessage(Message::SystemError);
     state = WorkerState::Finished;
   }
 

@@ -24,12 +24,10 @@ class Logger : public NotificationListener,
 {
 public:
 
-  using DataType = std::pair<size_t, std::string>;
-
   Logger(const std::string& newWorkerName,
-         const std::shared_ptr<SmartBuffer<DataType>>& newBuffer,
-         const std::string& newDestinationDirectory = "",
-         std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
+         const SharedSizeStringBuffer& newBuffer,
+         std::ostream& newErrorOut, std::mutex& newErrorOutLock,
+         const std::string& newDestinationDirectory = "") :
     AsyncWorker<threadsCount>{newWorkerName},
     buffer{newBuffer}, destinationDirectory{newDestinationDirectory},
     previousTimeStamp{}, additionalNameSection{},
@@ -115,11 +113,7 @@ private:
       throw(std::invalid_argument{"Logger source buffer not defined!"});
     }
 
-    decltype(buffer->getItem()) bufferReply{};
-    {
-      std::lock_guard<std::mutex> lockBuffer{buffer->dataLock};
-      bufferReply = buffer->getItem(shared_from_this());
-    }
+    auto bufferReply{buffer->getItem(shared_from_this())};
 
     if (false == bufferReply.first)
     {
@@ -171,16 +165,21 @@ private:
 
   void onThreadException(const std::exception& ex, const size_t threadIndex) override
   {
-    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+    {
+      std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+      errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+    }
 
     this->threadFinished[threadIndex] = true;
     this->shouldExit = true;
     this->threadNotifier.notify_all();
 
-    sendMessage(Message::Abort);
+    if (ex.what() == "Buffer is empty!")
+    {
+      errorMessage = Message::BufferEmpty;
+    }
 
-    abortFlag = true;
-    terminationNotifier.notify_all();
+    sendMessage(errorMessage);
   }
 
   void onTermination(const size_t threadIndex) override
@@ -191,19 +190,12 @@ private:
 
     if (true == this->noMoreData && this->notificationCount.load() == 0)
     {
-      terminationFlag = true;
+      sendMessage(Message::AllDataLogged);
     }
-
-    if (true == this->shouldExit)
-    {
-      abortFlag = true;
-    }
-
-    terminationNotifier.notify_all();
   }
 
 
-  std::shared_ptr<SmartBuffer<DataType>> buffer;
+  SharedSizeStringBuffer buffer;
   std::string destinationDirectory;
 
   size_t previousTimeStamp;
@@ -213,6 +205,8 @@ private:
   std::mutex& errorOutLock;
 
   SharedMultyMetrics threadMetrics;
+
+  Message errorMessage{Message::SystemError};
 };
 
 

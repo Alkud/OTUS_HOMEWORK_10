@@ -109,10 +109,12 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
         std::cout << "\n                     processor ABORT\n";
       #endif
 
+      {
+        std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+        std::cerr << ex.what();
+      }
       shouldExit = true;
-      sendMessage(Message::Abort);
-      std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
-      std::cerr << ex.what();
+      sendMessage(Message::SystemError);
     }
   }
 }
@@ -144,7 +146,7 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
     if (shouldExit != true)
     {
       shouldExit = true;
-      sendMessage(Message::Abort);
+      sendMessage(message);
       state = WorkerState::Finished;
     }
   }
@@ -186,10 +188,7 @@ void InputProcessor::sendCurrentBulk()
   };
 
   /* send the bulk to the output buffer */
-  {
-    std::lock_guard<std::mutex> lockOutputBuffer{outputBuffer->dataLock};
-    outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
-  }
+  outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
 
   /* Refresh metrics */
   threadMetrics->totalCommandCount += tempBuffer.size();

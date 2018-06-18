@@ -41,9 +41,7 @@ private:
 
   void onTermination(const size_t threadIndex) override;
 
-  using DataType = std::pair<size_t, std::string>;
-
-  std::shared_ptr<SmartBuffer<DataType>> buffer;
+  SharedSizeStringBuffer buffer;
   std::ostream& output;
   std::mutex& outputLock;  
 
@@ -51,4 +49,6 @@ private:
   std::mutex& errorOutLock;
 
   SharedMetrics threadMetrics;
+
+  Message errorMessage{Message::SystemError};
 };

@@ -10,7 +10,7 @@
 #include "publisher_mt.h"
 #include "logger_mt.h"
 
-template <size_t loggingThreadsCount = 2u>
+template <size_t loggingThreadCount = 2u>
 class CommandProcessor : public MessageBroadcaster,
                          public MessageListener
 {
@@ -44,15 +44,15 @@ public:
     )},
 
     /* creating logger */
-    logger{std::make_shared<Logger<loggingThreadsCount>>(
-      "logger", outputBuffer, dataLogged, shouldExit, terminationNotifier,
-      "", errorStream, errorStreamLock
+    logger{std::make_shared<Logger<loggingThreadCount>>(
+      "logger", outputBuffer, errorStream, errorStreamLock, ""
     )},
 
     /* creating publisher */
     publisher{std::make_shared<Publisher>(
-      "publisher", outputBuffer, dataPublished, shouldExit, terminationNotifier,
-      outputStream, outputStreamLock, errorStream, errorStreamLock
+      "publisher", outputBuffer,
+      newOutputStream, outputStreamLock,
+      errorStream, errorStreamLock
     )},
 
     /* creating command processor */
@@ -65,7 +65,7 @@ public:
     )},
 
     dataReceived{false}, dataPublished{false}, dataLogged{false}, shouldExit{false},
-    metricsOut{metricsStream}, errorOut{errorStream}, globalMetrics{}
+    globalMetrics{}
   {
     /* connect broadcasters and listeners */
     this->addMessageListener(inputReader);
@@ -87,7 +87,7 @@ public:
     globalMetrics["publisher"] = publisher->getMetrics();
 
     SharedMultyMetrics loggerMetrics{logger->getMetrics()};
-    for (size_t idx{0}; idx < loggingThreadsCount; ++idx)
+    for (size_t idx{0}; idx < loggingThreadCount; ++idx)
     {
       auto threadName = std::string{"logger thread#"} + std::to_string(idx);
       globalMetrics[threadName] = loggerMetrics[idx];
@@ -144,11 +144,11 @@ public:
   /// Runs input reading and processing
   void run()
   {
-    sharedThis = std::shared_ptr<CommandProcessor<loggingThreadsCount>>{this, DummyDeleter};
+    sharedThis = std::shared_ptr<CommandProcessor<loggingThreadCount>>{this, DummyDeleter()};
 
     inputReader->addMessageListener(sharedThis);
     logger->addMessageListener(sharedThis);
-    publisher->addMessageListener(sahredThis);
+    publisher->addMessageListener(sharedThis);
 
     inputBuffer->start();
     outputBuffer->start();
@@ -201,20 +201,20 @@ public:
     #endif
 
     /* Output metrics */    
-    metricsOut << "main thread - "
-               << globalMetrics["input processor"]->totalStringCount << " string(s), "
-               << globalMetrics["input processor"]->totalCommandCount << " command(s), "
-               << globalMetrics["input processor"]->totalBulkCount << " bulk(s)" << std::endl
-               << "log thread - "
-               << globalMetrics["publisher"]->totalBulkCount << " bulk(s), "
-               << globalMetrics["publisher"]->totalCommandCount << " command(s)" << std::endl;
+    metricsStream << "main thread - "
+                  << globalMetrics["input processor"]->totalStringCount << " string(s), "
+                  << globalMetrics["input processor"]->totalCommandCount << " command(s), "
+                  << globalMetrics["input processor"]->totalBulkCount << " bulk(s)" << std::endl
+                  << "log thread - "
+                  << globalMetrics["publisher"]->totalBulkCount << " bulk(s), "
+                  << globalMetrics["publisher"]->totalCommandCount << " command(s)" << std::endl;
 
-    for (size_t threadIndex{}; threadIndex < loggingThreadsCount; ++threadIndex)
+    for (size_t threadIndex{}; threadIndex < loggingThreadCount; ++threadIndex)
     {
       auto threadName = std::string{"logger thread#"} + std::to_string(threadIndex);
-      metricsOut << "file thread #" << threadIndex << " - "
-                 << globalMetrics[threadName]->totalBulkCount << " bulk(s), "
-                 << globalMetrics[threadName]->totalCommandCount << " command(s)" << std::endl;
+      metricsStream << "file thread #" << threadIndex << " - "
+                    << globalMetrics[threadName]->totalBulkCount << " bulk(s), "
+                    << globalMetrics[threadName]->totalCommandCount << " command(s)" << std::endl;
     }
   }
 
@@ -237,7 +237,7 @@ private:
   std::shared_ptr<SmartBuffer<std::string>> inputBuffer;
   std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>> outputBuffer;
   std::shared_ptr<InputReader> inputReader;
-  std::shared_ptr<Logger<loggingThreadsCount>> logger;
+  std::shared_ptr<Logger<loggingThreadCount>> logger;
   std::shared_ptr<Publisher> publisher;
   std::shared_ptr<InputProcessor> inputProcessor;
 
@@ -256,6 +256,6 @@ private:
     void operator()(T*){}
   };
 
-  std::shared_ptr<CommandProcessor<loggingThreadsCount>> sharedThis{};
+  std::shared_ptr<CommandProcessor<loggingThreadCount>> sharedThis{};
 };
 
