@@ -82,9 +82,6 @@ public:
     outputBuffer->addNotificationListener(logger);
     outputBuffer->addMessageListener(logger);
 
-    logger->addMessageListener(publisher);
-    publisher->addMessageListener(logger);
-
     /* creating metrics*/
     globalMetrics["input processor"] = inputProcessor->getMetrics();
     globalMetrics["publisher"] = publisher->getMetrics();
@@ -130,7 +127,6 @@ public:
         terminationNotifier.notify_all();
         break;
 
-
       default:
         break;
       }
@@ -148,6 +144,12 @@ public:
   /// Runs input reading and processing
   void run()
   {
+    sharedThis = std::shared_ptr<CommandProcessor<loggingThreadsCount>>{this, DummyDeleter};
+
+    inputReader->addMessageListener(sharedThis);
+    logger->addMessageListener(sharedThis);
+    publisher->addMessageListener(sahredThis);
+
     inputBuffer->start();
     outputBuffer->start();
     publisher->start();
@@ -249,6 +251,11 @@ private:
 
   SharedGlobalMetrics globalMetrics;
 
-  std::shared_ptr
+  struct DummyDeleter{
+    template<typename T>
+    void operator()(T*){}
+  };
+
+  std::shared_ptr<CommandProcessor<loggingThreadsCount>> sharedThis{};
 };
 

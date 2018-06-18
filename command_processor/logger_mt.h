@@ -70,32 +70,34 @@ public:
 
   void reactMessage(class MessageBroadcaster* sender, Message message) override
   {
-    switch(message)
+    if (messageCode(message) < 1000) // non error message
     {
-    case Message::NoMoreData :
-      if (this->noMoreData != true && buffer.get() == sender)
+      switch(message)
       {
-        #ifdef _DEBUG
-          std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
-        #endif
-
-        std::lock_guard<std::mutex> lockControl{this->controlLock};
-        this->noMoreData = true;
-        this->threadNotifier.notify_all();
-      }
-      break;
-
-    case Message::Abort :
-      if (this->shouldExit != true)
-      {
+      case Message::NoMoreData :
+        if (this->noMoreData.load() != true && buffer.get() == sender)
         {
-          std::lock_guard<std::mutex> lockControl{this->controlLock};
-          this->shouldExit = true;
+          #ifdef _DEBUG
+            std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+          #endif
+
+          this->noMoreData.store(true);
           this->threadNotifier.notify_all();
         }
-        sendMessage(Message::Abort);
+        break;
+
+      default:
+        break;
       }
-      break;
+    }
+    else                             // error message
+    {
+      if (this->shouldExit.load() != true)
+      {
+        this->shouldExit.store(true);
+        this->threadNotifier.notify_all();
+        sendMessage(message);
+      }
     }
   }
 

@@ -6,7 +6,7 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
                                const std::shared_ptr<SmartBuffer<std::string> >& newInputBuffer,
                                const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer,
                                std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
-  bulkSize{newBulkSize > 1 ? newBulkSize : 1},
+  bulkSize{newBulkSize},
   bulkOpenDelimiter{newBulkOpenDelimiter},
   bulkCloseDelimiter{newBulkCloseDelimiter},
   inputBuffer{newInputBuffer},
@@ -17,7 +17,17 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
   errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
   threadMetrics{std::make_shared<ThreadMetrics>("input processor")},
   state{WorkerState::Started}
-{}
+{
+  if (nullptr == inputBuffer)
+  {
+    throw(std::invalid_argument{"Input processor source buffer not defined!"});
+  }
+
+  if (nullptr == outputBuffer)
+  {
+    throw(std::invalid_argument{"Input processor destination buffer not defined!"});
+  }
+}
 
 InputProcessor::~InputProcessor()
 {
@@ -109,31 +119,34 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
 
 void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  switch (message)
+  if (messageCode(message) < 1000) // non error message
   {
-  case Message::NoMoreData:
-    if (inputBuffer.get() == sender)
+    switch(message)
     {
-      if (customBulkStarted != true)
+    case Message::NoMoreData :
+      if (inputBuffer.get() == sender)
       {
-        closeCurrentBulk();
-      }
-      sendMessage(Message::NoMoreData);
-      state = WorkerState::Finished;
-     }
-     break;
+        if (customBulkStarted != true)
+        {
+          closeCurrentBulk();
+        }
+        sendMessage(Message::NoMoreData);
+        state = WorkerState::Finished;
+       }
+      break;
 
-  case Message::Abort :
+    default:
+      break;
+    }
+  }
+  else                             // error message
+  {
     if (shouldExit != true)
     {
       shouldExit = true;
       sendMessage(Message::Abort);
       state = WorkerState::Finished;
     }
-    break;
-
-   default:
-     break;
   }
 }
 

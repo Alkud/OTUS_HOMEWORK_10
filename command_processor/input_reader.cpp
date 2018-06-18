@@ -68,15 +68,11 @@ void InputReader::read()
 
 void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  switch(message)
+  if (messageCode(message) > 1000           // error message
+      && shouldExit != true)
   {
-  case Message::Abort :
-    if (shouldExit != true)
-    {
-      shouldExit = true;
-      sendMessage(Message::Abort);
-    }
-    break;
+    shouldExit = true;
+    sendMessage(message);
   }
 }
 
