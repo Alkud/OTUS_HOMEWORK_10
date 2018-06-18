@@ -48,6 +48,7 @@ void InputReader::read()
       buffer->putItem(nextString);
       lockBuffer.unlock();
     }
+    sendMessage(Message::AllDataReceived);
     sendMessage(Message::NoMoreData);
     state = WorkerState::Finished;
   }
