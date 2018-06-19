@@ -150,7 +150,7 @@ protected:
         {
           #ifdef NDEBUG
           #else
-            //std::cout << this->workerName << " decrement notificationCount\n";
+            std::cout << this->workerName << " decrement notificationCount\n";
           #endif
 
           --notificationCount;
@@ -159,16 +159,19 @@ protected:
 
           #ifdef NDEBUG
           #else
-            //std::cout << this->workerName << " threadProcess success\n";
+            std::cout << this->workerName << " threadProcess success\n";
           #endif
         }
         else
         {          
-          if (shouldExit.load() != true || noMoreData.load() != true)
+          if (shouldExit.load() != true && noMoreData.load() != true)
           {
             #ifdef NDEBUG
             #else
-              std::cout << "\n                     " << this->workerName<< " waiting. shouldExit="<< shouldExit << ", noMoreData=" << noMoreData << "\n";
+              std::cout << "\n                     " << this->workerName
+                        << " waiting. shouldExit="<< shouldExit
+                        << ", noMoreData=" << noMoreData
+                        << "notificationCount=" << notificationCount.load() << "\n";
             #endif
 
             threadNotifier.wait_for(lockNotifier, std::chrono::milliseconds(1000), [this]()
@@ -177,8 +180,7 @@ protected:
             });
 
             lockNotifier.unlock();
-          }          
-
+          }
         }
       }
 
@@ -197,7 +199,7 @@ protected:
 
       #ifdef NDEBUG
       #else
-        //std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
+        std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
       #endif
 
       threadFinished[threadIndex].store(true);
@@ -208,7 +210,7 @@ protected:
       {
         #ifdef NDEBUG
         #else
-          //std::cout << "\n                     " << this->workerName<< " finishing\n";
+          std::cout << "\n                     " << this->workerName<< " finishing\n";
         #endif
 
         if (shouldExit.load() != true)

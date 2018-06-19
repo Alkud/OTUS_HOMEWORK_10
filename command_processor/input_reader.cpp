@@ -22,7 +22,8 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
 
 InputReader::~InputReader()
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "IR destructor\n";
   #endif
 }
@@ -52,7 +53,8 @@ void InputReader::read()
   }
   catch(std::exception& ex)
   {
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     reader ABORT\n";
     #endif
 

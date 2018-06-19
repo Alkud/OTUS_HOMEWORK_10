@@ -57,7 +57,8 @@ public:
   {
     if (buffer.get() == sender)
     {
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << this->workerName << " reactNotification\n";
       #endif
 
@@ -72,17 +73,16 @@ public:
     {
       switch(message)
       {
-      case Message::NoMoreData :
-        if (this->noMoreData.load() != true && buffer.get() == sender)
-        {
-          #ifdef _DEBUG
+        case Message::NoMoreData :
+        this->noMoreData.store(true);
+
+          #ifdef NDEBUG
+          #else
             std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
           #endif
 
-          this->noMoreData.store(true);
           this->threadNotifier.notify_all();
-        }
-        break;
+          break;
 
       default:
         break;
@@ -117,7 +117,8 @@ private:
 
     if (false == bufferReply.first)
     {
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << "\n                     " << this->workerName<< " FALSE received\n";
       #endif
 
@@ -170,8 +171,8 @@ private:
       errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
     }
 
-    this->threadFinished[threadIndex] = true;
-    this->shouldExit = true;
+    this->threadFinished[threadIndex].store(true);
+    this->shouldExit.store(true);
     this->threadNotifier.notify_all();
 
     if (ex.what() == "Buffer is empty!")
@@ -184,7 +185,8 @@ private:
 
   void onTermination(const size_t threadIndex) override
   {
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
     #endif
 

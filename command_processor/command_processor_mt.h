@@ -10,9 +10,18 @@
 #include "publisher_mt.h"
 #include "logger_mt.h"
 
+class AbstractProcessor
+{
+public:
+  virtual ~AbstractProcessor(){}
+  virtual void setBulkSize(const size_t) = 0;
+  virtual void run() = 0;
+};
+
 template <size_t loggingThreadCount = 2u>
 class CommandProcessor : public MessageBroadcaster,
-                         public MessageListener
+                         public MessageListener,
+                         public AbstractProcessor
 {
 public:
 
@@ -94,6 +103,8 @@ public:
     }
   }
 
+  ~CommandProcessor(){}
+
   void reactMessage(class MessageBroadcaster* sender, Message message) override
   {
     if (messageCode(message) < 1000) // non error message
@@ -101,7 +112,8 @@ public:
       switch(message)
       {
       case Message::AllDataReceived :
-        #ifdef _DEBUG
+        #ifdef NDEBUG
+        #else
           std::cout << "\n                     CP all data received\n";
         #endif
 
@@ -110,7 +122,8 @@ public:
         break;
 
       case Message::AllDataLogged :
-        #ifdef _DEBUG
+        #ifdef NDEBUG
+        #else
           std::cout << "\n                     CP all data logged\n";
         #endif
 
@@ -119,7 +132,8 @@ public:
         break;
 
       case Message::AllDataPublsihed :
-        #ifdef _DEBUG
+        #ifdef NDEBUG
+        #else
           std::cout << "\n                     CP all data published\n";
         #endif
 
@@ -172,14 +186,15 @@ public:
       #endif
 
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
-      terminationNotifier.wait_for(lockNotifier, std::chrono::seconds{1}, [this]()
+      terminationNotifier.wait_for(lockNotifier, std::chrono::milliseconds{1000}, [this]()
       {
         return (shouldExit.load()) || (dataLogged.load() && dataPublished.load());
       });
       lockNotifier.unlock();
     }
 
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     CP waiting ended\n";
     #endif
 
@@ -198,7 +213,8 @@ public:
       errorStream << "Abnormal termination\n";
     }
 
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     CP metrics output\n";
     #endif
 
@@ -219,6 +235,11 @@ public:
                     << globalMetrics[threadName]->totalBulkCount << " bulk(s), "
                     << globalMetrics[threadName]->totalCommandCount << " command(s)" << std::endl;
     }
+  }
+
+  void setBulkSize(const size_t newBulkSize) override
+  {
+    inputProcessor->setBulkSize(newBulkSize);
   }
 
   const std::shared_ptr<SmartBuffer<std::string>>&

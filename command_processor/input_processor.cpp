@@ -31,7 +31,8 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
 
 InputProcessor::~InputProcessor()
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "IP destructor\n";
   #endif
 }
@@ -103,7 +104,8 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
     }
     catch(std::exception& ex)
     {
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << "\n                     processor ABORT\n";
       #endif
 
@@ -126,11 +128,27 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
     case Message::NoMoreData :
       if (inputBuffer.get() == sender)
       {
+        #ifdef NDEBUG
+        #else
+          std::cout << "\n                     processor NoMoreData received\n";
+        #endif
+
         if (customBulkStarted != true)
         {
+          #ifdef NDEBUG
+          #else
+            std::cout << "\n                     processor trying close last bulk\n";
+          #endif
+
           closeCurrentBulk();
         }
         sendMessage(Message::NoMoreData);
+
+        #ifdef NDEBUG
+        #else
+          std::cout << "\n                     processor NoMoreData sent\n";
+        #endif
+
         state.store(WorkerState::Finished);
        }
       break;
@@ -152,8 +170,13 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 
 const SharedMetrics InputProcessor::getMetrics()
 {
-           return threadMetrics;
-           }
+  return threadMetrics;
+}
+
+void InputProcessor::setBulkSize(const size_t newBulkSize)
+{
+  bulkSize = newBulkSize;
+}
 
 WorkerState InputProcessor::getWorkerState()
 {
@@ -214,5 +237,3 @@ void InputProcessor::addCommandToBulk(std::string&& newCommand)
 {
   tempBuffer.push_back(std::move(newCommand));
 }
-
-

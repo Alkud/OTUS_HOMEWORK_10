@@ -29,6 +29,8 @@ public:
 
   void reactMessage(MessageBroadcaster* sender, Message message) override;
 
+  void setBulkSize(const size_t newBulkSize);
+
   const SharedMetrics getMetrics();
 
   WorkerState getWorkerState();
@@ -39,7 +41,7 @@ private:
   void closeCurrentBulk();
   void addCommandToBulk(std::string&& newCommand);
 
-  const size_t bulkSize;
+  size_t bulkSize;
   const std::string bulkOpenDelimiter;
   const std::string bulkCloseDelimiter;
 

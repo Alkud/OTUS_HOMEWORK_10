@@ -32,7 +32,7 @@ public:
   SmartBuffer(const std::string& newWorkerName, std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
     AsyncWorker<1>{newWorkerName},
     errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
-    dataEmpty{true}
+    dataReceived{true}
   {
     data.clear();
   }
@@ -66,7 +66,7 @@ public:
       data.emplace_back(newItem, notificationListeners);
     }
 
-    dataEmpty.store(false);
+    dataReceived.store(false);
     ++notificationCount;
     threadNotifier.notify_one();
   }
@@ -79,7 +79,7 @@ public:
       data.emplace_back(std::move(newItem), notificationListeners);
     }
 
-    dataEmpty.store(false);
+    dataReceived.store(false);
     ++notificationCount;
     threadNotifier.notify_one();
   }
@@ -130,13 +130,20 @@ public:
     if (iter->recipients.empty() == true)
     {
       data.erase(iter);
+
+      #ifdef NDEBUG
+      #else
+        std::cout << "\n                    " << workerName<< " check if this is the last data item\n";
+      #endif
+
       if (true == data.empty() && true == noMoreData.load())
       {
-        #ifdef _DEBUG
+        #ifdef NDEBUG
+        #else
           std::cout << "\n                    " << workerName<< " all data received\n";
         #endif
 
-        dataEmpty.store(true);
+        dataReceived.store(true);
         threadNotifier.notify_all();
       }
     }
@@ -172,15 +179,14 @@ public:
       switch(message)
       {
       case Message::NoMoreData :
-        if (noMoreData.load() != true)
-        {
-          #ifdef _DEBUG
-            std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
-          #endif
+        noMoreData.store(true);
 
-          noMoreData.store(true);
-          threadNotifier.notify_all();
-        }
+        #ifdef NDEBUG
+        #else
+          std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        #endif
+
+        threadNotifier.notify_all();
         break;
 
       default:
@@ -216,7 +222,7 @@ private:
       errorMessage = Message::BufferEmpty;
     }
 
-    threadFinished[threadIndex] = true;
+    threadFinished[threadIndex].store(true);
     shouldExit.store(true);
     threadNotifier.notify_all();
 
@@ -225,12 +231,25 @@ private:
 
   void onTermination(const size_t threadIndex) override
   {
-    while (dataEmpty.load() != true)
+    if (noMoreData.load() == true
+        && dataSize() == 0)
     {
+      dataReceived.store(true);
+    }
+
+    while (dataReceived.load() != true)
+    {
+      #ifdef NDEBUG
+        #else
+      std::cout << "\n                    "
+                << workerName << " dataReceived=" << dataReceived.load()
+                << "data.size()=" << data.size() <<  "\n";
+      #endif
+
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
       threadNotifier.wait_for(lockNotifier, std::chrono::milliseconds{1000}, [this]()
       {
-        return dataEmpty.load() == true;
+        return dataReceived.load() == true;
       });
       lockNotifier.unlock();
     }
@@ -244,7 +263,7 @@ private:
 
   std::deque<Record> data;
 
-  std::atomic_bool dataEmpty;
+  std::atomic_bool dataReceived;
 
   Message errorMessage{Message::SystemError};
 };
