@@ -5,8 +5,8 @@
 InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpenDelimiter, const char& newBulkCloseDelimiter,
                                const std::shared_ptr<SmartBuffer<std::string> >& newInputBuffer,
                                const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newOutputBuffer,
-                               std::ostream& newErrorOut) :
-  bulkSize{newBulkSize > 1 ? newBulkSize : 1},
+                               std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
+  bulkSize{newBulkSize},
   bulkOpenDelimiter{newBulkOpenDelimiter},
   bulkCloseDelimiter{newBulkCloseDelimiter},
   inputBuffer{newInputBuffer},
@@ -14,14 +14,25 @@ InputProcessor::InputProcessor(const size_t& newBulkSize, const char& newBulkOpe
   customBulkStarted{false},
   nestingDepth{0},
   shouldExit{false},
-  errorOut{newErrorOut},
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
   threadMetrics{std::make_shared<ThreadMetrics>("input processor")},
   state{WorkerState::Started}
-{}
+{
+  if (nullptr == inputBuffer)
+  {
+    throw(std::invalid_argument{"Input processor source buffer not defined!"});
+  }
+
+  if (nullptr == outputBuffer)
+  {
+    throw(std::invalid_argument{"Input processor destination buffer not defined!"});
+  }
+}
 
 InputProcessor::~InputProcessor()
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "IP destructor\n";
   #endif
 }
@@ -32,9 +43,7 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
   {
     try
     {
-      std::unique_lock<std::mutex> lockInputBuffer{inputBuffer->dataLock};
       auto bufferReply{inputBuffer->getItem(shared_from_this())};
-      lockInputBuffer.unlock();
 
       if (false == bufferReply.first)
        {
@@ -95,55 +104,83 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
     }
     catch(std::exception& ex)
     {
-      #ifdef _DEBUG
+      #ifdef NDEBUG
+      #else
         std::cout << "\n                     processor ABORT\n";
       #endif
 
+      {
+        std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+        std::cerr << ex.what();
+      }
       shouldExit = true;
-      sendMessage(Message::Abort);
-      std::cerr << ex.what();
+      sendMessage(Message::SystemError);
     }
   }
 }
 
 void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  switch (message)
+  if (messageCode(message) < 1000) // non error message
   {
-  case Message::NoMoreData:
-    if (inputBuffer.get() == sender)
+    switch(message)
     {
-      if (customBulkStarted != true)
+    case Message::NoMoreData :
+      if (inputBuffer.get() == sender)
       {
-        closeCurrentBulk();
-      }
-      sendMessage(Message::NoMoreData);
-      state = WorkerState::Finished;
-     }
-     break;
+        #ifdef NDEBUG
+        #else
+          std::cout << "\n                     processor NoMoreData received\n";
+        #endif
 
-  case Message::Abort :
+        if (customBulkStarted != true)
+        {
+          #ifdef NDEBUG
+          #else
+            std::cout << "\n                     processor trying close last bulk\n";
+          #endif
+
+          closeCurrentBulk();
+        }
+        sendMessage(Message::NoMoreData);
+
+        #ifdef NDEBUG
+        #else
+          std::cout << "\n                     processor NoMoreData sent\n";
+        #endif
+
+        state.store(WorkerState::Finished);
+       }
+      break;
+
+    default:
+      break;
+    }
+  }
+  else                             // error message
+  {
     if (shouldExit != true)
     {
       shouldExit = true;
-      sendMessage(Message::Abort);
-      state = WorkerState::Finished;
+      sendMessage(message);
+      state.store(WorkerState::Finished);
     }
-    break;
-
-   default:
-     break;
   }
 }
 
 const SharedMetrics InputProcessor::getMetrics()
 {
-           return threadMetrics;
-           }
+  return threadMetrics;
+}
+
+void InputProcessor::setBulkSize(const size_t newBulkSize)
+{
+  bulkSize = newBulkSize;
+}
 
 WorkerState InputProcessor::getWorkerState()
 {
-  return state;
+  return state.load();
 }
 
 void InputProcessor::sendCurrentBulk()
@@ -172,10 +209,7 @@ void InputProcessor::sendCurrentBulk()
   };
 
   /* send the bulk to the output buffer */
-  {
-    std::lock_guard<std::mutex> lockOutputBuffer{outputBuffer->dataLock};
-    outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
-  }
+  outputBuffer->putItem(std::make_pair(ticksCount, newBulk));
 
   /* Refresh metrics */
   threadMetrics->totalCommandCount += tempBuffer.size();
@@ -203,5 +237,3 @@ void InputProcessor::addCommandToBulk(std::string&& newCommand)
 {
   tempBuffer.push_back(std::move(newCommand));
 }
-
-

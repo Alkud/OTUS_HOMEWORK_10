@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['threadmetrics',['ThreadMetrics',['../struct_thread_metrics.html',1,'']]]
+  ['smartbuffer',['SmartBuffer',['../class_smart_buffer.html',1,'']]]
 ];

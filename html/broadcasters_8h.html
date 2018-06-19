@@ -87,7 +87,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">broadcasters.h File Reference</div>  </div>
 </div><!--header-->
@@ -123,16 +124,34 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a4f09127c805cc1f5ee20e67db7b45efa"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a> { <a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efaa72c846e189c7a9cb5ecedde873e4e203">Message::NoMoreData</a>, 
-<a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efaa839cd0090d0f6a1d575d33607aeaef01">Message::AllDataPublsihed</a>, 
-<a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efaa9aee811e5693435fbdf0a75fb8ce1a8c">Message::AllDataLogged</a>, 
-<a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efaa727b63583e01fa2b3952dab580c84dc2">Message::Abort</a>
+<tr class="memitem:aff97733e4706e994965da50c70605422"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> : unsigned int { <br/>
+&#160;&#160;<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a72c846e189c7a9cb5ecedde873e4e203">Message::NoMoreData</a> = 1u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a745eb2c43f5d3debdcb28ddbb9d31564">Message::AllDataReceived</a> = 2u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a839cd0090d0f6a1d575d33607aeaef01">Message::AllDataPublsihed</a> = 3u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a9aee811e5693435fbdf0a75fb8ce1a8c">Message::AllDataLogged</a> = 4u, 
+<br/>
+&#160;&#160;<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422ab932b91f686c2aa588adfd9a407155ca">Message::SystemError</a> = 1001u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a87d629fce76985a67de5043a16674ac2">Message::FileCreationError</a> = 1002u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a24cdc501638e4f97f1571f1b9867a757">Message::CharacterReadingError</a> = 1003u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a122426765eac9bdb79f0a1529e376d2d">Message::SourceNullptr</a> = 1004u, 
+<br/>
+&#160;&#160;<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422ae69f558a400c216896ea6f967bf342e4">Message::DestinationNullptr</a> = 1005u, 
+<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422a97670e256d3a807ee17c2107c2a9f6bd">Message::BufferEmpty</a> = 1006u
+<br/>
  }</td></tr>
-<tr class="memdesc:a4f09127c805cc1f5ee20e67db7b45efa"><td class="mdescLeft">&#160;</td><td class="mdescRight">inteprocess exchange messages  <a href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">More...</a><br/></td></tr>
-<tr class="separator:a4f09127c805cc1f5ee20e67db7b45efa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:aff97733e4706e994965da50c70605422"><td class="mdescLeft">&#160;</td><td class="mdescRight">inteprocess exchange messages  <a href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">More...</a><br/></td></tr>
+<tr class="separator:aff97733e4706e994965da50c70605422"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:aed1d20d3dbc85e3d55156ac530e49442"><td class="memTemplParams" colspan="2">template&lt;typename T  = unsigned int&gt; </td></tr>
+<tr class="memitem:aed1d20d3dbc85e3d55156ac530e49442"><td class="memTemplItemLeft" align="right" valign="top">std::enable_if_t<br class="typebreak"/>
+&lt; std::is_integral&lt; T &gt;::value, <br class="typebreak"/>
+T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="broadcasters_8h.html#aed1d20d3dbc85e3d55156ac530e49442">messageCode</a> (const <a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> &amp;message)</td></tr>
+<tr class="separator:aed1d20d3dbc85e3d55156ac530e49442"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a class="anchor" id="a4f09127c805cc1f5ee20e67db7b45efa"></a>
+<a class="anchor" id="aff97733e4706e994965da50c70605422"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -140,7 +159,7 @@ Enumerations</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a></td>
+          <td class="memname">enum <a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> : unsigned int</td>
         </tr>
       </table>
   </td>
@@ -152,19 +171,58 @@ Enumerations</h2></td></tr>
 
 <p>inteprocess exchange messages </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="a4f09127c805cc1f5ee20e67db7b45efaa72c846e189c7a9cb5ecedde873e4e203"></a>NoMoreData</em>&#160;</td><td class="fielddoc">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a72c846e189c7a9cb5ecedde873e4e203"></a>NoMoreData</em>&#160;</td><td class="fielddoc">
+<p>Data flow messages: </p>
 <p>no more data will be committed </p>
 </td></tr>
-<tr><td class="fieldname"><em><a class="anchor" id="a4f09127c805cc1f5ee20e67db7b45efaa839cd0090d0f6a1d575d33607aeaef01"></a>AllDataPublsihed</em>&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a745eb2c43f5d3debdcb28ddbb9d31564"></a>AllDataReceived</em>&#160;</td><td class="fielddoc">
+<p>all characters have been received </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a839cd0090d0f6a1d575d33607aeaef01"></a>AllDataPublsihed</em>&#160;</td><td class="fielddoc">
 <p>all bulks have been published </p>
 </td></tr>
-<tr><td class="fieldname"><em><a class="anchor" id="a4f09127c805cc1f5ee20e67db7b45efaa9aee811e5693435fbdf0a75fb8ce1a8c"></a>AllDataLogged</em>&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a9aee811e5693435fbdf0a75fb8ce1a8c"></a>AllDataLogged</em>&#160;</td><td class="fielddoc">
 <p>all bulks have been written to files </p>
 </td></tr>
-<tr><td class="fieldname"><em><a class="anchor" id="a4f09127c805cc1f5ee20e67db7b45efaa727b63583e01fa2b3952dab580c84dc2"></a>Abort</em>&#160;</td><td class="fielddoc">
-<p>some exception caught, need stop all threads </p>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422ab932b91f686c2aa588adfd9a407155ca"></a>SystemError</em>&#160;</td><td class="fielddoc">
+<p>Error code messages: </p>
+<p>any unknown exception </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a87d629fce76985a67de5043a16674ac2"></a>FileCreationError</em>&#160;</td><td class="fielddoc">
+<p>log file exception </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a24cdc501638e4f97f1571f1b9867a757"></a>CharacterReadingError</em>&#160;</td><td class="fielddoc">
+<p>input reader getline() exception </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a122426765eac9bdb79f0a1529e376d2d"></a>SourceNullptr</em>&#160;</td><td class="fielddoc">
+<p>source buffer pointer not defined or expired </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422ae69f558a400c216896ea6f967bf342e4"></a>DestinationNullptr</em>&#160;</td><td class="fielddoc">
+<p>destination buffer pointer not defined or expired </p>
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="aff97733e4706e994965da50c70605422a97670e256d3a807ee17c2107c2a9f6bd"></a>BufferEmpty</em>&#160;</td><td class="fielddoc">
+<p>source buffer empty while trying to read on notification </p>
 </td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aed1d20d3dbc85e3d55156ac530e49442"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T  = unsigned int&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::enable_if_t&lt;std::is_integral&lt;T&gt;::value, T&gt; messageCode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> &amp;&#160;</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

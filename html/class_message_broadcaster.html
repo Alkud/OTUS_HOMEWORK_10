@@ -84,6 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_message_broadcaster-members.html">List of all members</a>  </div>
@@ -98,20 +99,27 @@ Inheritance diagram for MessageBroadcaster:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_message_broadcaster__inherit__graph.png" border="0" usemap="#_message_broadcaster_inherit__map" alt="Inheritance graph"/></div>
 <map name="_message_broadcaster_inherit__map" id="_message_broadcaster_inherit__map">
-<area shape="rect" id="node2" href="class_command_processor.html" title="CommandProcessor\&lt; logging\lThreadsCount \&gt;" alt="" coords="200,5,395,46"/><area shape="rect" id="node3" href="class_input_processor.html" title="InputProcessor" alt="" coords="242,71,353,97"/><area shape="rect" id="node4" href="class_input_reader.html" title="InputReader" alt="" coords="251,121,344,148"/><area shape="rect" id="node5" href="class_logger.html" title="Logger\&lt; threadsCount \&gt;" alt="" coords="216,172,379,199"/><area shape="rect" id="node6" href="class_publisher.html" title="Publisher" alt="" coords="259,223,335,249"/><area shape="rect" id="node7" href="class_smart_buffer.html" title="SmartBuffer\&lt; T \&gt;" alt="" coords="235,273,359,300"/></map>
+<area shape="rect" id="node2" href="class_command_processor.html" title="CommandProcessor\&lt; logging\lThreadCount \&gt;" alt="" coords="200,5,395,46"/><area shape="rect" id="node3" href="class_input_processor.html" title="InputProcessor" alt="" coords="242,71,353,97"/><area shape="rect" id="node4" href="class_input_reader.html" title="InputReader" alt="" coords="251,121,344,148"/><area shape="rect" id="node5" href="class_logger.html" title="Logger\&lt; threadsCount \&gt;" alt="" coords="216,172,379,199"/><area shape="rect" id="node6" href="class_publisher.html" title="Publisher" alt="" coords="259,223,335,249"/><area shape="rect" id="node7" href="class_smart_buffer.html" title="SmartBuffer\&lt; T \&gt;" alt="" coords="235,273,359,300"/></map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:ac8de3c7e21aaa2fbfb4659dfc49dce5c"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> = std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;</td></tr>
+<tr class="separator:ac8de3c7e21aaa2fbfb4659dfc49dce5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98151d95dc8354561e7c43db884213cb"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">WeakMessageListener</a> = std::weak_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;</td></tr>
+<tr class="separator:a98151d95dc8354561e7c43db884213cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a233b4bf529f9ba2b4c58a35134b3f64c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a233b4bf529f9ba2b4c58a35134b3f64c">~MessageBroadcaster</a> ()</td></tr>
 <tr class="separator:a233b4bf529f9ba2b4c58a35134b3f64c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae93ef9f52518f8ad3ff58b011a6d0a2c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae93ef9f52518f8ad3ff58b011a6d0a2c">addMessageListener</a> (const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;newListener)</td></tr>
-<tr class="memdesc:ae93ef9f52518f8ad3ff58b011a6d0a2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new listeners.  <a href="#ae93ef9f52518f8ad3ff58b011a6d0a2c">More...</a><br/></td></tr>
-<tr class="separator:ae93ef9f52518f8ad3ff58b011a6d0a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa296971c12b979c7bbcb7f81ff5bb70"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#afa296971c12b979c7bbcb7f81ff5bb70">removeMessageListener</a> (const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;listener)</td></tr>
-<tr class="memdesc:afa296971c12b979c7bbcb7f81ff5bb70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a listener.  <a href="#afa296971c12b979c7bbcb7f81ff5bb70">More...</a><br/></td></tr>
-<tr class="separator:afa296971c12b979c7bbcb7f81ff5bb70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8e7f93dbbcf8cc1c62574ca6b71f2f8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">sendMessage</a> (<a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a> message)</td></tr>
+<tr class="memitem:a9c86fb59c4ce9a5d48b4a2403ae7ba82"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a9c86fb59c4ce9a5d48b4a2403ae7ba82">addMessageListener</a> (const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;newListener)</td></tr>
+<tr class="memdesc:a9c86fb59c4ce9a5d48b4a2403ae7ba82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new listeners.  <a href="#a9c86fb59c4ce9a5d48b4a2403ae7ba82">More...</a><br/></td></tr>
+<tr class="separator:a9c86fb59c4ce9a5d48b4a2403ae7ba82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb82e570ead2387ee1afd69ce9c9d8a6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#afb82e570ead2387ee1afd69ce9c9d8a6">removeMessageListener</a> (const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;listener)</td></tr>
+<tr class="memdesc:afb82e570ead2387ee1afd69ce9c9d8a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a listener.  <a href="#afb82e570ead2387ee1afd69ce9c9d8a6">More...</a><br/></td></tr>
+<tr class="separator:afb82e570ead2387ee1afd69ce9c9d8a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8e7f93dbbcf8cc1c62574ca6b71f2f8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">sendMessage</a> (<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> message)</td></tr>
 <tr class="memdesc:ae8e7f93dbbcf8cc1c62574ca6b71f2f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send instruction to all registered listeners.  <a href="#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">More...</a><br/></td></tr>
 <tr class="separator:ae8e7f93dbbcf8cc1c62574ca6b71f2f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72bdc718a0558928fcb918399369dd80"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a72bdc718a0558928fcb918399369dd80">clearMessageListenerList</a> ()</td></tr>
@@ -120,14 +128,38 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a95a811516fbd1370acf7335b1c663fb8"><td class="memItemLeft" align="right" valign="top">std::set&lt; std::weak_ptr<br class="typebreak"/>
-&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;<br class="typebreak"/>
-, <a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a95a811516fbd1370acf7335b1c663fb8">messageListeners</a></td></tr>
-<tr class="separator:a95a811516fbd1370acf7335b1c663fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0de505d69ac2d6f5af3da263199c59ea"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">WeakMessageListener</a>, <br class="typebreak"/>
+<a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a0de505d69ac2d6f5af3da263199c59ea">messageListeners</a></td></tr>
+<tr class="separator:a0de505d69ac2d6f5af3da263199c59ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base class for a brodcaster, sending messages, containing instructions for listeners </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a class="anchor" id="ac8de3c7e21aaa2fbfb4659dfc49dce5c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">MessageBroadcaster::SharedMessageListener</a> =  std::shared_ptr&lt;<a class="el" href="class_message_listener.html">MessageListener</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a98151d95dc8354561e7c43db884213cb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">MessageBroadcaster::WeakMessageListener</a> =  std::weak_ptr&lt;<a class="el" href="class_message_listener.html">MessageListener</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a233b4bf529f9ba2b4c58a35134b3f64c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -152,7 +184,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ae93ef9f52518f8ad3ff58b011a6d0a2c"></a>
+<a class="anchor" id="a9c86fb59c4ce9a5d48b4a2403ae7ba82"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -162,7 +194,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual void MessageBroadcaster::addMessageListener </td>
           <td>(</td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;&#160;</td>
           <td class="paramname"><em>newListener</em></td><td>)</td>
           <td></td>
         </tr>
@@ -203,7 +235,7 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="afa296971c12b979c7bbcb7f81ff5bb70"></a>
+<a class="anchor" id="afb82e570ead2387ee1afd69ce9c9d8a6"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -213,7 +245,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual void MessageBroadcaster::removeMessageListener </td>
           <td>(</td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;&#160;</td>
           <td class="paramname"><em>listener</em></td><td>)</td>
           <td></td>
         </tr>
@@ -239,7 +271,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">virtual void MessageBroadcaster::sendMessage </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a>&#160;</td>
           <td class="paramname"><em>message</em></td><td>)</td>
           <td></td>
         </tr>
@@ -256,7 +288,7 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a95a811516fbd1370acf7335b1c663fb8"></a>
+<a class="anchor" id="a0de505d69ac2d6f5af3da263199c59ea"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -264,7 +296,7 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::set&lt;std::weak_ptr&lt;<a class="el" href="class_message_listener.html">MessageListener</a>&gt;, <a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt;<a class="el" href="class_message_listener.html">MessageListener</a>&gt; &gt; MessageBroadcaster::messageListeners</td>
+          <td class="memname">std::set&lt;<a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">WeakMessageListener</a>, <a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt;<a class="el" href="class_message_listener.html">MessageListener</a>&gt; &gt; MessageBroadcaster::messageListeners</td>
         </tr>
       </table>
   </td>

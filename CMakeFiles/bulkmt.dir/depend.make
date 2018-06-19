@@ -15,7 +15,6 @@ CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/publisher_mt.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/smart_buffer_mt.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/thread_metrics.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/weak_ptr_less.h
-CMakeFiles/bulkmt.dir/homework_10.cpp.o: ./command_processor/worker_state.h
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: homework_10.cpp
 CMakeFiles/bulkmt.dir/homework_10.cpp.o: homework_10.h
 

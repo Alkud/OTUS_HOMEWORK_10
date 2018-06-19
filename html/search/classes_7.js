@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['smartbuffer',['SmartBuffer',['../class_smart_buffer.html',1,'']]]
+  ['publisher',['Publisher',['../class_publisher.html',1,'']]]
 ];

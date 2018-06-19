@@ -110,28 +110,28 @@ Collaboration diagram for InputReader:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa3d980fdaa8d18b49384a472d02f86b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#aa3d980fdaa8d18b49384a472d02f86b3">InputReader</a> (std::istream &amp;newInput, std::mutex &amp;newInputLock, const std::shared_ptr&lt; <a class="el" href="class_smart_buffer.html">SmartBuffer</a>&lt; std::string &gt;&gt; &amp;newBuffer)</td></tr>
-<tr class="separator:aa3d980fdaa8d18b49384a472d02f86b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeb56ac5f3497bdf90cbd3692cd62e51"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#afeb56ac5f3497bdf90cbd3692cd62e51">InputReader</a> (std::istream &amp;newInput, std::mutex &amp;newInputLock, const <a class="el" href="smart__buffer__mt_8h.html#ac3089a6c099deb305c66a331430bafc6">SharedStringBuffer</a> &amp;newBuffer, std::ostream &amp;newErrorOut, std::mutex &amp;newErrorOutLock)</td></tr>
+<tr class="separator:afeb56ac5f3497bdf90cbd3692cd62e51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38875ce3bae818dd0836da36fb7ea891"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a38875ce3bae818dd0836da36fb7ea891">~InputReader</a> ()</td></tr>
 <tr class="separator:a38875ce3bae818dd0836da36fb7ea891"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb28e20423127d667e1c93a15172607e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#abb28e20423127d667e1c93a15172607e">read</a> ()</td></tr>
 <tr class="memdesc:abb28e20423127d667e1c93a15172607e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read from input stream until eof.  <a href="#abb28e20423127d667e1c93a15172607e">More...</a><br/></td></tr>
 <tr class="separator:abb28e20423127d667e1c93a15172607e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc8f908513a22c67d91cde0de4a9bc20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#afc8f908513a22c67d91cde0de4a9bc20">reactMessage</a> (class <a class="el" href="class_message_broadcaster.html">MessageBroadcaster</a> *sender, <a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a> message) override</td></tr>
+<tr class="memitem:afc8f908513a22c67d91cde0de4a9bc20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#afc8f908513a22c67d91cde0de4a9bc20">reactMessage</a> (class <a class="el" href="class_message_broadcaster.html">MessageBroadcaster</a> *sender, <a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> message) override</td></tr>
 <tr class="memdesc:afc8f908513a22c67d91cde0de4a9bc20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Describes object's reaction to a message.  <a href="#afc8f908513a22c67d91cde0de4a9bc20">More...</a><br/></td></tr>
 <tr class="separator:afc8f908513a22c67d91cde0de4a9bc20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bde7ac0ebfa4e58bb687bd2ad21a873"><td class="memItemLeft" align="right" valign="top"><a class="el" href="worker__state_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a1bde7ac0ebfa4e58bb687bd2ad21a873">getWorkerState</a> ()</td></tr>
+<tr class="memitem:a1bde7ac0ebfa4e58bb687bd2ad21a873"><td class="memItemLeft" align="right" valign="top"><a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a1bde7ac0ebfa4e58bb687bd2ad21a873">getWorkerState</a> ()</td></tr>
 <tr class="separator:a1bde7ac0ebfa4e58bb687bd2ad21a873"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_message_broadcaster"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_message_broadcaster')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_message_broadcaster.html">MessageBroadcaster</a></td></tr>
 <tr class="memitem:a233b4bf529f9ba2b4c58a35134b3f64c inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a233b4bf529f9ba2b4c58a35134b3f64c">~MessageBroadcaster</a> ()</td></tr>
 <tr class="separator:a233b4bf529f9ba2b4c58a35134b3f64c inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae93ef9f52518f8ad3ff58b011a6d0a2c inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae93ef9f52518f8ad3ff58b011a6d0a2c">addMessageListener</a> (const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;newListener)</td></tr>
-<tr class="memdesc:ae93ef9f52518f8ad3ff58b011a6d0a2c inherit pub_methods_class_message_broadcaster"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new listeners.  <a href="#ae93ef9f52518f8ad3ff58b011a6d0a2c">More...</a><br/></td></tr>
-<tr class="separator:ae93ef9f52518f8ad3ff58b011a6d0a2c inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa296971c12b979c7bbcb7f81ff5bb70 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#afa296971c12b979c7bbcb7f81ff5bb70">removeMessageListener</a> (const std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &amp;listener)</td></tr>
-<tr class="memdesc:afa296971c12b979c7bbcb7f81ff5bb70 inherit pub_methods_class_message_broadcaster"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a listener.  <a href="#afa296971c12b979c7bbcb7f81ff5bb70">More...</a><br/></td></tr>
-<tr class="separator:afa296971c12b979c7bbcb7f81ff5bb70 inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8e7f93dbbcf8cc1c62574ca6b71f2f8 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">sendMessage</a> (<a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a> message)</td></tr>
+<tr class="memitem:a9c86fb59c4ce9a5d48b4a2403ae7ba82 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a9c86fb59c4ce9a5d48b4a2403ae7ba82">addMessageListener</a> (const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;newListener)</td></tr>
+<tr class="memdesc:a9c86fb59c4ce9a5d48b4a2403ae7ba82 inherit pub_methods_class_message_broadcaster"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new listeners.  <a href="#a9c86fb59c4ce9a5d48b4a2403ae7ba82">More...</a><br/></td></tr>
+<tr class="separator:a9c86fb59c4ce9a5d48b4a2403ae7ba82 inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb82e570ead2387ee1afd69ce9c9d8a6 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#afb82e570ead2387ee1afd69ce9c9d8a6">removeMessageListener</a> (const <a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> &amp;listener)</td></tr>
+<tr class="memdesc:afb82e570ead2387ee1afd69ce9c9d8a6 inherit pub_methods_class_message_broadcaster"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a listener.  <a href="#afb82e570ead2387ee1afd69ce9c9d8a6">More...</a><br/></td></tr>
+<tr class="separator:afb82e570ead2387ee1afd69ce9c9d8a6 inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8e7f93dbbcf8cc1c62574ca6b71f2f8 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">sendMessage</a> (<a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a> message)</td></tr>
 <tr class="memdesc:ae8e7f93dbbcf8cc1c62574ca6b71f2f8 inherit pub_methods_class_message_broadcaster"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send instruction to all registered listeners.  <a href="#ae8e7f93dbbcf8cc1c62574ca6b71f2f8">More...</a><br/></td></tr>
 <tr class="separator:ae8e7f93dbbcf8cc1c62574ca6b71f2f8 inherit pub_methods_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72bdc718a0558928fcb918399369dd80 inherit pub_methods_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a72bdc718a0558928fcb918399369dd80">clearMessageListenerList</a> ()</td></tr>
@@ -147,24 +147,31 @@ Private Attributes</h2></td></tr>
 <tr class="separator:ad717dc819e34c2003c4224161bd57488"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20c0eb4e30e745e09336d85594eb61b7"><td class="memItemLeft" align="right" valign="top">std::mutex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a20c0eb4e30e745e09336d85594eb61b7">inputLock</a></td></tr>
 <tr class="separator:a20c0eb4e30e745e09336d85594eb61b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95b567c035385a8eade411f89df7b533"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_smart_buffer.html">SmartBuffer</a><br class="typebreak"/>
-&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a95b567c035385a8eade411f89df7b533">buffer</a></td></tr>
-<tr class="separator:a95b567c035385a8eade411f89df7b533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93793f1ec487515a5f89e86e45cdf43c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="smart__buffer__mt_8h.html#ac3089a6c099deb305c66a331430bafc6">SharedStringBuffer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a93793f1ec487515a5f89e86e45cdf43c">buffer</a></td></tr>
+<tr class="separator:a93793f1ec487515a5f89e86e45cdf43c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a237d88236a2f102d52d78a5839c7df1f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a237d88236a2f102d52d78a5839c7df1f">shouldExit</a></td></tr>
 <tr class="separator:a237d88236a2f102d52d78a5839c7df1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfdf25e2cb12ccfcf05a81ba143b255f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="worker__state_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#acfdf25e2cb12ccfcf05a81ba143b255f">state</a></td></tr>
-<tr class="separator:acfdf25e2cb12ccfcf05a81ba143b255f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ab9d8c841a643f6438ea08cf537621b"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a0ab9d8c841a643f6438ea08cf537621b">errorOut</a></td></tr>
+<tr class="separator:a0ab9d8c841a643f6438ea08cf537621b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af307c918591eed5db62575b972cf00c7"><td class="memItemLeft" align="right" valign="top">std::mutex &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#af307c918591eed5db62575b972cf00c7">errorOutLock</a></td></tr>
+<tr class="separator:af307c918591eed5db62575b972cf00c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f468b3ff91e4ffb180a3b4488031e74"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; <a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_input_reader.html#a3f468b3ff91e4ffb180a3b4488031e74">state</a></td></tr>
+<tr class="separator:a3f468b3ff91e4ffb180a3b4488031e74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_types_class_message_broadcaster"><td colspan="2" onclick="javascript:toggleInherit('pub_types_class_message_broadcaster')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="class_message_broadcaster.html">MessageBroadcaster</a></td></tr>
+<tr class="memitem:ac8de3c7e21aaa2fbfb4659dfc49dce5c inherit pub_types_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#ac8de3c7e21aaa2fbfb4659dfc49dce5c">SharedMessageListener</a> = std::shared_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;</td></tr>
+<tr class="separator:ac8de3c7e21aaa2fbfb4659dfc49dce5c inherit pub_types_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98151d95dc8354561e7c43db884213cb inherit pub_types_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">WeakMessageListener</a> = std::weak_ptr&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;</td></tr>
+<tr class="separator:a98151d95dc8354561e7c43db884213cb inherit pub_types_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_class_message_broadcaster"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_class_message_broadcaster')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="class_message_broadcaster.html">MessageBroadcaster</a></td></tr>
-<tr class="memitem:a95a811516fbd1370acf7335b1c663fb8 inherit pro_attribs_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">std::set&lt; std::weak_ptr<br class="typebreak"/>
-&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt;<br class="typebreak"/>
-, <a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a95a811516fbd1370acf7335b1c663fb8">messageListeners</a></td></tr>
-<tr class="separator:a95a811516fbd1370acf7335b1c663fb8 inherit pro_attribs_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0de505d69ac2d6f5af3da263199c59ea inherit pro_attribs_class_message_broadcaster"><td class="memItemLeft" align="right" valign="top">std::set&lt; <a class="el" href="class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb">WeakMessageListener</a>, <br class="typebreak"/>
+<a class="el" href="struct_weak_ptr_less.html">WeakPtrLess</a>&lt; <a class="el" href="class_message_listener.html">MessageListener</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_message_broadcaster.html#a0de505d69ac2d6f5af3da263199c59ea">messageListeners</a></td></tr>
+<tr class="separator:a0de505d69ac2d6f5af3da263199c59ea inherit pro_attribs_class_message_broadcaster"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa3d980fdaa8d18b49384a472d02f86b3"></a>
+<a class="anchor" id="afeb56ac5f3497bdf90cbd3692cd62e51"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -183,8 +190,20 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="class_smart_buffer.html">SmartBuffer</a>&lt; std::string &gt;&gt; &amp;&#160;</td>
-          <td class="paramname"><em>newBuffer</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="smart__buffer__mt_8h.html#ac3089a6c099deb305c66a331430bafc6">SharedStringBuffer</a> &amp;&#160;</td>
+          <td class="paramname"><em>newBuffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>newErrorOut</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::mutex &amp;&#160;</td>
+          <td class="paramname"><em>newErrorOutLock</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -217,7 +236,7 @@ Additional Inherited Members</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="worker__state_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a> InputReader::getWorkerState </td>
+          <td class="memname"><a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a> InputReader::getWorkerState </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -243,7 +262,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="broadcasters_8h.html#a4f09127c805cc1f5ee20e67db7b45efa">Message</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="broadcasters_8h.html#aff97733e4706e994965da50c70605422">Message</a>&#160;</td>
           <td class="paramname"><em>message</em>&#160;</td>
         </tr>
         <tr>
@@ -283,7 +302,7 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a95b567c035385a8eade411f89df7b533"></a>
+<a class="anchor" id="a93793f1ec487515a5f89e86e45cdf43c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -291,7 +310,47 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="class_smart_buffer.html">SmartBuffer</a>&lt;std::string&gt; &gt; InputReader::buffer</td>
+          <td class="memname"><a class="el" href="smart__buffer__mt_8h.html#ac3089a6c099deb305c66a331430bafc6">SharedStringBuffer</a> InputReader::buffer</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0ab9d8c841a643f6438ea08cf537621b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream&amp; InputReader::errorOut</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af307c918591eed5db62575b972cf00c7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::mutex&amp; InputReader::errorOutLock</td>
         </tr>
       </table>
   </td>
@@ -363,7 +422,7 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="acfdf25e2cb12ccfcf05a81ba143b255f"></a>
+<a class="anchor" id="a3f468b3ff91e4ffb180a3b4488031e74"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -371,7 +430,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="worker__state_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a> InputReader::state</td>
+          <td class="memname">std::atomic&lt;<a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a>&gt; InputReader::state</td>
         </tr>
       </table>
   </td>

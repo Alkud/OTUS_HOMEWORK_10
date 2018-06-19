@@ -15,12 +15,12 @@ atomic
 -
 vector
 -
+array
+-
 future
 -
 cassert
 -
-worker_state.h
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/worker_state.h
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/broadcasters.h
 set
@@ -158,9 +158,11 @@ memory
 
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/weak_ptr_less.h
 
-/home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/worker_state.h
-
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/homework_10.cpp
+array
+-
+utility
+-
 homework_10.h
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/homework_10.h
 ./command_processor/command_processor_mt.h

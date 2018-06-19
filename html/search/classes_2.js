@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['inputprocessor',['InputProcessor',['../class_input_processor.html',1,'']]],
-  ['inputreader',['InputReader',['../class_input_reader.html',1,'']]]
+  ['dummydeleter',['DummyDeleter',['../struct_command_processor_1_1_dummy_deleter.html',1,'CommandProcessor']]]
 ];

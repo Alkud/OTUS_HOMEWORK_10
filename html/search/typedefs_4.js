@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['sharedglobalmetrics',['SharedGlobalMetrics',['../thread__metrics_8h.html#ac1589e063b43543469fafabc05566bcc',1,'thread_metrics.h']]],
-  ['sharedmetrics',['SharedMetrics',['../thread__metrics_8h.html#a7c05dd501440a173e68ec65d91beb76d',1,'thread_metrics.h']]],
-  ['sharedmultymetrics',['SharedMultyMetrics',['../thread__metrics_8h.html#ae5877028144abdb2fd0d601eae9bcf2e',1,'thread_metrics.h']]]
+  ['weakmessagelistener',['WeakMessageListener',['../class_message_broadcaster.html#a98151d95dc8354561e7c43db884213cb',1,'MessageBroadcaster']]],
+  ['weaknotificationlistener',['WeakNotificationListener',['../class_notification_broadcaster.html#a22630675e5b13cad32a43a4b3dc375a9',1,'NotificationBroadcaster']]]
 ];

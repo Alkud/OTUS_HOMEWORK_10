@@ -19,15 +19,17 @@ public:
   InputProcessor(const size_t& newBulkSize,
                  const char& newBulkOpenDelimiter,
                  const char& newBulkCloseDelimiter,
-                 const std::shared_ptr<SmartBuffer<std::string>>& newInputBuffer,
-                 const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>>& newOutputBuffer,
-                 std::ostream& newErrorOut);
+                 const SharedStringBuffer& newInputBuffer,
+                 const SharedSizeStringBuffer& newOutputBuffer,
+                 std::ostream& newErrorOut, std::mutex& newErrorOutLock);
 
   ~InputProcessor();
 
   void reactNotification(NotificationBroadcaster* sender) override;
 
   void reactMessage(MessageBroadcaster* sender, Message message) override;
+
+  void setBulkSize(const size_t newBulkSize);
 
   const SharedMetrics getMetrics();
 
@@ -39,12 +41,12 @@ private:
   void closeCurrentBulk();
   void addCommandToBulk(std::string&& newCommand);
 
-  const size_t bulkSize;
+  size_t bulkSize;
   const std::string bulkOpenDelimiter;
   const std::string bulkCloseDelimiter;
 
-  std::shared_ptr<SmartBuffer<std::string>> inputBuffer;
-  std::shared_ptr<SmartBuffer<std::pair<size_t, std::string>>> outputBuffer;
+  SharedStringBuffer inputBuffer;
+  SharedSizeStringBuffer outputBuffer;
 
   std::deque<std::string> tempBuffer;
   bool customBulkStarted;
@@ -54,8 +56,9 @@ private:
   bool shouldExit;
 
   std::ostream& errorOut;
+  std::mutex& errorOutLock;
 
   SharedMetrics threadMetrics;
 
-  WorkerState state;
+  std::atomic<WorkerState> state;
 };

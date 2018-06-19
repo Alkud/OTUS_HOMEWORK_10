@@ -9,7 +9,6 @@ command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o: comman
 command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o: command_processor/smart_buffer_mt.h
 command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o: command_processor/thread_metrics.h
 command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o: command_processor/weak_ptr_less.h
-command_processor/CMakeFiles/command_processor.dir/input_processor.cpp.o: command_processor/worker_state.h
 
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/async_worker.h
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/broadcasters.h
@@ -18,7 +17,6 @@ command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_p
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/listeners.h
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/smart_buffer_mt.h
 command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/weak_ptr_less.h
-command_processor/CMakeFiles/command_processor.dir/input_reader.cpp.o: command_processor/worker_state.h
 
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/async_worker.h
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/broadcasters.h
@@ -28,5 +26,4 @@ command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_p
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/smart_buffer_mt.h
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/thread_metrics.h
 command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/weak_ptr_less.h
-command_processor/CMakeFiles/command_processor.dir/publisher_mt.cpp.o: command_processor/worker_state.h
 

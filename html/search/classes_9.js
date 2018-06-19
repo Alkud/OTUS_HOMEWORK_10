@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['weakptrless',['WeakPtrLess',['../struct_weak_ptr_less.html',1,'']]]
+  ['threadmetrics',['ThreadMetrics',['../struct_thread_metrics.html',1,'']]]
 ];

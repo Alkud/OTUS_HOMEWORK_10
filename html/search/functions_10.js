@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['_7easyncworker',['~AsyncWorker',['../class_async_worker.html#a5e3bb58b9d2884e54a793089137e3e68',1,'AsyncWorker']]],
+  ['_7eabstractprocessor',['~AbstractProcessor',['../class_abstract_processor.html#a217ef29327feaae70f1e346b05b8a3e2',1,'AbstractProcessor']]],
+  ['_7easyncworker',['~AsyncWorker',['../class_async_worker.html#acb16bbc39d0121e46e4bcc84fed82b3b',1,'AsyncWorker']]],
+  ['_7ecommandprocessor',['~CommandProcessor',['../class_command_processor.html#a95f0eba5e96fb2cb0b8325ae3462d3ab',1,'CommandProcessor']]],
   ['_7einputprocessor',['~InputProcessor',['../class_input_processor.html#a8beb9f13c7a23b0cdd941d3c043cd9c2',1,'InputProcessor']]],
   ['_7einputreader',['~InputReader',['../class_input_reader.html#a38875ce3bae818dd0836da36fb7ea891',1,'InputReader']]],
   ['_7emessagebroadcaster',['~MessageBroadcaster',['../class_message_broadcaster.html#a233b4bf529f9ba2b4c58a35134b3f64c',1,'MessageBroadcaster']]],

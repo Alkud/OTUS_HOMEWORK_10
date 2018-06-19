@@ -139,52 +139,46 @@ BOOST_AUTO_TEST_SUITE(homework_10_test)
 
 BOOST_AUTO_TEST_CASE(objects_creation_failure)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "objects_creation_failure test\n";
   #endif
 
   std::mutex dummyMutex{};
-  bool published{false};
-  bool logged{false};
-  bool shouldExit{false};
-  std::condition_variable notifier{};
 
   /* can't create input reader with null buffer pointer */
-  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr}), std::invalid_argument);
+  BOOST_CHECK_THROW((InputReader{std::cin, dummyMutex, nullptr, std::cerr, dummyMutex}), std::invalid_argument);
 
   /* can't create publisher with null buffer pointer */
-  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, published, shouldExit, notifier, std::cout, dummyMutex}), std::invalid_argument);
+  BOOST_CHECK_THROW((Publisher{"publisher", nullptr, std::cout, dummyMutex, std::cerr, dummyMutex}), std::invalid_argument);
 
   /* can't create logger with null buffer pointer */
-  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, logged, shouldExit, notifier, ""}), std::invalid_argument);
+  BOOST_CHECK_THROW((Logger<2>{"logger", nullptr, std::cerr, dummyMutex, ""}), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "log_file_creation_failure test\n";
   #endif
 
-  std::stringstream outputStream{};
+  std::stringstream errorStream{};
+  std::mutex errorStreamLock;
   std::stringstream metricsStream{};
   std::string badDirectoryName{"/non_existing_directory/"};
   SharedMultyMetrics metrics{};
 
   {
-    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer")};
+    const auto bulkBuffer{std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>("bulk buffer", errorStream, errorStreamLock)};
     const auto dummyBroadcaster {std::make_shared<MessageBroadcaster>()};
-    bool logged{false};
-    bool shouldExit{false};
-    std::condition_variable notifier{};
-    std::mutex notifierLock{};
 
     /* use bad directory name as constructor parameter */
     const auto badLogger{
       std::make_shared<Logger<2>>(
-            "bad logger",bulkBuffer,
-            logged, shouldExit, notifier,
-            badDirectoryName,
-            outputStream
+            "bad logger", bulkBuffer,
+            errorStream, errorStreamLock,
+            badDirectoryName
             )
     };
 
@@ -202,16 +196,14 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
     dummyBroadcaster->sendMessage(Message::NoMoreData);
 
-    std::unique_lock<std::mutex> lockNotifier{notifierLock};
-    notifier.wait(lockNotifier, [&logged, &shouldExit]{return logged || shouldExit;});
-    lockNotifier.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds{200});
 
     /* get metrics */
     metrics = badLogger->getMetrics();
   }
 
   /* get error message string */
-  std::string errorMessage{outputStream.str()};
+  std::string errorMessage{errorStream.str()};
 
   /* error message sholud contain expected text */
   BOOST_CHECK(errorMessage.find("Cannot create log file") != std::string::npos);
@@ -226,13 +218,16 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 
 BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "trying_get_from_empty_buffer test\n";
   #endif
 
+  std::mutex dummyMutex;
+
   const auto emptyBuffer{
     std::make_shared<SmartBuffer<std::pair<size_t, std::string>>>(
-          "empty buffer"
+          "empty buffer", std::cerr, dummyMutex
           )
   };
 
@@ -251,7 +246,8 @@ BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 
 BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "no_command_line_parameters test\n";
   #endif
 
@@ -270,7 +266,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
     /* error output should contain expected text*/
     BOOST_CHECK(errorStream.str() ==
-                "usage: bulkmt [bulk size]\n");
+                "usage: bulkmt [bulk size] {[number of logging threads]}\n");
 
     /* application metrics and output sholud be empty */
     BOOST_CHECK(outputStream.str() == ""
@@ -286,7 +282,8 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
 BOOST_AUTO_TEST_CASE(empty_input_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "empty_input_test test\n";
   #endif
 
@@ -320,7 +317,8 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 
 BOOST_AUTO_TEST_CASE(empty_command_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "empty_command_test test\n";
   #endif
 
@@ -359,7 +357,8 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "bulk_segmentation_test1 test\n";
   #endif
 
@@ -410,7 +409,8 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 
 BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "bulk_segmentation_test2 test\n";
   #endif
 
@@ -467,7 +467,8 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 
 BOOST_AUTO_TEST_CASE(nested_bulks_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "nested_bulks_test test\n";
   #endif
 
@@ -530,7 +531,8 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
 
 BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "unexpected_bulk_end_test test\n";
   #endif
 
@@ -587,7 +589,8 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 
 BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "incorrect_closing_test test\n";
   #endif
 
@@ -642,7 +645,8 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 
 BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "commands_containing_delimiter_test test\n";
   #endif
 
@@ -689,7 +693,8 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 
 BOOST_AUTO_TEST_CASE(logging)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "logging test\n";
   #endif
 
@@ -776,7 +781,8 @@ BOOST_AUTO_TEST_CASE(logging)
 
 BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "unexpected_buffer_exhaustion test\n";
   #endif
 

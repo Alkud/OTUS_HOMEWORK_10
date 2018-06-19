@@ -1,3 +1,5 @@
-<map id="CommandProcessor&lt; loggingThreadsCount &gt;" name="CommandProcessor&lt; loggingThreadsCount &gt;">
-<area shape="rect" id="node2" href="$class_message_broadcaster.html" title="MessageBroadcaster" alt="" coords="30,5,175,32"/>
+<map id="CommandProcessor&lt; loggingThreadCount &gt;" name="CommandProcessor&lt; loggingThreadCount &gt;">
+<area shape="rect" id="node2" href="$class_message_broadcaster.html" title="MessageBroadcaster" alt="" coords="5,5,149,32"/>
+<area shape="rect" id="node3" href="$class_message_listener.html" title="Base class for message broadcast subscribers. " alt="" coords="174,5,295,32"/>
+<area shape="rect" id="node4" href="$class_abstract_processor.html" title="AbstractProcessor" alt="" coords="320,5,449,32"/>
 </map>

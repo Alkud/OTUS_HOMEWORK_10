@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['maxinputstringsize',['MaxInputStringSize',['../input__reader_8h.html#a450d7b71e116ba2b6ed6528309e76ab1af77dee9304d83bc8155051b427f9505e',1,'input_reader.h']]]
+  ['debug_5foff',['debug_off',['../otus__hw__10__test_8cpp.html#ad23721f303b059caeb1d8a751a39562bacc5e678934bcd48572b4f36e5084bd08',1,'otus_hw_10_test.cpp']]],
+  ['debug_5fon',['debug_on',['../otus__hw__10__test_8cpp.html#ad23721f303b059caeb1d8a751a39562ba152f67dfc669651c1aea5b314277af2e',1,'otus_hw_10_test.cpp']]],
+  ['destinationnullptr',['DestinationNullptr',['../broadcasters_8h.html#aff97733e4706e994965da50c70605422ae69f558a400c216896ea6f967bf342e4',1,'broadcasters.h']]]
 ];

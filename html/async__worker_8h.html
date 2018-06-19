@@ -86,7 +86,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">async_worker.h File Reference</div>  </div>
 </div><!--header-->
@@ -95,15 +96,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;mutex&gt;</code><br/>
 <code>#include &lt;atomic&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
+<code>#include &lt;array&gt;</code><br/>
 <code>#include &lt;future&gt;</code><br/>
 <code>#include &lt;cassert&gt;</code><br/>
-<code>#include &quot;<a class="el" href="worker__state_8h_source.html">worker_state.h</a>&quot;</code><br/>
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for async_worker.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="async__worker_8h__incl.png" border="0" usemap="#command__processor_2async__worker_8h" alt=""/></div>
 <map name="command__processor_2async__worker_8h" id="command__processor_2async__worker_8h">
-<area shape="rect" id="node8" href="worker__state_8h.html" title="worker_state.h" alt="" coords="507,96,615,123"/></map>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
@@ -117,9 +118,46 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html">AsyncWorker&lt; workingThreadsCount &gt;</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html">AsyncWorker&lt; workingThreadCount &gt;</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a0cc9396b0d49842062b68234bac0b526"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a> { <a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526afa7be7845bc42b3491d9d0377958be94">WorkerState::NotStarted</a> = 0, 
+<a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526a8428552d86c0d262a542a528af490afa">WorkerState::Started</a> = 1, 
+<a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526a8f3d10eb21bd36347c258679eba9e92b">WorkerState::Finished</a> = 2
+ }</td></tr>
+<tr class="separator:a0cc9396b0d49842062b68234bac0b526"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a class="anchor" id="a0cc9396b0d49842062b68234bac0b526"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="async__worker_8h.html#a0cc9396b0d49842062b68234bac0b526">WorkerState</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><em><a class="anchor" id="a0cc9396b0d49842062b68234bac0b526afa7be7845bc42b3491d9d0377958be94"></a>NotStarted</em>&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a0cc9396b0d49842062b68234bac0b526a8428552d86c0d262a542a528af490afa"></a>Started</em>&#160;</td><td class="fielddoc">
+</td></tr>
+<tr><td class="fieldname"><em><a class="anchor" id="a0cc9396b0d49842062b68234bac0b526a8f3d10eb21bd36347c258679eba9e92b"></a>Finished</em>&#160;</td><td class="fielddoc">
+</td></tr>
+</table>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

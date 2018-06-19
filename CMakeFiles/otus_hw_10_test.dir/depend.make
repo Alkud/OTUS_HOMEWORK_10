@@ -12,7 +12,6 @@ CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: ./command_processor/publisher_
 CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: ./command_processor/smart_buffer_mt.h
 CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: ./command_processor/thread_metrics.h
 CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: ./command_processor/weak_ptr_less.h
-CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: ./command_processor/worker_state.h
 CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: homework_10.cpp
 CMakeFiles/otus_hw_10_test.dir/homework_10.cpp.o: homework_10.h
 
@@ -27,7 +26,6 @@ CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: ./command_processor/publis
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: ./command_processor/smart_buffer_mt.h
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: ./command_processor/thread_metrics.h
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: ./command_processor/weak_ptr_less.h
-CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: ./command_processor/worker_state.h
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: homework_10.h
 CMakeFiles/otus_hw_10_test.dir/otus_hw_10_test.cpp.o: otus_hw_10_test.cpp
 

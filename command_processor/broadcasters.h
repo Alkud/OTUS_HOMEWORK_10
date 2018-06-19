@@ -9,23 +9,52 @@
 #include "weak_ptr_less.h"
 
 /// inteprocess exchange messages
-enum class Message
+enum class Message : unsigned int
 {
+  /// Data flow messages:
+
   /// no more data will be committed
-  NoMoreData,
+  NoMoreData = 1u,
+  /// all characters have been received
+  AllDataReceived = 2u,
   /// all bulks  have been published
-  AllDataPublsihed,
+  AllDataPublsihed = 3u,
   /// all bulks have been written to files
-  AllDataLogged,
-  /// some exception caught, need stop all threads
-  Abort
+  AllDataLogged = 4u,
+
+
+  /// Error code messages:
+
+  /// any unknown exception
+  SystemError = 1001u,
+  /// log file exception
+  FileCreationError = 1002u,
+  /// input reader getline() exception
+  CharacterReadingError = 1003u,
+  /// source buffer pointer not defined or expired
+  SourceNullptr = 1004u,
+  /// destination buffer pointer not defined or expired
+  DestinationNullptr = 1005u,
+  /// source buffer empty while trying to read on notification
+  BufferEmpty = 1006u
 };
+
+template<typename T = unsigned int>
+typename std::enable_if_t<std::is_integral<T>::value, T>
+messageCode(const Message& message)
+{
+  return static_cast<T> (message);
+}
 
 /// Base class for a brodcaster, sending messages,
 /// containing instructions for listeners
 class MessageBroadcaster
 {
 public:  
+
+  using SharedMessageListener = std::shared_ptr<MessageListener>;
+  using WeakMessageListener = std::weak_ptr<MessageListener>;
+
   virtual ~MessageBroadcaster()
   {
     clearMessageListenerList();
@@ -33,21 +62,21 @@ public:
 
   /// Add a new listeners
   virtual void
-  addMessageListener(const std::shared_ptr<MessageListener>& newListener)
+  addMessageListener(const SharedMessageListener& newListener)
   {
     if (newListener != nullptr)
     {
-      messageListeners.insert(std::weak_ptr<MessageListener>{newListener});
+      messageListeners.insert(WeakMessageListener{newListener});
     }
   }
 
   /// Remove a listener
   virtual void
-  removeMessageListener(const std::shared_ptr<MessageListener>& listener)
+  removeMessageListener(const SharedMessageListener& listener)
   {
     if (listener != nullptr)
     {
-      messageListeners.erase(std::weak_ptr<MessageListener>{listener});
+      messageListeners.erase(WeakMessageListener{listener});
     }
   }
 
@@ -74,7 +103,7 @@ public:
   }
 
 protected:
-  std::set<std::weak_ptr<MessageListener>, WeakPtrLess<MessageListener>> messageListeners;
+  std::set<WeakMessageListener, WeakPtrLess<MessageListener>> messageListeners;
 };
 
 
@@ -84,6 +113,10 @@ protected:
 class NotificationBroadcaster
 {
 public:
+
+  using SharedNotificationListener = std::shared_ptr<NotificationListener>;
+  using WeakNotificationListener = std::weak_ptr<NotificationListener>;
+
   virtual ~NotificationBroadcaster()
   {
     clearNotificationListenerList();
@@ -91,21 +124,21 @@ public:
 
   /// Add a listener to the list
   virtual void
-  addNotificationListener(const std::shared_ptr<NotificationListener>& newListener)
+  addNotificationListener(const SharedNotificationListener& newListener)
   {
     if (newListener != nullptr)
     {
-      notificationListeners.insert(std::weak_ptr<NotificationListener>{newListener});
+      notificationListeners.insert(WeakNotificationListener{newListener});
     }
   }
 
   /// Remove a listener from the list
   virtual void
-  removeNotificationListener(const std::shared_ptr<NotificationListener>& listener)
+  removeNotificationListener(const SharedNotificationListener& listener)
   {
     if (listener != nullptr)
     {
-      notificationListeners.erase(std::weak_ptr<NotificationListener>{listener});
+      notificationListeners.erase(WeakNotificationListener{listener});
     }
   }
 
@@ -132,5 +165,5 @@ public:
   }
 
 protected:
-  std::set<std::weak_ptr<NotificationListener>, WeakPtrLess<NotificationListener>> notificationListeners;
+  std::set<WeakNotificationListener, WeakPtrLess<NotificationListener>> notificationListeners;
 };
