@@ -38,7 +38,7 @@ public:
   {
     #ifdef NDEBUG
     #else
-      std::cout << "\n                    " << workerName << " destructor, shouldExit = " << shouldExit << "\n";
+      //std::cout << "\n                    " << workerName << " destructor, shouldExit = " << shouldExit << "\n";
     #endif
 
     assert(isStopped == true);
@@ -71,7 +71,7 @@ public:
 
     #ifdef NDEBUG
     #else
-      std::cout << "\n                    " << workerName << " trying to stop\n";
+      //std::cout << "\n                    " << workerName << " trying to stop\n";
     #endif
 
     shouldExit.store(true);
@@ -150,7 +150,7 @@ protected:
         {
           #ifdef NDEBUG
           #else
-            std::cout << this->workerName << " decrement notificationCount\n";
+            //std::cout << this->workerName << " decrement notificationCount\n";
           #endif
 
           --notificationCount;
@@ -159,7 +159,7 @@ protected:
 
           #ifdef NDEBUG
           #else
-            std::cout << this->workerName << " threadProcess success\n";
+            //std::cout << this->workerName << " threadProcess success\n";
           #endif
         }
         else
@@ -168,10 +168,10 @@ protected:
           {
             #ifdef NDEBUG
             #else
-              std::cout << "\n                     " << this->workerName
-                        << " waiting. shouldExit="<< shouldExit
-                        << ", noMoreData=" << noMoreData
-                        << "notificationCount=" << notificationCount.load() << "\n";
+              //std::cout << "\n                     " << this->workerName
+              //          << " waiting. shouldExit="<< shouldExit
+              //          << ", noMoreData=" << noMoreData
+              //          << "notificationCount=" << notificationCount.load() << "\n";
             #endif
 
             threadNotifier.wait_for(lockNotifier, std::chrono::milliseconds(1000), [this]()
@@ -199,7 +199,7 @@ protected:
 
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
+        //std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
       #endif
 
       threadFinished[threadIndex].store(true);
@@ -210,7 +210,7 @@ protected:
       {
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     " << this->workerName<< " finishing\n";
+          //std::cout << "\n                     " << this->workerName<< " finishing\n";
         #endif
 
         if (shouldExit.load() != true)
@@ -222,7 +222,7 @@ protected:
 
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     " << this->workerName<< " finished\n";
+        //std::cout << "\n                     " << this->workerName<< " finished\n";
       #endif
 
       return true;

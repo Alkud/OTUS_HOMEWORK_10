@@ -24,7 +24,7 @@ InputReader::~InputReader()
 {
   #ifdef NDEBUG
   #else
-    std::cout << "IR destructor\n";
+    //std::cout << "IR destructor\n";
   #endif
 }
 
@@ -55,7 +55,7 @@ void InputReader::read()
   {
     #ifdef NDEBUG
     #else
-      std::cout << "\n                     reader ABORT\n";
+      //std::cout << "\n                     reader ABORT\n";
     #endif
 
     {

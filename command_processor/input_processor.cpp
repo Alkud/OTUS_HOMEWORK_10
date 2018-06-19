@@ -33,7 +33,7 @@ InputProcessor::~InputProcessor()
 {
   #ifdef NDEBUG
   #else
-    std::cout << "IP destructor\n";
+    //std::cout << "IP destructor\n";
   #endif
 }
 
@@ -106,7 +106,7 @@ void InputProcessor::reactNotification(NotificationBroadcaster* sender)
     {
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     processor ABORT\n";
+        //std::cout << "\n                     processor ABORT\n";
       #endif
 
       {
@@ -130,14 +130,14 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
       {
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     processor NoMoreData received\n";
+          //std::cout << "\n                     processor NoMoreData received\n";
         #endif
 
         if (customBulkStarted != true)
         {
           #ifdef NDEBUG
           #else
-            std::cout << "\n                     processor trying close last bulk\n";
+            //std::cout << "\n                     processor trying close last bulk\n";
           #endif
 
           closeCurrentBulk();
@@ -146,7 +146,7 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
 
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     processor NoMoreData sent\n";
+          //std::cout << "\n                     processor NoMoreData sent\n";
         #endif
 
         state.store(WorkerState::Finished);

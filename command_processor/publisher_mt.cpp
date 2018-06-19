@@ -29,7 +29,7 @@ void Publisher::reactNotification(NotificationBroadcaster* sender)
   {
     #ifdef NDEBUG
     #else
-      std::cout << this->workerName << " reactNotification\n";
+      //std::cout << this->workerName << " reactNotification\n";
     #endif
 
     ++notificationCount;    
@@ -48,7 +48,7 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
 
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+        //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
       #endif
 
       threadNotifier.notify_all();
@@ -124,7 +124,7 @@ void Publisher::onTermination(const size_t threadIndex)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "\n                     " << this->workerName<< " AllDataPublished\n";
+    //std::cout << "\n                     " << this->workerName<< " AllDataPublished\n";
   #endif
 
   if (true == noMoreData.load() && notificationCount.load() == 0)

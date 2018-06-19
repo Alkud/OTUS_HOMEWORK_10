@@ -150,7 +150,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">      #ifdef NDEBUG</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor"></span><span class="preprocessor">      #else</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor"></span>        std::cout &lt;&lt; this-&gt;<a class="code" href="class_async_worker.html#af71a3c3ed83afcc6ac38623973016801">workerName</a> &lt;&lt; <span class="stringliteral">&quot; reactNotification\n&quot;</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor"></span>        <span class="comment">//std::cout &lt;&lt; this-&gt;workerName &lt;&lt; &quot; reactNotification\n&quot;;</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">      #endif</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      ++this-&gt;<a class="code" href="class_async_worker.html#a9f1eaf097abba38a681a83c22da5e6d2">notificationCount</a>;</div>
@@ -169,7 +169,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">          #ifdef NDEBUG</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor"></span><span class="preprocessor">          #else</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor"></span>            std::cout &lt;&lt; <span class="stringliteral">&quot;\n                     &quot;</span> &lt;&lt; this-&gt;<a class="code" href="class_async_worker.html#af71a3c3ed83afcc6ac38623973016801">workerName</a>&lt;&lt; <span class="stringliteral">&quot; NoMoreData received\n&quot;</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor"></span>            <span class="comment">//std::cout &lt;&lt; &quot;\n                     &quot; &lt;&lt; this-&gt;workerName&lt;&lt; &quot; NoMoreData received\n&quot;;</span></div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">          #endif</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;          this-&gt;<a class="code" href="class_async_worker.html#a6e2f251afbb0ac6c4c294a2e8c40d20b">threadNotifier</a>.notify_all();</div>
@@ -210,7 +210,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    {</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">      #ifdef NDEBUG</span></div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor"></span><span class="preprocessor">      #else</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor"></span>        std::cout &lt;&lt; <span class="stringliteral">&quot;\n                     &quot;</span> &lt;&lt; this-&gt;<a class="code" href="class_async_worker.html#af71a3c3ed83afcc6ac38623973016801">workerName</a>&lt;&lt; <span class="stringliteral">&quot; FALSE received\n&quot;</span>;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor"></span>        <span class="comment">//std::cout &lt;&lt; &quot;\n                     &quot; &lt;&lt; this-&gt;workerName&lt;&lt; &quot; FALSE received\n&quot;;</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">      #endif</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -278,7 +278,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="keyword">  </span>{</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="preprocessor">    #ifdef NDEBUG</span></div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="preprocessor"></span><span class="preprocessor">    #else</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor"></span>      std::cout &lt;&lt; <span class="stringliteral">&quot;\n                     &quot;</span> &lt;&lt; this-&gt;<a class="code" href="class_async_worker.html#af71a3c3ed83afcc6ac38623973016801">workerName</a>&lt;&lt; <span class="stringliteral">&quot; AllDataLogged\n&quot;</span>;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor"></span>      <span class="comment">//std::cout &lt;&lt; &quot;\n                     &quot; &lt;&lt; this-&gt;workerName&lt;&lt; &quot; AllDataLogged\n&quot;;</span></div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">    #endif</span></div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">true</span> == this-&gt;<a class="code" href="class_async_worker.html#aada84414491e4b995f2d95c0136ca265">noMoreData</a>.load() &amp;&amp; this-&gt;<a class="code" href="class_async_worker.html#a9f1eaf097abba38a681a83c22da5e6d2">notificationCount</a>.load() == 0)</div>
