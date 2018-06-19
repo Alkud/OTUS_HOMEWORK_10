@@ -1,10 +1,10 @@
-Start testing: Jun 19 20:46 UTC
+Start testing: Jun 19 20:56 UTC
 ----------------------------------------------------------
 1/1 Testing: test_hw_10
 1/1 Test: test_hw_10
 Command: "/home/travis/build/Alkud/OTUS_HOMEWORK_10/otus_hw_10_test"
 Directory: /home/travis/build/Alkud/OTUS_HOMEWORK_10
-"test_hw_10" start time: Jun 19 20:46 UTC
+"test_hw_10" start time: Jun 19 20:56 UTC
 Output:
 ----------------------------------------------------------
 Running 14 test cases...
@@ -14,10 +14,13 @@ objects_creation_failure test
 
                     logger destructor, shouldExit = 0
 log_file_creation_failure test
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     bad logger waiting. shouldExit=
+                     bulk buffer NoMoreData received
 bulk buffer decrement notificationCount
 bad logger reactNotification
-
-                     bulk buffer NoMoreData received
 bulk buffer threadProcess success
 
                      bulk buffer activeThreadCount=0
@@ -25,7 +28,10 @@ bulk buffer threadProcess success
                      bulk buffer finishing
 
                     bulk buffer dataReceived=0data.size()=1
+0, noMoreData=0notificationCount=0
 bad logger decrement notificationCount
+
+                     bad logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                     bulk buffer check if this is the last data item
 
@@ -48,15 +54,15 @@ bad logger decrement notificationCount
                     bulk buffer destructor, shouldExit = 1
 trying_get_from_empty_buffer test
 
+                     empty buffer NoMoreData received
+
+                    empty buffer trying to stop
+
                      empty buffer activeThreadCount=0
 
                      empty buffer finishing
 
                      empty buffer finished
-
-                     empty buffer NoMoreData received
-
-                    empty buffer trying to stop
 
                     empty buffer destructor, shouldExit = 1
 no_command_line_parameters test
@@ -70,11 +76,11 @@ empty_input_test test
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
                      CP all data received
 
                      command buffer NoMoreData received
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      CP is going to wait. dataLogged = 0 dataPublished = 0
 
@@ -108,16 +114,6 @@ empty_input_test test
 
                      logger finished
 
-                     logger activeThreadCount=0
-
-                     logger finishing
-
-                     logger AllDataLogged
-
-                     CP all data logged
-
-                     logger finished
-
                      publisher activeThreadCount=0
 
                      publisher finishing
@@ -127,6 +123,16 @@ empty_input_test test
                      CP all data published
 
                      publisher finished
+
+                     logger activeThreadCount=0
+
+                     logger finishing
+
+                     logger AllDataLogged
+
+                     CP all data logged
+
+                     logger finished
 
                      CP waiting ended
 
@@ -153,31 +159,51 @@ empty_command_test test
 
                      command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-
-                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-
-                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-
-                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      CP all data received
 
                      command buffer NoMoreData received
+
+                     publisher waiting. shouldExit=0
+                     CP is going to wait. dataLogged = 0 dataPublished = , noMoreData=0
+0notificationCount=
+                     CP waiting
+0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+
+                    command buffer all data received
+bulk buffer decrement notificationCount
+logger reactNotification
+publisher reactNotification
+bulk buffer threadProcess success
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger decrement notificationCount
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+publisher decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+command buffer threadProcess success
 
                      command buffer activeThreadCount=0
 
@@ -193,33 +219,9 @@ command buffer threadProcess success
 
                      command buffer finished
 
-                     CP is going to wait. dataLogged = 0 dataPublished = 0
-
-                     CP waiting
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-bulk buffer decrement notificationCount
-logger reactNotification
-logger decrement notificationCount
-logger threadProcess success
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-publisher reactNotification
-bulk buffer threadProcess success
-
                      bulk buffer activeThreadCount=0
 
                      bulk buffer finishing
-
-                    bulk buffer dataReceived=0data.size()=1
-publisher decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-
-                    bulk buffer all data received
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      logger NoMoreData received
 
@@ -274,100 +276,90 @@ IR destructor
                     command buffer destructor, shouldExit = 1
 bulk_segmentation_test1 test
 
-                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+command buffer threadProcess success
 command buffer decrement notificationCount
 
                      CP all data received
 
                      command buffer NoMoreData received
 
-                     CP is going to wait. dataLogged = 0 dataPublished = 0
+                    command buffer check if this is the last data item
+
+                     CP is going to wait. dataLogged = command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+0command buffer threadProcess success
+command buffer decrement notificationCount
+ dataPublished = 0
 
                      CP waiting
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-
-                     logger waiting. shouldExit=command buffer threadProcess success
-command buffer decrement notificationCount
-0, noMoreData=0notificationCount=0
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-bulk buffer decrement notificationCount
-logger reactNotification
 
                     command buffer check if this is the last data item
 
                     command buffer all data received
 command buffer threadProcess success
-publisher
-                      reactNotification
-command buffer activeThreadCount=0
+
+                     command buffer activeThreadCount=0
 
                      command buffer finishing
 
                      processor NoMoreData received
 
                      processor trying close last bulk
-publisher decrement notificationCount
+bulk buffer decrement notificationCount
+logger reactNotification
 
                      bulk buffer NoMoreData received
 
                      processor NoMoreData sent
 
                      command buffer finished
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+publisher reactNotification
 bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 logger reactNotification
+publisher reactNotification
+bulk buffer threadProcess success
+
+                     bulk buffer activeThreadCount=0
+publisher decrement notificationCount
+
+                     bulk buffer finishing
+
+                    bulk buffer dataReceived=0data.size()=2
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger decrement notificationCount
+publisher threadProcess success
+publisher decrement notificationCount
 logger decrement notificationCount
 
                     bulk buffer check if this is the last data item
-logger decrement notificationCount
-publisher reactNotification
-publisher decrement notificationCount
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                     bulk buffer check if this is the last data item
 
                     bulk buffer all data received
-publisher threadProcess success
+logger threadProcess success
 
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-bulk buffer threadProcess success
-
-                     bulk buffer activeThreadCount=0
-
-                     bulk buffer finishing
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      logger NoMoreData received
 
                      publisher NoMoreData received
 
                      bulk buffer finished
-
-                     publisher activeThreadCount=0
-
-                     publisher finishing
-
-                     publisher AllDataPublished
-
-                     CP all data published
-
-                     publisher finished
-logger threadProcess success
 
                      logger activeThreadCount=1
 
@@ -383,6 +375,16 @@ logger threadProcess success
                      CP all data logged
 
                      logger finished
+
+                     publisher activeThreadCount=0
+
+                     publisher finishing
+
+                     publisher AllDataPublished
+
+                     CP all data published
+
+                     publisher finished
 
                      CP waiting ended
 
@@ -415,8 +417,6 @@ bulk_segmentation_test2 test
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
                      CP all data received
 
                      command buffer NoMoreData received
@@ -424,6 +424,8 @@ bulk_segmentation_test2 test
                      CP is going to wait. dataLogged = 0 dataPublished = 0
 
                      CP waiting
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
@@ -443,35 +445,34 @@ command buffer threadProcess success
 command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
+bulk buffer decrement notificationCount
+logger reactNotification
 command buffer threadProcess success
 command buffer decrement notificationCount
+publisher reactNotification
 
                     command buffer check if this is the last data item
 
                     command buffer all data received
+bulk buffer threadProcess success
+bulk buffer decrement notificationCount
 command buffer threadProcess success
+logger reactNotification
 
                      command buffer activeThreadCount=0
+publisher
+                     command buffer reactNotification
+ finishing
+bulk buffer threadProcess success
 
-                     command buffer finishing
-
+                     bulk buffer waiting. shouldExit=0, noMoreData=
                      processor NoMoreData received
-
+0notificationCount=
                      processor trying close last bulk
+0
 
                      bulk buffer NoMoreData received
-
-                     processor NoMoreData sent
-
-                     command buffer finished
-bulk buffer decrement notificationCount
-logger reactNotification
-publisher reactNotification
-bulk buffer threadProcess success
-bulk buffer decrement notificationCount
-logger reactNotification
-publisher reactNotification
-bulk buffer threadProcess success
+publisher decrement notificationCount
 bulk buffer decrement notificationCount
 logger reactNotification
 publisher reactNotification
@@ -482,25 +483,25 @@ bulk buffer threadProcess success
                      bulk buffer finishing
 
                     bulk buffer dataReceived=0data.size()=3
-publisher decrement notificationCount
-logger decrement notificationCount
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
 publisher threadProcess success
 publisher decrement notificationCount
+
+                     processor NoMoreData sent
+
+                     command buffer finished
 publisher threadProcess success
 publisher decrement notificationCount
 publisher threadProcess success
 
                      publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-logger threadProcess success
+logger decrement notificationCount
+
+                    bulk buffer check if this is the last data item
 logger decrement notificationCount
 
                     bulk buffer check if this is the last data item
 logger threadProcess success
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger decrement notificationCount
 
                     bulk buffer check if this is the last data item
 
@@ -512,10 +513,6 @@ logger threadProcess success
 
                      bulk buffer finished
 
-                     logger activeThreadCount=1
-
-                     logger finished
-
                      publisher activeThreadCount=0
 
                      publisher finishing
@@ -525,6 +522,11 @@ logger threadProcess success
                      CP all data published
 
                      publisher finished
+logger threadProcess success
+
+                     logger activeThreadCount=1
+
+                     logger finished
 logger threadProcess success
 
                      logger activeThreadCount=0
@@ -562,13 +564,13 @@ nested_bulks_test test
 
                      command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      CP all data received
 
@@ -671,44 +673,56 @@ command buffer threadProcess success
                      command buffer finished
 bulk buffer decrement notificationCount
 logger reactNotification
+logger decrement notificationCount
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 publisher reactNotification
+publisher decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 logger reactNotification
 publisher reactNotification
+publisher decrement notificationCount
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 logger reactNotification
+logger decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+logger threadProcess success
+logger decrement notificationCount
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 publisher reactNotification
+publisher decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+
+                    bulk buffer all data received
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 bulk buffer threadProcess success
 
                      bulk buffer activeThreadCount=0
 
                      bulk buffer finishing
 
-                    bulk buffer dataReceived=0data.size()=3
-publisher decrement notificationCount
-publisher threadProcess success
-publisher decrement notificationCount
-publisher threadProcess success
-publisher decrement notificationCount
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-logger threadProcess success
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-
-                    bulk buffer all data received
-
                      logger NoMoreData received
+
+                     logger activeThreadCount=1
+
+                     logger finished
 
                      publisher NoMoreData received
 
@@ -723,12 +737,6 @@ logger decrement notificationCount
                      CP all data published
 
                      publisher finished
-logger threadProcess success
-
-                     logger activeThreadCount=1
-
-                     logger finished
-logger threadProcess success
 
                      logger activeThreadCount=0
 
@@ -764,181 +772,10 @@ IR destructor
 unexpected_bulk_end_test test
 
                      command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     CP all data received
-
-                     command buffer NoMoreData received
-
-                     CP is going to wait. dataLogged = 0 dataPublished = 0
-
-                     CP waiting
 
                      bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command bufferbulk buffer threadProcess success
- decrement notificationCount
-command buffer decrement notificationCount
-logger reactNotification
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-logger decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-logger
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
- threadProcess success
-
-                     logger waiting. shouldExit=0, noMoreData=0
-                    notificationCount=command buffer0
- check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-publisher
-                     reactNotification
-command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-
-                    command buffer check if this is the last data item
-command buffer threadProcess success
-command buffer decrement notificationCount
-publisher decrement notificationCount
-
-                    command buffer check if this is the last data item
-
-                    command buffer all data received
-command buffer threadProcess success
-
-                    
-                     bulk buffercommand buffer check if this is the last data item
- activeThreadCount=0
-
-                     command buffer finishing
-
-                     processor NoMoreData received
-
-                     bulk buffer NoMoreData received
-
-                     processor NoMoreData sent
-publisher
-                      threadProcess success
-command buffer
-                      finished
-publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-bulk buffer threadProcess success
-
-                     bulk buffer activeThreadCount=0
-
-                     bulk buffer finishing
-
-                     logger NoMoreData received
-
-                     logger activeThreadCount=1
-
-                     logger finished
-
-                     logger activeThreadCount=0
-
-                     
-                     loggerpublisher NoMoreData received
- finishing
-
-                     logger AllDataLogged
-
-                     CP all data logged
-
-                     publisher activeThreadCount=0
-
-                     publisher finishing
-
-                     publisher AllDataPublished
-
-                     CP all data published
-
-                     publisher finished
-
-                     CP waiting ended
-
-                     CP metrics output
-
-                     bulk buffer finished
-IP destructor
-
-                    publisher trying to stop
-
-                    publisher destructor, shouldExit = 1
-
-                    logger trying to stop
-
-                     logger finished
-
-                    logger destructor, shouldExit = 1
-IR destructor
-
-                    bulk buffer trying to stop
-
-                    bulk buffer destructor, shouldExit = 1
-
-                    command buffer trying to stop
-
-                    command buffer destructor, shouldExit = 1
-incorrect_closing_test test
 
                      publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
@@ -954,6 +791,50 @@ incorrect_closing_test test
 command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+bulk buffer decrement notificationCount
+logger reactNotification
+publisher reactNotification
+
+                    command buffer check if this is the last data item
+bulk buffer threadProcess success
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+publisher decrement notificationCount
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 command buffer threadProcess success
 command buffer decrement notificationCount
 
@@ -1004,6 +885,152 @@ command buffer threadProcess success
 
                      processor NoMoreData received
 
+                     bulk buffer NoMoreData received
+
+                     processor NoMoreData sent
+
+                     command buffer finished
+
+                     bulk buffer activeThreadCount=0
+
+                     bulk buffer finishing
+
+                     logger NoMoreData received
+
+                     publisher NoMoreData received
+
+                     bulk buffer finished
+
+                     logger activeThreadCount=1
+
+                     logger finished
+
+                     logger
+                      activeThreadCount=publisher activeThreadCount=00
+
+
+                     
+                     publisherlogger finishing
+ finishing
+
+                     
+                     publisherlogger AllDataPublished
+ AllDataLogged
+
+                     CP all data logged
+
+                     CP all data published
+
+                     publisher finished
+
+                     CP waiting ended
+
+                     CP metrics output
+IP destructor
+
+                    publisher trying to stop
+
+                    publisher destructor, shouldExit = 1
+
+                    logger trying to stop
+
+                     logger finished
+
+                    logger destructor, shouldExit = 1
+IR destructor
+
+                    bulk buffer trying to stop
+
+                    bulk buffer destructor, shouldExit = 1
+
+                    command buffer trying to stop
+
+                    command buffer destructor, shouldExit = 1
+incorrect_closing_test test
+
+                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     CP all data received
+
+                     command buffercommand buffer NoMoreData received
+ decrement notificationCount
+
+                     CP is going to wait. dataLogged = 0 dataPublished = 0
+
+                     CP waiting
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+bulk buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+publisher reactNotification
+command buffer threadProcess success
+command buffer decrement notificationCount
+logger reactNotification
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+bulk buffer threadProcess success
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                    command buffer check if this is the last data item
+publisher decrement notificationCount
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=
+                    0command buffernotificationCount= check if this is the last data item
+0
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+logger decrement notificationCount
+command buffer threadProcess success
+command buffer decrement notificationCount
+
+                    command buffer check if this is the last data item
+
+                    
+                    command bufferbulk buffer check if this is the last data item
+ all data received
+command buffer threadProcess success
+
+                     command buffer activeThreadCount=0
+
+                     command buffer finishing
+
+                     processor NoMoreData received
+
                      processor trying close last bulk
 
                      bulk buffer NoMoreData received
@@ -1011,34 +1038,15 @@ command buffer threadProcess success
                      processor NoMoreData sent
 
                      command buffer finished
-bulk buffer decrement notificationCount
-publisher reactNotification
-publisher decrement notificationCount
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-logger reactNotification
-bulk buffer threadProcess success
-bulk buffer decrement notificationCount
-publisher reactNotification
-publisher decrement notificationCount
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
 logger threadProcess success
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+bulk buffer decrement notificationCount
+publisher reactNotification
 logger reactNotification
 bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 publisher reactNotification
-publisher decrement notificationCount
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 logger reactNotification
 bulk buffer threadProcess success
 
@@ -1048,16 +1056,19 @@ bulk buffer threadProcess success
 
                     bulk buffer dataReceived=0data.size()=2
 logger decrement notificationCount
+publisher decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+publisher threadProcess success
+publisher decrement notificationCount
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 logger decrement notificationCount
 
                     bulk buffer check if this is the last data item
 
-                    bulk buffer check if this is the last data item
-
                     bulk buffer all data received
-logger threadProcess success
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 logger threadProcess success
 
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
@@ -1068,6 +1079,10 @@ logger threadProcess success
 
                      bulk buffer finished
 
+                     logger activeThreadCount=1
+
+                     logger finished
+
                      publisher activeThreadCount=0
 
                      publisher finishing
@@ -1077,10 +1092,7 @@ logger threadProcess success
                      CP all data published
 
                      publisher finished
-
-                     logger activeThreadCount=1
-
-                     logger finished
+logger threadProcess success
 
                      logger activeThreadCount=0
 
@@ -1117,13 +1129,8 @@ commands_containing_delimiter_test test
 
                      command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
-                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-
                      logger waiting. shouldExit=0, noMoreData=0notificationCount=0
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+command buffer decrement notificationCount
 
                      CP all data received
 
@@ -1132,27 +1139,34 @@ commands_containing_delimiter_test test
                      CP is going to wait. dataLogged = 0 dataPublished = 0
 
                      CP waiting
-command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
 command buffer threadProcess success
 command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 command buffer threadProcess success
 command buffer decrement notificationCount
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                     command buffer check if this is the last data item
 command buffer threadProcess success
 command buffer decrement notificationCount
 
-                    command buffer check if this is the last data item
+                    command bufferbulk buffer check if this is the last data item
+ decrement notificationCount
+logger reactNotification
 command buffer threadProcess success
-command buffer decrement notificationCount
+command bufferpublisher decrement notificationCount
+ reactNotification
 
                     command buffer check if this is the last data item
 
                     command buffer all data received
+publisher decrement notificationCount
 command buffer threadProcess success
 
                      command buffer activeThreadCount=0
@@ -1162,23 +1176,39 @@ command buffer threadProcess success
                      processor NoMoreData received
 
                      processor trying close last bulk
+publisher threadProcess success
 
+                     publisher waiting. shouldExit=
                      bulk buffer NoMoreData received
-
+0, noMoreData=0
                      processor NoMoreData sent
+notificationCount=0
 
                      command buffer finished
+bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 logger reactNotification
-publisher reactNotification
 logger decrement notificationCount
-bulk buffer threadProcess success
-bulk buffer decrement notificationCount
-logger reactNotification
+
+                    bulk buffer check if this is the last data item
+logger decrement notificationCount
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 publisher reactNotification
 bulk buffer threadProcess success
 bulk buffer decrement notificationCount
 logger reactNotification
+logger decrement notificationCount
+publisher decrement notificationCount
+
+                    bulk buffer check if this is the last data item
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 publisher reactNotification
 bulk buffer threadProcess success
 
@@ -1186,35 +1216,22 @@ bulk buffer threadProcess success
 
                      bulk buffer finishing
 
-                    bulk buffer dataReceived=0data.size()=3
+                    bulk buffer dataReceived=0data.size()=1
 publisher decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-publisher threadProcess success
-publisher decrement notificationCount
-publisher threadProcess success
-publisher decrement notificationCount
-publisher threadProcess success
-
-                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
-logger decrement notificationCount
-
-                    bulk buffer check if this is the last data item
-logger threadProcess success
-logger threadProcess success
-logger decrement notificationCount
-
-                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                     bulk buffer check if this is the last data item
 
                     bulk buffer all data received
+publisher threadProcess success
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      logger NoMoreData received
 
                      publisher NoMoreData received
-
-                     bulk buffer finished
 
                      publisher activeThreadCount=0
 
@@ -1225,7 +1242,8 @@ logger decrement notificationCount
                      CP all data published
 
                      publisher finished
-logger threadProcess success
+
+                     bulk buffer finished
 
                      logger activeThreadCount=1
 
@@ -1266,14 +1284,22 @@ logging test
 
                      command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
 
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     publisher waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
                      CP all data received
-command buffer decrement notificationCount
 
                      command buffer NoMoreData received
 
                      CP is going to wait. dataLogged = 0 dataPublished = 0
 
                      CP waiting
+command buffer decrement notificationCount
 
                     command buffer check if this is the last data item
 command buffer threadProcess success
@@ -1331,16 +1357,6 @@ logger decrement notificationCount
 
                      bulk buffer finished
 
-                     publisher activeThreadCount=0
-
-                     publisher finishing
-
-                     publisher AllDataPublished
-
-                     CP all data published
-
-                     publisher finished
-
                      logger activeThreadCount=1
 
                      logger finished
@@ -1354,7 +1370,13 @@ logger threadProcess success
 
                      CP all data logged
 
-                     logger finished
+                     publisher activeThreadCount=0
+
+                     publisher finishing
+
+                     publisher AllDataPublished
+
+                     CP all data published
 
                      CP waiting ended
 
@@ -1363,9 +1385,13 @@ IP destructor
 
                     publisher trying to stop
 
+                     publisher finished
+
                     publisher destructor, shouldExit = 1
 
                     logger trying to stop
+
+                     logger finished
 
                     logger destructor, shouldExit = 1
 IR destructor
@@ -1381,6 +1407,11 @@ unexpected_buffer_exhaustion test
 logger reactNotification
 publisher reactNotification
 
+                     command buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     bulk buffer waiting. shouldExit=0, noMoreData=0notificationCount=0
+publisher decrement notificationCount
+
                      CP all data received
 
                      command buffer NoMoreData received
@@ -1388,26 +1419,42 @@ publisher reactNotification
                      CP is going to wait. dataLogged = 0 dataPublished = 0
 
                      CP waiting
-logger decrement notificationCount
+command buffer decrement notificationCount
 
-                     logger activeThreadCount=0
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
 
-                     logger finishing
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
 
-                     logger finished
-publisher decrement notificationCount
+                    command buffer check if this is the last data item
+command buffer threadProcess success
+command buffer decrement notificationCount
 
-                     bulk buffer activeThreadCount=0
+                    command buffer check if this is the last data item
 
-                     bulk buffer finishing
-
-                     bulk buffer finished
+                    command buffer all data received
+command buffer threadProcess success
 
                      command buffer activeThreadCount=0
 
                      command buffer finishing
 
                      command buffer finished
+
+                     bulk buffer activeThreadCount=0
+
+                     bulk buffer finishing
+
+                     bulk buffer finished
+logger decrement notificationCount
+logger threadProcess success
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
+
+                     logger waiting. shouldExit=0, noMoreData=0notificationCount=0
 
                      CP waiting ended
 
@@ -1419,6 +1466,16 @@ IP destructor
                     publisher destructor, shouldExit = 1
 
                     logger trying to stop
+
+                     logger activeThreadCount=1
+
+                     logger finished
+
+                     logger activeThreadCount=0
+
+                     logger finishing
+
+                     logger finished
 
                     logger destructor, shouldExit = 1
 IR destructor
@@ -1633,11 +1690,11 @@ IR destructor
 
                     command buffer destructor, shouldExit = 0
 <end of output>
-Test time =   3.22 sec
+Test time =   3.21 sec
 ----------------------------------------------------------
 Test Passed.
-"test_hw_10" end time: Jun 19 20:46 UTC
+"test_hw_10" end time: Jun 19 20:56 UTC
 "test_hw_10" time elapsed: 00:00:03
 ----------------------------------------------------------
 
-End testing: Jun 19 20:46 UTC
+End testing: Jun 19 20:56 UTC
