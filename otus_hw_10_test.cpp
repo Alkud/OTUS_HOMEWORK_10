@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(objects_creation_failure)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "objects_creation_failure test\n";
+   // std::cout << "objects_creation_failure test\n";
   #endif
 
   std::mutex dummyMutex{};
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(log_file_creation_failure)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "log_file_creation_failure test\n";
+    //std::cout << "log_file_creation_failure test\n";
   #endif
 
   std::stringstream errorStream{};
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(trying_get_from_empty_buffer)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "trying_get_from_empty_buffer test\n";
+    //std::cout << "trying_get_from_empty_buffer test\n";
   #endif
 
   std::mutex dummyMutex;
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "no_command_line_parameters test\n";
+    //std::cout << "no_command_line_parameters test\n";
   #endif
 
   try
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "empty_input_test test\n";
+    //std::cout << "empty_input_test test\n";
   #endif
 
   try
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "empty_command_test test\n";
+    //std::cout << "empty_command_test test\n";
   #endif
 
   const std::string testString{"cmd1\n"
@@ -359,7 +359,7 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "bulk_segmentation_test1 test\n";
+    //std::cout << "bulk_segmentation_test1 test\n";
   #endif
 
   try
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "bulk_segmentation_test2 test\n";
+    //std::cout << "bulk_segmentation_test2 test\n";
   #endif
 
   try
@@ -469,7 +469,7 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "nested_bulks_test test\n";
+    //std::cout << "nested_bulks_test test\n";
   #endif
 
   try
@@ -533,7 +533,7 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "unexpected_bulk_end_test test\n";
+    //std::cout << "unexpected_bulk_end_test test\n";
   #endif
 
   try
@@ -591,7 +591,7 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "incorrect_closing_test test\n";
+    //std::cout << "incorrect_closing_test test\n";
   #endif
 
   try
@@ -647,7 +647,7 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "commands_containing_delimiter_test test\n";
+    //std::cout << "commands_containing_delimiter_test test\n";
   #endif
 
   try
@@ -695,7 +695,7 @@ BOOST_AUTO_TEST_CASE(logging)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "logging test\n";
+    //std::cout << "logging test\n";
   #endif
 
   try
@@ -783,7 +783,7 @@ BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
 {
   #ifdef NDEBUG
   #else
-    std::cout << "unexpected_buffer_exhaustion test\n";
+    //std::cout << "unexpected_buffer_exhaustion test\n";
   #endif
 
   try

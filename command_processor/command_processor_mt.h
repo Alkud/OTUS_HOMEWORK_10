@@ -114,7 +114,7 @@ public:
       case Message::AllDataReceived :
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     CP all data received\n";
+          //std::cout << "\n                     CP all data received\n";
         #endif
 
         dataReceived.store(true);
@@ -124,7 +124,7 @@ public:
       case Message::AllDataLogged :
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     CP all data logged\n";
+          //std::cout << "\n                     CP all data logged\n";
         #endif
 
         dataLogged.store(true);
@@ -134,7 +134,7 @@ public:
       case Message::AllDataPublsihed :
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     CP all data published\n";
+          //std::cout << "\n                     CP all data published\n";
         #endif
 
         dataPublished.store(true);
@@ -173,8 +173,8 @@ public:
 
     #ifdef NDEBUG
     #else
-      std::cout << "\n                     CP is going to wait. dataLogged = "
-                << dataLogged << " dataPublished = " << dataPublished << "\n";
+      //std::cout << "\n                     CP is going to wait. dataLogged = "
+      //          << dataLogged << " dataPublished = " << dataPublished << "\n";
     #endif
 
     while (shouldExit.load() != true
@@ -182,7 +182,7 @@ public:
     {
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     CP waiting\n";
+        //std::cout << "\n                     CP waiting\n";
       #endif
 
       std::unique_lock<std::mutex> lockNotifier{notifierLock};
@@ -195,7 +195,7 @@ public:
 
     #ifdef NDEBUG
     #else
-      std::cout << "\n                     CP waiting ended\n";
+      //std::cout << "\n                     CP waiting ended\n";
     #endif
 
     /* waiting for all workers to finish */
@@ -215,7 +215,7 @@ public:
 
     #ifdef NDEBUG
     #else
-      std::cout << "\n                     CP metrics output\n";
+      //std::cout << "\n                     CP metrics output\n";
     #endif
 
     /* Output metrics */    

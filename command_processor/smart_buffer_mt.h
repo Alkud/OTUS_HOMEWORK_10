@@ -133,14 +133,14 @@ public:
 
       #ifdef NDEBUG
       #else
-        std::cout << "\n                    " << workerName<< " check if this is the last data item\n";
+        //std::cout << "\n                    " << workerName<< " check if this is the last data item\n";
       #endif
 
       if (true == data.empty() && true == noMoreData.load())
       {
         #ifdef NDEBUG
         #else
-          std::cout << "\n                    " << workerName<< " all data received\n";
+          //std::cout << "\n                    " << workerName<< " all data received\n";
         #endif
 
         dataReceived.store(true);
@@ -183,7 +183,7 @@ public:
 
         #ifdef NDEBUG
         #else
-          std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+          //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
         #endif
 
         threadNotifier.notify_all();
@@ -241,9 +241,9 @@ private:
     {
       #ifdef NDEBUG
         #else
-      std::cout << "\n                    "
-                << workerName << " dataReceived=" << dataReceived.load()
-                << "data.size()=" << data.size() <<  "\n";
+      //std::cout << "\n                    "
+      //          << workerName << " dataReceived=" << dataReceived.load()
+      //          << "data.size()=" << data.size() <<  "\n";
       #endif
 
       std::unique_lock<std::mutex> lockNotifier{notifierLock};

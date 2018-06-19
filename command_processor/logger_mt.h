@@ -59,7 +59,7 @@ public:
     {
       #ifdef NDEBUG
       #else
-        std::cout << this->workerName << " reactNotification\n";
+        //std::cout << this->workerName << " reactNotification\n";
       #endif
 
       ++this->notificationCount;
@@ -78,7 +78,7 @@ public:
 
           #ifdef NDEBUG
           #else
-            std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
+            //std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
           #endif
 
           this->threadNotifier.notify_all();
@@ -119,7 +119,7 @@ private:
     {
       #ifdef NDEBUG
       #else
-        std::cout << "\n                     " << this->workerName<< " FALSE received\n";
+        //std::cout << "\n                     " << this->workerName<< " FALSE received\n";
       #endif
 
       return false;
@@ -187,7 +187,7 @@ private:
   {
     #ifdef NDEBUG
     #else
-      std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+      //std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
     #endif
 
     if (true == this->noMoreData.load() && this->notificationCount.load() == 0)
