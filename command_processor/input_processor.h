@@ -58,5 +58,5 @@ private:
 
   SharedMetrics threadMetrics;
 
-  WorkerState state;
+  std::atomic<WorkerState> state;
 };

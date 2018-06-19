@@ -203,6 +203,7 @@ public:
     #endif
 
     /* Output metrics */    
+    std::lock_guard<std::mutex> lockOutputStream{outputStreamLock};
     metricsStream << "main thread - "
                   << globalMetrics["input processor"]->totalStringCount << " string(s), "
                   << globalMetrics["input processor"]->totalCommandCount << " command(s), "

@@ -85,7 +85,7 @@ public:
   }
 
   /// Each recipient starts looking from the first element in the queue.
-  /// When an element is found that wasn't received yet by this recipient,
+  /// When an element that wasn't received yet by this recipient is found,
   /// the recipient gets the value of this element and updates pecipient list
   /// for this element.
   std::pair<bool, T> getItem(const std::shared_ptr<NotificationListener> recipient = nullptr)
@@ -130,7 +130,7 @@ public:
     if (iter->recipients.empty() == true)
     {
       data.erase(iter);
-      if (true == data.empty() && true == noMoreData)
+      if (true == data.empty() && true == noMoreData.load())
       {
         #ifdef _DEBUG
           std::cout << "\n                    " << workerName<< " all data received\n";

@@ -131,7 +131,7 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
           closeCurrentBulk();
         }
         sendMessage(Message::NoMoreData);
-        state = WorkerState::Finished;
+        state.store(WorkerState::Finished);
        }
       break;
 
@@ -145,7 +145,7 @@ void InputProcessor::reactMessage(MessageBroadcaster* sender, Message message)
     {
       shouldExit = true;
       sendMessage(message);
-      state = WorkerState::Finished;
+      state.store(WorkerState::Finished);
     }
   }
 }
@@ -157,7 +157,7 @@ const SharedMetrics InputProcessor::getMetrics()
 
 WorkerState InputProcessor::getWorkerState()
 {
-  return state;
+  return state.load();
 }
 
 void InputProcessor::sendCurrentBulk()

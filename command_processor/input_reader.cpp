@@ -32,7 +32,7 @@ InputReader::~InputReader()
 void InputReader::read()
 {
   std::string nextString{};
-  state = WorkerState::Started;
+  state.store(WorkerState::Started);
   try
   {
     std::lock_guard<std::mutex> lockInput{inputLock};
@@ -48,7 +48,7 @@ void InputReader::read()
     }
     sendMessage(Message::AllDataReceived);
     sendMessage(Message::NoMoreData);
-    state = WorkerState::Finished;
+    state.store(WorkerState::Finished);
   }
   catch(std::exception& ex)
   {
@@ -62,7 +62,7 @@ void InputReader::read()
     }
 
     sendMessage(Message::SystemError);
-    state = WorkerState::Finished;
+    state.store(WorkerState::Finished);
   }
 
 }
@@ -79,5 +79,5 @@ void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
 
 WorkerState InputReader::getWorkerState()
 {
-  return state;
+  return state.load();
 }

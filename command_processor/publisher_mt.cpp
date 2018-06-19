@@ -43,7 +43,7 @@ void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
     switch(message)
     {
     case Message::NoMoreData :
-      if (noMoreData != true && buffer.get() == sender)
+      if (noMoreData.load() != true && buffer.get() == sender)
       {
         #ifdef _DEBUG
           std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
@@ -109,7 +109,7 @@ void Publisher::onThreadException(const std::exception& ex, const size_t threadI
   }
 
   threadFinished[threadIndex] = true;
-  shouldExit = true;
+  shouldExit.store(true);
   threadNotifier.notify_all();
 
   if (ex.what() == "Buffer is empty!")

@@ -41,5 +41,5 @@ private:
   std::ostream& errorOut;
   std::mutex& errorOutLock;
 
-  WorkerState state;
+  std::atomic<WorkerState> state;
 };

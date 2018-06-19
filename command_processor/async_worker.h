@@ -6,11 +6,18 @@
 #include <mutex>
 #include <atomic>
 #include <vector>
+#include <array>
 #include <future>
 #include <cassert>
-#include "worker_state.h"
 
-template<size_t workingThreadsCount = 1u>
+enum class WorkerState
+{
+  NotStarted = 0,
+  Started = 1,
+  Finished = 2
+};
+
+template<size_t workingThreadCount = 1u>
 class AsyncWorker
 {
 public:
@@ -20,8 +27,11 @@ public:
     shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{0},
     threadFinished{}, workerName{newWorkerName}, state{WorkerState::NotStarted}
   {
-    futureResults.reserve(workingThreadsCount);
-    threadFinished.resize(workingThreadsCount, false);
+    futureResults.reserve(workingThreadCount);
+    for (auto& item : threadFinished)
+    {
+      item.store(false);
+    }
   }
 
   virtual ~AsyncWorker()
@@ -78,9 +88,9 @@ public:
       }
     }
 
-    if (state != WorkerState::Finished)
+    if (state.load() != WorkerState::Finished)
     {
-      state = WorkerState::Finished;
+      state.store(WorkerState::Finished);
     }
 
     isStopped = true;
@@ -88,7 +98,7 @@ public:
 
   WorkerState getWorkerState()
   {
-    return state;
+    return state.load();
   }
 
 protected:
@@ -101,18 +111,18 @@ protected:
     }
 
     /* start working threads */
-    for (size_t threadIndex{0}; threadIndex < workingThreadsCount; ++threadIndex)
+    for (size_t threadIndex{0}; threadIndex < workingThreadCount; ++threadIndex)
     {
       futureResults.push_back(
         std::async(
           std::launch::async,
-          &AsyncWorker<workingThreadsCount>::run,
+          &AsyncWorker<workingThreadCount>::run,
           this, threadIndex
         )
       );
     }
     isStopped = false;
-    state = WorkerState::Started;
+    state.store(WorkerState::Started);
   }
 
   bool waitForThreadTermination()
@@ -132,7 +142,7 @@ protected:
     try
     {
       while(shouldExit.load() != true
-            && (noMoreData.load() != true || notificationCount > 0))
+            && (noMoreData.load() != true || notificationCount.load() > 0))
       {
         std::unique_lock<std::mutex> lockNotifier{notifierLock};
 
@@ -176,10 +186,10 @@ protected:
       std::unique_lock<std::mutex> lockTermination{terminationLock};
 
       size_t activeThreadCount{};
-      for (size_t idx{0}; idx < workingThreadsCount; ++idx)
+      for (size_t idx{0}; idx < workingThreadCount; ++idx)
       {
         if (idx != threadIndex
-            && threadFinished[idx] != true)
+            && threadFinished[idx].load() != true)
         {
           ++activeThreadCount;
         }
@@ -190,7 +200,7 @@ protected:
         //std::cout << "\n                     " << this->workerName<< " activeThreadCount=" << activeThreadCount << "\n";
       #endif
 
-      threadFinished[threadIndex] = true;
+      threadFinished[threadIndex].store(true);
 
       lockTermination.unlock();
 
@@ -205,7 +215,7 @@ protected:
         {
           onTermination(threadIndex);
         }
-        state = WorkerState::Finished;
+        state.store(WorkerState::Finished);
       }
 
       #ifdef NDEBUG
@@ -218,7 +228,7 @@ protected:
     catch (const std::exception& ex)
     {
       onThreadException(ex, threadIndex);
-      state = WorkerState::Finished;
+      state.store(WorkerState::Finished);
       return false;
     }
   }
@@ -239,10 +249,10 @@ protected:
   std::condition_variable threadNotifier{};
   std::mutex notifierLock;
 
-  std::vector<bool> threadFinished;
+  std::array<std::atomic_bool, workingThreadCount> threadFinished;
   std::mutex terminationLock;
 
   const std::string workerName;
 
-  WorkerState state;
+  std::atomic<WorkerState> state;
 };
