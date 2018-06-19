@@ -4,15 +4,13 @@
 
 
 Publisher::Publisher(const std::string& newWorkerName,
-                     const std::shared_ptr<SmartBuffer<std::pair<size_t, std::string> > >& newBuffer, bool& newTerminationFlag, bool& newAbortFlag, std::condition_variable& newTerminationNotifier,
+                     const SharedSizeStringBuffer& newBuffer,
                      std::ostream& newOutput, std::mutex& newOutpuLock,
-                     std::ostream& newErrorOut) :
+                     std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
   AsyncWorker<1>{newWorkerName},
   buffer{newBuffer}, output{newOutput}, outputLock{newOutpuLock},
   threadMetrics{std::make_shared<ThreadMetrics>("publisher")},
-  errorOut{newErrorOut},
-  terminationFlag{newTerminationFlag}, abortFlag{newAbortFlag},
-  terminationNotifier{newTerminationNotifier}
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock}
 {
   if (nullptr == buffer)
   {
@@ -29,7 +27,8 @@ void Publisher::reactNotification(NotificationBroadcaster* sender)
 {
   if (buffer.get() == sender)
   {
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << this->workerName << " reactNotification\n";
     #endif
 
@@ -40,32 +39,32 @@ void Publisher::reactNotification(NotificationBroadcaster* sender)
 
 void Publisher::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  switch(message)
+  if (messageCode(message) < 1000) // non error message
   {
-  case Message::NoMoreData :
-    if (noMoreData != true && buffer.get() == sender)
+    switch(message)
     {
-      #ifdef _DEBUG
-        std::cout << "\n                    publisher NoMoreData received\n";
+    case Message::NoMoreData :
+      noMoreData.store(true);
+
+      #ifdef NDEBUG
+      #else
+        std::cout << "\n                     " << this->workerName<< " NoMoreData received\n";
       #endif
 
-      std::lock_guard<std::mutex> lockControl{this->controlLock};
-      noMoreData = true;
       threadNotifier.notify_all();
-    }
-    break;
+      break;
 
-  case Message::Abort :
-    if (shouldExit != true)
-    {
-      {
-        std::lock_guard<std::mutex> lockControl{this->controlLock};
-        shouldExit = true;
-        threadNotifier.notify_all();
-      }
-        sendMessage(Message::Abort);
+    default:
+      break;
     }
-    break;
+  }
+  else                             // error message
+  {
+    if (shouldExit.load() != true)
+    {
+      shouldExit.store(true);
+      sendMessage(message);
+    }
   }
 }
 
@@ -81,11 +80,7 @@ bool Publisher::threadProcess(const size_t threadIndex)
     throw(std::invalid_argument{"Logger source buffer not defined!"});
   }
 
-  decltype(buffer->getItem()) bufferReply{};
-  {
-    std::lock_guard<std::mutex> lockBuffer{buffer->dataLock};
-    bufferReply = buffer->getItem(shared_from_this());
-  }
+  auto bufferReply{buffer->getItem(shared_from_this())};
 
   if (false == bufferReply.first)
   {
@@ -108,33 +103,32 @@ bool Publisher::threadProcess(const size_t threadIndex)
 
 void Publisher::onThreadException(const std::exception& ex, const size_t threadIndex)
 {
-  errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+  {
+    std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+    errorOut << this->workerName << " thread #" << threadIndex << " stopped. Reason: " << ex.what() << std::endl;
+  }
 
   threadFinished[threadIndex] = true;
-  shouldExit = true;
+  shouldExit.store(true);
   threadNotifier.notify_all();
 
-  sendMessage(Message::Abort);
+  if (ex.what() == "Buffer is empty!")
+  {
+    errorMessage = Message::BufferEmpty;
+  }
 
-  abortFlag = true;
-  terminationNotifier.notify_all();
+  sendMessage(errorMessage);
 }
 
 void Publisher::onTermination(const size_t threadIndex)
 {
-  #ifdef _DEBUG
-    std::cout << "\n                     " << this->workerName<< " AllDataLogged\n";
+  #ifdef NDEBUG
+  #else
+    std::cout << "\n                     " << this->workerName<< " AllDataPublished\n";
   #endif
 
-  if (true == noMoreData && notificationCount.load() == 0)
+  if (true == noMoreData.load() && notificationCount.load() == 0)
   {
-    terminationFlag = true;
+    sendMessage(Message::AllDataPublsihed);
   }
-
-  if (true == shouldExit)
-  {
-    abortFlag = true;
-  }
-
-  terminationNotifier.notify_all();
 }

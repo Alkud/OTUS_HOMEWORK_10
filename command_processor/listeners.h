@@ -8,7 +8,7 @@
 class MessageBroadcaster;
 class NotificationBroadcaster;
 
-enum class Message;
+enum class Message : unsigned int;
 /// Base class for message broadcast subscribers
 class MessageListener
 {

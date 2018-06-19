@@ -6,11 +6,13 @@
 #include <mutex>
 
 InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
-                         const std::shared_ptr<SmartBuffer<std::string> >& newBuffer) :
+                         const SharedStringBuffer& newBuffer, std::ostream& newErrorOut, std::mutex& newErrorOutLock) :
   input{newInput},
   inputLock{newInputLock},
   buffer{newBuffer},
-  shouldExit{false}, state{WorkerState::NotStarted}
+  shouldExit{false},
+  errorOut{newErrorOut}, errorOutLock{newErrorOutLock},
+  state{WorkerState::NotStarted}
 {
   if (nullptr == buffer)
   {
@@ -20,7 +22,8 @@ InputReader::InputReader(std::istream& newInput, std::mutex& newInputLock,
 
 InputReader::~InputReader()
 {
-  #ifdef _DEBUG
+  #ifdef NDEBUG
+  #else
     std::cout << "IR destructor\n";
   #endif
 }
@@ -30,53 +33,53 @@ InputReader::~InputReader()
 void InputReader::read()
 {
   std::string nextString{};
-  state = WorkerState::Started;
+  state.store(WorkerState::Started);
   try
   {
     std::lock_guard<std::mutex> lockInput{inputLock};
-    while(shouldExit!= true
+    while(shouldExit != true
           && std::getline(input, nextString))
     {
       if (nextString.size() > (size_t)InputReaderSettings::MaxInputStringSize)
       {
         std::cerr << "Maximum command length exceeded! String truncated";
         nextString = nextString.substr((size_t)InputReaderSettings::MaxInputStringSize);
-      }
-      std::unique_lock<std::mutex> lockBuffer{buffer->dataLock};
+      }      
       buffer->putItem(nextString);
-      lockBuffer.unlock();
     }
+    sendMessage(Message::AllDataReceived);
     sendMessage(Message::NoMoreData);
-    state = WorkerState::Finished;
+    state.store(WorkerState::Finished);
   }
   catch(std::exception& ex)
   {
-    #ifdef _DEBUG
+    #ifdef NDEBUG
+    #else
       std::cout << "\n                     reader ABORT\n";
     #endif
 
-    sendMessage(Message::Abort);
-    std::cerr << ex.what();
-    state = WorkerState::Finished;
+    {
+      std::lock_guard<std::mutex> lockErrorOut{errorOutLock};
+      errorOut << ex.what();
+    }
+
+    sendMessage(Message::SystemError);
+    state.store(WorkerState::Finished);
   }
 
 }
 
 void InputReader::reactMessage(MessageBroadcaster* sender, Message message)
 {
-  switch(message)
+  if (messageCode(message) > 1000           // error message
+      && shouldExit != true)
   {
-  case Message::Abort :
-    if (shouldExit != true)
-    {
-      shouldExit = true;
-      sendMessage(Message::Abort);
-    }
-    break;
+    shouldExit = true;
+    sendMessage(message);
   }
 }
 
 WorkerState InputReader::getWorkerState()
 {
-  return state;
+  return state.load();
 }
