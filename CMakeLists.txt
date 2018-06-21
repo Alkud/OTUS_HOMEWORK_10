@@ -36,6 +36,9 @@ add_executable(bulkmt bulkmt.cpp ${homework_10})
 #Set test target_link_libraries
 add_executable(otus_hw_10_test otus_hw_10_test.cpp ${homework_10})
 
+#Set performance test target_link_libraries
+add_executable(bulkmt_perf_test bulkmt_perf_test.cpp)
+
 #Enable tests
 enable_testing()
 add_test(NAME test_hw_10
@@ -56,6 +59,8 @@ set_target_properties(otus_hw_10_test PROPERTIES
 
 #Link
 target_link_libraries(bulkmt pthread command_processor)
+
+target_link_libraries(bulkmt_perf_test pthread command_processor)
 
 target_link_libraries(otus_hw_10_test pthread command_processor)
 

@@ -59,30 +59,38 @@ public:
   };
 
   /// Copy new element to the buffer
-  void putItem(const T& newItem)
-  {
+    void putItem(const T& newItem)
     {
       std::lock_guard<std::mutex> lockData{dataLock};
+
+      /* don't accept data if NoMoreData message received! */
+      if (noMoreData.load() == true)
+      {
+        return;
+      }
+
       data.emplace_back(newItem, notificationListeners);
+      dataReceived.store(false);
+      ++notificationCount;
+      threadNotifier.notify_one();
     }
 
-    dataReceived.store(false);
-    ++notificationCount;
-    threadNotifier.notify_one();
-  }
-
-  /// Move new element to the buffer
-  void putItem(T&& newItem)
-  {
+    /// Move new element to the buffer
+    void putItem(T&& newItem)
     {
       std::lock_guard<std::mutex> lockData{dataLock};
-      data.emplace_back(std::move(newItem), notificationListeners);
-    }
 
-    dataReceived.store(false);
-    ++notificationCount;
-    threadNotifier.notify_one();
-  }
+      /* don't accept data if NoMoreData message received! */
+      if (noMoreData.load() == true)
+      {
+        return;
+      }
+
+      data.emplace_back(std::move(newItem), notificationListeners);
+      dataReceived.store(false);
+      ++notificationCount;
+      threadNotifier.notify_one();
+    }
 
   /// Each recipient starts looking from the first element in the queue.
   /// When an element that wasn't received yet by this recipient is found,

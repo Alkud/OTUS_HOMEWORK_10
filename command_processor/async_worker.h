@@ -79,7 +79,7 @@ public:
 
     for (auto& result : futureResults)
     {
-      while (result.wait_for(std::chrono::milliseconds(0))
+      while (result.valid() && result.wait_for(std::chrono::milliseconds(0))
           != std::future_status::ready)
       {
         shouldExit.store(true);
