@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
     /* error output should contain expected text*/
     BOOST_CHECK(errorStream.str() ==
-                "usage: bulkmt [bulk size] {[number of logging threads]}\n");
+                "usage: bulkmt [bulk size]\n");
 
     /* application metrics and output sholud be empty */
     BOOST_CHECK(outputStream.str() == ""
