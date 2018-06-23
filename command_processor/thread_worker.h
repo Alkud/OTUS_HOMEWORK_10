@@ -18,16 +18,16 @@ enum class WorkerState
 };
 
 template<size_t workingThreadCount = 1u>
-class AsyncWorker
+class ThreadWorker
 {
 public:
-  AsyncWorker() = delete;
+  ThreadWorker() = delete;
 
-  AsyncWorker(const std::string& newWorkerName) :
+  ThreadWorker(const std::string& newWorkerName) :
     shouldExit{false}, noMoreData{false}, isStopped{true}, notificationCount{0},
     threadFinished{}, workerName{newWorkerName}, state{WorkerState::NotStarted}
   {
-    futureResults.reserve(workingThreadCount);
+    workingThreads.reserve(workingThreadCount);
     threadID.resize(workingThreadCount, std::thread::id{});
     for (auto& item : threadFinished)
     {
@@ -35,7 +35,7 @@ public:
     }
   }
 
-  virtual ~AsyncWorker()
+  virtual ~ThreadWorker()
   {
     #ifdef NDEBUG
     #else
@@ -53,7 +53,7 @@ public:
   virtual bool startAndWait()
   {
     startWorkingThreads();
-    if (futureResults.empty() != true)
+    if (workingThreads.empty() != true)
     {
       return waitForThreadTermination();
     }
@@ -78,14 +78,13 @@ public:
     shouldExit.store(true);
     threadNotifier.notify_all();
 
-    for (auto& result : futureResults)
+    for (auto& thread : workingThreads)
     {
-      while (result.valid() && result.wait_for(std::chrono::milliseconds(0))
-          != std::future_status::ready)
+      if (thread.joinable())
       {
         shouldExit.store(true);
         threadNotifier.notify_all();
-        result.wait_for(std::chrono::milliseconds(500));
+        thread.join();
       }
     }
 
@@ -106,7 +105,7 @@ protected:
 
   void startWorkingThreads()
   {
-    if (futureResults.empty() != true)
+    if (workingThreads.empty() != true)
     {
       return;
     }
@@ -114,10 +113,9 @@ protected:
     /* start working threads */
     for (size_t threadIndex{0}; threadIndex < workingThreadCount; ++threadIndex)
     {
-      futureResults.push_back(
-        std::async(
-          std::launch::async,
-          &AsyncWorker<workingThreadCount>::run,
+      workingThreads.push_back(
+        std::thread(
+          &ThreadWorker<workingThreadCount>::run,
           this, threadIndex
         )
       );
@@ -128,14 +126,15 @@ protected:
 
   bool waitForThreadTermination()
   {
-    /* wait for working threads results */
-    bool workSuccess{true};
-    for (auto& result : futureResults)
+    for (auto& thread : workingThreads)
     {
-      workSuccess = workSuccess && result.get();
+      if (thread.joinable())
+      {
+        thread.join();
+      }
     }
 
-    return workSuccess;
+    return true;
   }
 
   virtual void onThreadStart(const size_t threadIndex)
@@ -250,7 +249,7 @@ protected:
 
   virtual void onTermination(const size_t threadIndex) = 0;
 
-  std::vector<std::future<bool>> futureResults{};
+  std::vector<std::thread> workingThreads{};
   std::vector<std::thread::id> threadID;
   std::atomic<bool> shouldExit;
   std::atomic<bool> noMoreData;
