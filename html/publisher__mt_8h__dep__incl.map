@@ -1,6 +1,7 @@
 <map id="command_processor/publisher_mt.h" name="command_processor/publisher_mt.h">
-<area shape="rect" id="node2" href="$command__processor__mt_8h.html" title="command_processor/command\l_processor_mt.h" alt="" coords="47,81,251,122"/>
-<area shape="rect" id="node5" href="$publisher__mt_8cpp.html" title="command_processor/publisher\l_mt.cpp" alt="" coords="275,81,473,122"/>
-<area shape="rect" id="node3" href="$homework__10_8cpp.html" title="homework_10.cpp" alt="" coords="5,171,133,197"/>
-<area shape="rect" id="node4" href="$otus__hw__10__test_8cpp.html" title="otus_hw_10_test.cpp" alt="" coords="157,171,304,197"/>
+<area shape="rect" id="node2" href="$command__processor__mt_8h.html" title="command_processor/command\l_processor_mt.h" alt="" coords="135,81,339,122"/>
+<area shape="rect" id="node6" href="$publisher__mt_8cpp.html" title="command_processor/publisher\l_mt.cpp" alt="" coords="363,81,561,122"/>
+<area shape="rect" id="node3" href="$bulkmt__perf__test_8cpp.html" title="bulkmt_perf_test.cpp" alt="" coords="5,171,149,197"/>
+<area shape="rect" id="node4" href="$homework__10_8cpp.html" title="homework_10.cpp" alt="" coords="173,171,301,197"/>
+<area shape="rect" id="node5" href="$otus__hw__10__test_8cpp.html" title="otus_hw_10_test.cpp" alt="" coords="325,171,472,197"/>
 </map>

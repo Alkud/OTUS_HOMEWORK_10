@@ -250,6 +250,9 @@ public:
   getBulkBuffer()
   { return outputBuffer; }
 
+  auto getLoggerStringThreadID()
+  { return logger->getStringThreadID();}
+
 private:
   std::ostream& errorStream;
   std::ostream& metricsStream;

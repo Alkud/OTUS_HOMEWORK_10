@@ -123,6 +123,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/otus_hw_10_test.dir/DependInfo.cmake"
+  "CMakeFiles/bulkmt_perf_test.dir/DependInfo.cmake"
   "CMakeFiles/bulkmt.dir/DependInfo.cmake"
   "command_processor/CMakeFiles/command_processor.dir/DependInfo.cmake"
   )

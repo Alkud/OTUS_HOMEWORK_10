@@ -9,7 +9,7 @@ var searchData=
   ['debug_5foff',['debug_off',['../otus__hw__10__test_8cpp.html#ad23721f303b059caeb1d8a751a39562bacc5e678934bcd48572b4f36e5084bd08',1,'otus_hw_10_test.cpp']]],
   ['debug_5fon',['debug_on',['../otus__hw__10__test_8cpp.html#ad23721f303b059caeb1d8a751a39562ba152f67dfc669651c1aea5b314277af2e',1,'otus_hw_10_test.cpp']]],
   ['debugoutput',['DebugOutput',['../otus__hw__10__test_8cpp.html#ad23721f303b059caeb1d8a751a39562b',1,'otus_hw_10_test.cpp']]],
-  ['destinationdirectory',['destinationDirectory',['../class_logger.html#a99cdbad80d0ca316361f4dd59df3c91a',1,'Logger::destinationDirectory()'],['../class_logger.html#a2f41da437d76cf481ba4b16164bdda65',1,'Logger::destinationDirectory()']]],
+  ['destinationdirectory',['destinationDirectory',['../class_logger.html#ae708053a3f3818a168a82e745647bd9b',1,'Logger::destinationDirectory()'],['../class_logger.html#a12ef37aebb84b27a0c4619044e68fe97',1,'Logger::destinationDirectory()']]],
   ['destinationnullptr',['DestinationNullptr',['../broadcasters_8h.html#aff97733e4706e994965da50c70605422ae69f558a400c216896ea6f967bf342e4',1,'broadcasters.h']]],
   ['dummydeleter',['DummyDeleter',['../struct_command_processor_1_1_dummy_deleter.html',1,'CommandProcessor']]]
 ];

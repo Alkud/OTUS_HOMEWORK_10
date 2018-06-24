@@ -93,6 +93,12 @@ thread
 -
 fstream
 -
+sstream
+-
+cstdio
+-
+numeric
+-
 listeners.h
 /home/travis/build/Alkud/OTUS_HOMEWORK_10/./command_processor/listeners.h
 smart_buffer_mt.h

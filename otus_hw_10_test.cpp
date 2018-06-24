@@ -28,7 +28,8 @@ getProcessorOutput
   char openDelimiter,
   char closeDelimiter,
   size_t bulkSize,
-  DebugOutput debugOutput
+  DebugOutput debugOutput,
+  std::shared_ptr<std::vector<std::string>>& loggingThreadID
 )
 {
   std::stringstream inputStream{inputString};
@@ -43,6 +44,8 @@ getProcessorOutput
   };
 
   testProcessor.run();
+
+  loggingThreadID = testProcessor.getLoggerStringThreadID();
 
   //std::this_thread::sleep_for(std::chrono::milliseconds{200});
 
@@ -266,7 +269,7 @@ BOOST_AUTO_TEST_CASE(no_command_line_parameters)
 
     /* error output should contain expected text*/
     BOOST_CHECK(errorStream.str() ==
-                "usage: bulkmt [bulk size] {[number of logging threads]}\n");
+                "usage: bulkmt [bulk size]\n");
 
     /* application metrics and output sholud be empty */
     BOOST_CHECK(outputStream.str() == ""
@@ -289,8 +292,9 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 
   try
   {
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off)
+      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* metrics sholud contain expected text */
@@ -327,8 +331,9 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
                                "cmd2"};
   try
   {
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
+      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* check main application output */
@@ -364,12 +369,14 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 
   try
   {
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
+
     const std::string testString{"cmd1\n"
                            "cmd2\n"
                            "cmd3\n"
                            "cmd4"};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
+      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -416,6 +423,8 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 
   try
   {
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
+
     const std::string testString
     {
       "cmd1\n"
@@ -426,7 +435,7 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
       "cmd4"
     };
     auto processorOutput{
-      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off)
+      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -495,8 +504,9 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
       "cmd12\n"
       "cmd13\n"
     };
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -558,8 +568,9 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
         "cmd12\n"
         "cmd13\n"
     };
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -609,8 +620,9 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
       "cmd7\n"
       "cmd8\n"
     };
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -660,8 +672,9 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
       "cmd4}\n"
       "cmd5"
     };
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off)
+      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* main application output */
@@ -703,6 +716,8 @@ BOOST_AUTO_TEST_CASE(logging)
     /* wait 2 seconds to get separate log files for this test */
     std::this_thread::sleep_for(std::chrono::seconds{2});
 
+    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
+
     const std::string testString{
       "cmd1\n"
       "cmd2\n"
@@ -710,7 +725,7 @@ BOOST_AUTO_TEST_CASE(logging)
       "cmd4\n"
     };
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
     };
 
     /* get current time */
@@ -726,20 +741,24 @@ BOOST_AUTO_TEST_CASE(logging)
 
     /* build log file name */
     --ticksCount;
-    while (!std::ifstream{std::to_string(ticksCount).append("_11.log")}
-           &&!std::ifstream{std::to_string(ticksCount).append("_12.log")})
+    auto firstFileName{std::to_string(ticksCount).append("_").append(loggingThreadID->at(0)).append("_1.log")};
+    auto secondFileName{std::to_string(ticksCount).append("_").append(loggingThreadID->at(1)).append("_1.log")};
+    while (!std::ifstream{firstFileName}
+           &&!std::ifstream{secondFileName})
     {
       ++ticksCount;
+      firstFileName = std::to_string(ticksCount).append("_").append(loggingThreadID->at(0)).append("_1.log");
+      secondFileName = std::to_string(ticksCount).append("_").append(loggingThreadID->at(1)).append("_1.log");
     }
 
     std::string logFileName;
-    if (std::ifstream{std::to_string(ticksCount).append("_11.log")})
+    if (std::ifstream{firstFileName})
     {
-      logFileName = std::to_string(ticksCount) + "_11.log";
+      logFileName = firstFileName;
     }
     else
     {
-      logFileName = std::to_string(ticksCount) + "_12.log";
+      logFileName = secondFileName;
     };
 
     std::ifstream logFile(logFileName);

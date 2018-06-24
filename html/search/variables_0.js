@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['additionalnamesection',['additionalNameSection',['../class_logger.html#a69f942db22bc652ec76809b8959f9aa2',1,'Logger::additionalNameSection()'],['../class_logger.html#ab3a440f473ab35ba6df218c17866db16',1,'Logger::additionalNameSection()']]]
+  ['additionalnamesection',['additionalNameSection',['../class_logger.html#a4021e7a8a9ed768e84c79d463942aa2f',1,'Logger::additionalNameSection()'],['../class_logger.html#aed5365702e805b6453c631d079d08a06',1,'Logger::additionalNameSection()']]]
 ];

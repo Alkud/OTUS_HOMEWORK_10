@@ -9,5 +9,6 @@ var searchData=
   ['_7emessagelistener',['~MessageListener',['../class_message_listener.html#a70778be12f8d64adbb571c610c412021',1,'MessageListener']]],
   ['_7enotificationbroadcaster',['~NotificationBroadcaster',['../class_notification_broadcaster.html#a19ab9abeba5b04f6abb4f633b405942b',1,'NotificationBroadcaster']]],
   ['_7enotificationlistener',['~NotificationListener',['../class_notification_listener.html#add75d91127cddb0b91b63042b204bda0',1,'NotificationListener']]],
-  ['_7epublisher',['~Publisher',['../class_publisher.html#ac69af7131a48792510b533573c2373f7',1,'Publisher']]]
+  ['_7epublisher',['~Publisher',['../class_publisher.html#ac69af7131a48792510b533573c2373f7',1,'Publisher']]],
+  ['_7ethreadworker',['~ThreadWorker',['../class_thread_worker.html#aa4905f2af812bfb72d34fed45261c84a',1,'ThreadWorker']]]
 ];

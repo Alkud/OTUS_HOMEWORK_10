@@ -56,16 +56,17 @@ CMAKE_BINARY_DIR = /home/travis/build/Alkud/OTUS_HOMEWORK_10
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target package_source
-package_source:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackSourceConfig.cmake /home/travis/build/Alkud/OTUS_HOMEWORK_10/CPackSourceConfig.cmake
-.PHONY : package_source
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
 
-# Special rule for the target package_source
-package_source/fast: package_source
-
-.PHONY : package_source/fast
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
 
 # Special rule for the target package
 package: preinstall
@@ -99,6 +100,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
+	/usr/local/cmake-3.9.2/bin/cpack --config ./CPackSourceConfig.cmake /home/travis/build/Alkud/OTUS_HOMEWORK_10/CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+
+.PHONY : package_source/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -145,18 +157,6 @@ install/fast: preinstall/fast
 	/usr/local/cmake-3.9.2/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/local/cmake-3.9.2/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles /home/travis/build/Alkud/OTUS_HOMEWORK_10/CMakeFiles/progress.marks
@@ -201,6 +201,19 @@ otus_hw_10_test: cmake_check_build_system
 otus_hw_10_test/fast:
 	$(MAKE) -f CMakeFiles/otus_hw_10_test.dir/build.make CMakeFiles/otus_hw_10_test.dir/build
 .PHONY : otus_hw_10_test/fast
+
+#=============================================================================
+# Target rules for targets named bulkmt_perf_test
+
+# Build rule for target.
+bulkmt_perf_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 bulkmt_perf_test
+.PHONY : bulkmt_perf_test
+
+# fast build rule for target.
+bulkmt_perf_test/fast:
+	$(MAKE) -f CMakeFiles/bulkmt_perf_test.dir/build.make CMakeFiles/bulkmt_perf_test.dir/build
+.PHONY : bulkmt_perf_test/fast
 
 #=============================================================================
 # Target rules for targets named bulkmt
@@ -254,6 +267,33 @@ bulkmt.s: bulkmt.cpp.s
 bulkmt.cpp.s:
 	$(MAKE) -f CMakeFiles/bulkmt.dir/build.make CMakeFiles/bulkmt.dir/bulkmt.cpp.s
 .PHONY : bulkmt.cpp.s
+
+bulkmt_perf_test.o: bulkmt_perf_test.cpp.o
+
+.PHONY : bulkmt_perf_test.o
+
+# target to build an object file
+bulkmt_perf_test.cpp.o:
+	$(MAKE) -f CMakeFiles/bulkmt_perf_test.dir/build.make CMakeFiles/bulkmt_perf_test.dir/bulkmt_perf_test.cpp.o
+.PHONY : bulkmt_perf_test.cpp.o
+
+bulkmt_perf_test.i: bulkmt_perf_test.cpp.i
+
+.PHONY : bulkmt_perf_test.i
+
+# target to preprocess a source file
+bulkmt_perf_test.cpp.i:
+	$(MAKE) -f CMakeFiles/bulkmt_perf_test.dir/build.make CMakeFiles/bulkmt_perf_test.dir/bulkmt_perf_test.cpp.i
+.PHONY : bulkmt_perf_test.cpp.i
+
+bulkmt_perf_test.s: bulkmt_perf_test.cpp.s
+
+.PHONY : bulkmt_perf_test.s
+
+# target to generate assembly for a file
+bulkmt_perf_test.cpp.s:
+	$(MAKE) -f CMakeFiles/bulkmt_perf_test.dir/build.make CMakeFiles/bulkmt_perf_test.dir/bulkmt_perf_test.cpp.s
+.PHONY : bulkmt_perf_test.cpp.s
 
 homework_10.o: homework_10.cpp.o
 
@@ -318,21 +358,25 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... package_source"
+	@echo "... install/local"
 	@echo "... package"
 	@echo "... test"
 	@echo "... otus_hw_10_test"
 	@echo "... rebuild_cache"
+	@echo "... bulkmt_perf_test"
 	@echo "... bulkmt"
+	@echo "... package_source"
 	@echo "... edit_cache"
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... install"
-	@echo "... install/local"
 	@echo "... command_processor"
 	@echo "... bulkmt.o"
 	@echo "... bulkmt.i"
 	@echo "... bulkmt.s"
+	@echo "... bulkmt_perf_test.o"
+	@echo "... bulkmt_perf_test.i"
+	@echo "... bulkmt_perf_test.s"
 	@echo "... homework_10.o"
 	@echo "... homework_10.i"
 	@echo "... homework_10.s"

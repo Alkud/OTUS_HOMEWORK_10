@@ -118,6 +118,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a0fd39ec8089b6da51e2a29bab8b13a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e410b9516796d11452fe0e107543bf4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#a4e410b9516796d11452fe0e107543bf4">waitForThreadTermination</a> ()</td></tr>
 <tr class="separator:a4e410b9516796d11452fe0e107543bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ccefa4ba08012291153a0db5e8dcbee"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#a1ccefa4ba08012291153a0db5e8dcbee">onThreadStart</a> (const size_t threadIndex)</td></tr>
+<tr class="separator:a1ccefa4ba08012291153a0db5e8dcbee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0eb4d633cb4ca3fec72440942f0048f9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#a0eb4d633cb4ca3fec72440942f0048f9">run</a> (const size_t threadIndex)</td></tr>
 <tr class="separator:a0eb4d633cb4ca3fec72440942f0048f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a53ffa087efa86514f46d56b95852e9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#a5a53ffa087efa86514f46d56b95852e9">threadProcess</a> (const size_t threadIndex)=0</td></tr>
@@ -131,6 +133,8 @@ Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a82fcf15762c8d9e3f4606272bd431578"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::future&lt; bool &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#a82fcf15762c8d9e3f4606272bd431578">futureResults</a> {}</td></tr>
 <tr class="separator:a82fcf15762c8d9e3f4606272bd431578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3a8315b2b4b26bfa7f0d7e01797f5cc"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::thread::id &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#ac3a8315b2b4b26bfa7f0d7e01797f5cc">threadID</a></td></tr>
+<tr class="separator:ac3a8315b2b4b26bfa7f0d7e01797f5cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9ddf369aab8745b691ba4f24676c88f"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#ad9ddf369aab8745b691ba4f24676c88f">shouldExit</a></td></tr>
 <tr class="separator:ad9ddf369aab8745b691ba4f24676c88f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aada84414491e4b995f2d95c0136ca265"><td class="memItemLeft" align="right" valign="top">std::atomic&lt; bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_async_worker.html#aada84414491e4b995f2d95c0136ca265">noMoreData</a></td></tr>
@@ -319,6 +323,32 @@ template&lt;size_t workingThreadCount = 1u&gt; </div>
 </div><div class="memdoc">
 
 <p>Implemented in <a class="el" href="class_smart_buffer.html#a23d6459aabf528279a19c4546196e773">SmartBuffer&lt; T &gt;</a>, and <a class="el" href="class_publisher.html#a14d4525f5926a61b7ea3eb37c45521e1">Publisher</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1ccefa4ba08012291153a0db5e8dcbee"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;size_t workingThreadCount = 1u&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="class_async_worker.html">AsyncWorker</a>&lt; workingThreadCount &gt;::onThreadStart </td>
+          <td>(</td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>threadIndex</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -689,6 +719,28 @@ template&lt;size_t workingThreadCount = 1u&gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">std::array&lt;std::atomic_bool, workingThreadCount&gt; <a class="el" href="class_async_worker.html">AsyncWorker</a>&lt; workingThreadCount &gt;::threadFinished</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac3a8315b2b4b26bfa7f0d7e01797f5cc"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;size_t workingThreadCount = 1u&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::thread::id&gt; <a class="el" href="class_async_worker.html">AsyncWorker</a>&lt; workingThreadCount &gt;::threadID</td>
         </tr>
       </table>
   </td>

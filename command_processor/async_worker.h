@@ -28,6 +28,7 @@ public:
     threadFinished{}, workerName{newWorkerName}, state{WorkerState::NotStarted}
   {
     futureResults.reserve(workingThreadCount);
+    threadID.resize(workingThreadCount, std::thread::id{});
     for (auto& item : threadFinished)
     {
       item.store(false);
@@ -79,8 +80,8 @@ public:
 
     for (auto& result : futureResults)
     {
-      while (result.wait_for(std::chrono::milliseconds(0))
-          != std::future_status::ready)
+      while (result.valid()
+             && result.wait_for(std::chrono::seconds{0}) != std::future_status::ready)
       {
         shouldExit.store(true);
         threadNotifier.notify_all();
@@ -137,10 +138,18 @@ protected:
     return workSuccess;
   }
 
+  virtual void onThreadStart(const size_t threadIndex)
+  {}
+
   virtual bool run(const size_t threadIndex)
   {
+    onThreadStart(threadIndex);
+
     try
     {
+      /* get unique thread ID */
+      threadID[threadIndex] = std::this_thread::get_id();
+
       while(shouldExit.load() != true
             && (noMoreData.load() != true || notificationCount.load() > 0))
       {
@@ -242,6 +251,7 @@ protected:
   virtual void onTermination(const size_t threadIndex) = 0;
 
   std::vector<std::future<bool>> futureResults{};
+  std::vector<std::thread::id> threadID;
   std::atomic<bool> shouldExit;
   std::atomic<bool> noMoreData;
 

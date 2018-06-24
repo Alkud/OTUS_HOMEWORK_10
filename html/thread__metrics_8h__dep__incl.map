@@ -1,10 +1,11 @@
 <map id="command_processor/thread_metrics.h" name="command_processor/thread_metrics.h">
 <area shape="rect" id="node2" href="$input__processor_8h.html" title="command_processor/input\l_processor.h" alt="" coords="5,97,179,138"/>
-<area shape="rect" id="node7" href="$publisher__mt_8h.html" title="command_processor/publisher_mt.h" alt="" coords="443,104,675,131"/>
-<area shape="rect" id="node9" href="$logger__mt_8h.html" title="command_processor/logger_mt.h" alt="" coords="203,104,417,131"/>
+<area shape="rect" id="node8" href="$publisher__mt_8h.html" title="command_processor/publisher_mt.h" alt="" coords="443,104,675,131"/>
+<area shape="rect" id="node10" href="$logger__mt_8h.html" title="command_processor/logger_mt.h" alt="" coords="203,104,417,131"/>
 <area shape="rect" id="node3" href="$command__processor__mt_8h.html" title="command_processor/command\l_processor_mt.h" alt="" coords="209,187,412,229"/>
-<area shape="rect" id="node6" href="$input__processor_8cpp.html" title="command_processor/input\l_processor.cpp" alt="" coords="5,187,179,229"/>
-<area shape="rect" id="node4" href="$homework__10_8cpp.html" title="homework_10.cpp" alt="" coords="165,277,293,304"/>
-<area shape="rect" id="node5" href="$otus__hw__10__test_8cpp.html" title="otus_hw_10_test.cpp" alt="" coords="317,277,464,304"/>
-<area shape="rect" id="node8" href="$publisher__mt_8cpp.html" title="command_processor/publisher\l_mt.cpp" alt="" coords="459,187,657,229"/>
+<area shape="rect" id="node7" href="$input__processor_8cpp.html" title="command_processor/input\l_processor.cpp" alt="" coords="5,187,179,229"/>
+<area shape="rect" id="node4" href="$bulkmt__perf__test_8cpp.html" title="bulkmt_perf_test.cpp" alt="" coords="79,277,223,304"/>
+<area shape="rect" id="node5" href="$homework__10_8cpp.html" title="homework_10.cpp" alt="" coords="247,277,375,304"/>
+<area shape="rect" id="node6" href="$otus__hw__10__test_8cpp.html" title="otus_hw_10_test.cpp" alt="" coords="399,277,545,304"/>
+<area shape="rect" id="node9" href="$publisher__mt_8cpp.html" title="command_processor/publisher\l_mt.cpp" alt="" coords="459,187,657,229"/>
 </map>

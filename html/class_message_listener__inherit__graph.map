@@ -2,7 +2,7 @@
 <area shape="rect" id="node2" href="$class_command_processor.html" title="CommandProcessor\&lt; logging\lThreadCount \&gt;" alt="" coords="176,5,371,46"/>
 <area shape="rect" id="node3" href="$class_input_processor.html" title="InputProcessor" alt="" coords="218,71,329,97"/>
 <area shape="rect" id="node4" href="$class_input_reader.html" title="InputReader" alt="" coords="227,121,320,148"/>
-<area shape="rect" id="node5" href="$class_logger.html" title="Logger\&lt; threadsCount \&gt;" alt="" coords="192,172,355,199"/>
+<area shape="rect" id="node5" href="$class_logger.html" title="Logger\&lt; threadCount \&gt;" alt="" coords="195,172,351,199"/>
 <area shape="rect" id="node6" href="$class_publisher.html" title="Publisher" alt="" coords="235,223,311,249"/>
 <area shape="rect" id="node7" href="$class_smart_buffer.html" title="SmartBuffer\&lt; T \&gt;" alt="" coords="211,273,335,300"/>
 </map>

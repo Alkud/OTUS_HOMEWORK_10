@@ -1,0 +1,1 @@
+/usr/bin/g++    -rdynamic CMakeFiles/bulkmt_perf_test.dir/bulkmt_perf_test.cpp.o  -o bulkmt_perf_test -lpthread command_processor/libcommand_processor.a 
