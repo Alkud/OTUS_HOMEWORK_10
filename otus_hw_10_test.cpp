@@ -46,9 +46,6 @@ getProcessorOutput
   testProcessor.run();
 
   loggingThreadID = testProcessor.getLoggerStringThreadID();
-
-  //std::this_thread::sleep_for(std::chrono::milliseconds{200});
-
   }
 
   std::array<std::vector<std::string>, 3> result {};
