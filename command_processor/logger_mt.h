@@ -104,6 +104,11 @@ public:
     }
   }
 
+  auto getStringThreadID()
+  {
+    return std::make_shared<std::vector<std::string>>(stringThreadID);
+  }
+
   const SharedMultyMetrics getMetrics()
   {
     return threadMetrics;
