@@ -4,7 +4,6 @@
 add_library(command_processor
   broadcasters.h listeners.h
   async_worker.h
-  thread_worker.h
   command_processor_mt.h
   input_processor.h input_processor.cpp
   input_reader.h input_reader.cpp

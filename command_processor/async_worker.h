@@ -80,8 +80,8 @@ public:
 
     for (auto& result : futureResults)
     {
-      while (result.valid() && result.wait_for(std::chrono::milliseconds(0))
-          != std::future_status::ready)
+      while (result.valid()
+             && result.wait_for(std::chrono::seconds{0}) != std::future_status::ready)
       {
         shouldExit.store(true);
         threadNotifier.notify_all();

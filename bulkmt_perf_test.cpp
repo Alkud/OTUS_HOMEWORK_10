@@ -7,7 +7,7 @@
 #include <utility>
 #include "./command_processor/command_processor_mt.h"
 
-constexpr size_t maxThreadCount {120};
+constexpr size_t maxThreadCount {20};
 
 std::stringstream inputStream;
 
