@@ -7,5 +7,5 @@ var searchData=
   ['inputreader',['inputReader',['../class_command_processor.html#a0ec0d6e48963271a6e096606e4db6c9d',1,'CommandProcessor']]],
   ['inputstream',['inputStream',['../bulkmt__perf__test_8cpp.html#ab0b33d5705502cb3e8c37b490d554e1d',1,'bulkmt_perf_test.cpp']]],
   ['inputstreamlock',['inputStreamLock',['../class_command_processor.html#a6673631c4ef8c082ae0aaa11d318cf86',1,'CommandProcessor']]],
-  ['isstopped',['isStopped',['../class_async_worker.html#ad74ffc43c34fb72d091592dcff26ded2',1,'AsyncWorker::isStopped()'],['../class_thread_worker.html#a609365b837072fea2f6c28dc5353c14b',1,'ThreadWorker::isStopped()']]]
+  ['isstopped',['isStopped',['../class_async_worker.html#ad74ffc43c34fb72d091592dcff26ded2',1,'AsyncWorker']]]
 ];

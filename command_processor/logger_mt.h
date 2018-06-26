@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdio>
+#include <unistd.h>
 #include <numeric>
 #include "listeners.h"
 #include "smart_buffer_mt.h"
@@ -147,8 +148,10 @@ private:
       destinationDirectory + std::to_string(nextBulkInfo.first)
     };
 
-    auto fileNameSuffix {std::to_string(additionalNameSection[threadIndex])};
-    auto logFileName {bulkFileName + "_" + stringThreadID[threadIndex] + "_" + fileNameSuffix + ".log"};
+    std::stringstream fileNameSuffix{};
+    fileNameSuffix << ::getpid() << threadIndex << "_" << additionalNameSection[threadIndex];
+    auto logFileName {bulkFileName + "_" + fileNameSuffix.str() + ".log"};
+
 
     std::ofstream logFile{logFileName};
 

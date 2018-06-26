@@ -28,8 +28,7 @@ getProcessorOutput
   char openDelimiter,
   char closeDelimiter,
   size_t bulkSize,
-  DebugOutput debugOutput,
-  std::shared_ptr<std::vector<std::string>>& loggingThreadID
+  DebugOutput debugOutput
 )
 {
   std::stringstream inputStream{inputString};
@@ -44,8 +43,6 @@ getProcessorOutput
   };
 
   testProcessor.run();
-
-  loggingThreadID = testProcessor.getLoggerStringThreadID();
   }
 
   std::array<std::vector<std::string>, 3> result {};
@@ -77,8 +74,6 @@ getProcessorOutput
 auto parseMetrics(std::stringstream& metricsStream)
 {
   std::string threadMetrics{};
-  size_t searchStartPosition{};
-  size_t digitPosition{};
 
   std::vector<std::vector<int>> result;
   while (std::getline(metricsStream, threadMetrics))
@@ -289,9 +284,8 @@ BOOST_AUTO_TEST_CASE(empty_input_test)
 
   try
   {
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(std::string{}, '{', '}', 3, DebugOutput::debug_off)
     };
 
     /* metrics sholud contain expected text */
@@ -328,9 +322,8 @@ BOOST_AUTO_TEST_CASE(empty_command_test)
                                "cmd2"};
   try
   {
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
     };
 
     /* check main application output */
@@ -366,14 +359,12 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test1)
 
   try
   {
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
-
     const std::string testString{"cmd1\n"
                            "cmd2\n"
                            "cmd3\n"
                            "cmd4"};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '{', '}', 3, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -420,8 +411,6 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
 
   try
   {
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
-
     const std::string testString
     {
       "cmd1\n"
@@ -432,7 +421,7 @@ BOOST_AUTO_TEST_CASE(bulk_segmentation_test2)
       "cmd4"
     };
     auto processorOutput{
-      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '<', '>', 3, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -501,9 +490,8 @@ BOOST_AUTO_TEST_CASE(nested_bulks_test)
       "cmd12\n"
       "cmd13\n"
     };
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -565,9 +553,8 @@ BOOST_AUTO_TEST_CASE(unexpected_bulk_end_test)
         "cmd12\n"
         "cmd13\n"
     };
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -617,9 +604,8 @@ BOOST_AUTO_TEST_CASE(incorrect_closing_test)
       "cmd7\n"
       "cmd8\n"
     };
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -669,9 +655,8 @@ BOOST_AUTO_TEST_CASE(commands_containing_delimiter_test)
       "cmd4}\n"
       "cmd5"
     };
-    std::shared_ptr<std::vector<std::string>> loggingThreadID{};
     auto processorOutput{
-      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '{', '}', 2, DebugOutput::debug_off)
     };
 
     /* main application output */
@@ -722,7 +707,7 @@ BOOST_AUTO_TEST_CASE(logging)
       "cmd4\n"
     };
     auto processorOutput{
-      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off, loggingThreadID)
+      getProcessorOutput(testString, '(', ')', 4, DebugOutput::debug_off)
     };
 
     /* get current time */
@@ -738,14 +723,18 @@ BOOST_AUTO_TEST_CASE(logging)
 
     /* build log file name */
     --ticksCount;
-    auto firstFileName{std::to_string(ticksCount).append("_").append(loggingThreadID->at(0)).append("_1.log")};
-    auto secondFileName{std::to_string(ticksCount).append("_").append(loggingThreadID->at(1)).append("_1.log")};
+
+    std::stringstream fileNameSuffix{};
+    fileNameSuffix << ::getpid();
+
+    auto firstFileName{std::to_string(ticksCount).append("_").append(fileNameSuffix.str()).append("0").append("_1.log")};
+    auto secondFileName{std::to_string(ticksCount).append("_").append(fileNameSuffix.str()).append("1").append("_1.log")};
     while (!std::ifstream{firstFileName}
            &&!std::ifstream{secondFileName})
     {
       ++ticksCount;
-      firstFileName = std::to_string(ticksCount).append("_").append(loggingThreadID->at(0)).append("_1.log");
-      secondFileName = std::to_string(ticksCount).append("_").append(loggingThreadID->at(1)).append("_1.log");
+      firstFileName = std::to_string(ticksCount).append("_").append(fileNameSuffix.str()).append("0").append("_1.log");
+      secondFileName = std::to_string(ticksCount).append("_").append(fileNameSuffix.str()).append("1").append("_1.log");
     }
 
     std::string logFileName;
@@ -824,8 +813,6 @@ BOOST_AUTO_TEST_CASE(unexpected_buffer_exhaustion)
 
 
     auto errorMessage{errorStream.str()};
-
-    //std::cout << "Error message:" << errorMessage << std::endl;
 
     BOOST_CHECK(errorMessage.find("Abnormal termination")
                 != std::string::npos);
